@@ -1,0 +1,104 @@
+import React from 'react';
+import { ChamferCard } from '../ui/ChamferCard';
+import { ProductionException } from '../../types';
+import { AlertCircle, AlertTriangle, Info, Check, Clock } from 'lucide-react';
+
+interface ExceptionsCardProps {
+  exceptions: ProductionException[];
+  onAcknowledge: (id: string) => void;
+  onNavigateToExceptions: () => void;
+}
+
+export const ExceptionsCard: React.FC<ExceptionsCardProps> = ({
+  exceptions,
+  onAcknowledge,
+  onNavigateToExceptions
+}) => {
+  return (
+    <ChamferCard
+      title="ACTIVE PRODUCTION EXCEPTIONS"
+      tag="DEVIATION ALERTS"
+      action={
+        <button
+          onClick={onNavigateToExceptions}
+          className="font-mono text-[10px] text-forge-orange hover:underline font-semibold"
+        >
+          VIEW ALL ({exceptions.length})
+        </button>
+      }
+    >
+      <div className="space-y-2.5">
+        {exceptions.map((ex) => {
+          const isCritical = ex.severity === 'CRITICAL';
+          const isWarning = ex.severity === 'WARNING';
+
+          const icon = isCritical ? (
+            <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
+          ) : isWarning ? (
+            <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+          ) : (
+            <Info className="w-4 h-4 text-blue-600 flex-shrink-0" />
+          );
+
+          const borderBg = isCritical
+            ? 'border-rose-300 bg-rose-50/40'
+            : isWarning
+            ? 'border-amber-300 bg-amber-50/30'
+            : 'border-forge-aluminum bg-forge-alabaster/40';
+
+          return (
+            <div
+              key={ex.id}
+              className={`p-3 border flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${borderBg}`}
+            >
+              <div className="flex items-start gap-2.5">
+                <div className="mt-0.5">{icon}</div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono font-bold text-xs text-forge-black">
+                      {ex.title}
+                    </span>
+                    <span className="font-mono text-[9px] px-1 py-0.2 bg-white border border-forge-aluminum text-forge-steel font-semibold">
+                      {ex.machineId}
+                    </span>
+                  </div>
+                  <p className="text-xs text-forge-steel font-sans mt-0.5">
+                    {ex.description}
+                  </p>
+                  <div className="flex items-center gap-2 mt-1 text-[10px] font-mono text-forge-steel">
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      {ex.timestamp}
+                    </span>
+                    {ex.jobId && <span>• JOB: {ex.jobId}</span>}
+                    {ex.acknowledged && (
+                      <span className="text-emerald-700 font-semibold">
+                        • ACKNOWLEDGED BY {ex.acknowledgedBy}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 flex-shrink-0 self-end sm:self-center">
+                {!ex.acknowledged ? (
+                  <button
+                    onClick={() => onAcknowledge(ex.id)}
+                    className="px-2.5 py-1 bg-white hover:bg-forge-alabaster border border-forge-aluminum text-xs font-mono font-semibold text-forge-black flex items-center gap-1 transition-colors"
+                  >
+                    <Check className="w-3 h-3" />
+                    ACKNOWLEDGE
+                  </button>
+                ) : (
+                  <span className="px-2 py-0.5 bg-emerald-50 border border-emerald-300 text-emerald-800 text-[10px] font-mono font-semibold">
+                    RESOLVING
+                  </span>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </ChamferCard>
+  );
+};
