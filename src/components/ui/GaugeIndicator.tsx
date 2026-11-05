@@ -44,7 +44,14 @@ export const LinearGauge: React.FC<LinearGaugeProps> = ({
       </div>
 
       {/* Gauge Track */}
-      <div className="h-2 bg-forge-alabaster border border-forge-aluminum relative overflow-hidden flex items-center">
+      <div 
+        role="progressbar"
+        aria-valuenow={value}
+        aria-valuemin={0}
+        aria-valuemax={max}
+        aria-label={`${label}: ${value} ${unit}`}
+        className="h-2 bg-forge-alabaster border border-forge-aluminum relative overflow-hidden flex items-center"
+      >
         <div
           className={`h-full ${colorStyles[color]} transition-all duration-300`}
           style={{ width: `${percentage}%` }}
@@ -61,7 +68,7 @@ export const LinearGauge: React.FC<LinearGaugeProps> = ({
       {showTicks && (
         <div className="flex justify-between text-[8px] text-forge-steel/80">
           <span>0</span>
-          {nominalTarget && targetPct !== null && <span>TARGET</span>}
+          {nominalTarget && targetPct !== null && <span>TARGET: {nominalTarget.toLocaleString()}</span>}
           <span>{max.toLocaleString()}</span>
         </div>
       )}

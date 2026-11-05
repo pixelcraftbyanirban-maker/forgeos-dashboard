@@ -4,7 +4,7 @@ import { StatusBadge } from '../ui/StatusBadge';
 import { ShiftTimeline } from '../ui/ShiftTimeline';
 import { LinearGauge } from '../ui/GaugeIndicator';
 import { Machine } from '../../types';
-import { Activity, User, ArrowRight } from 'lucide-react';
+import { User, ArrowRight } from 'lucide-react';
 
 interface MachineFleetGridProps {
   machines: Machine[];
@@ -58,9 +58,12 @@ export const MachineFleetGrid: React.FC<MachineFleetGridProps> = ({
             { id: 'ATTENTION', label: `ALARM / STOP (${stateCounts.attention})` },
           ].map((tab) => (
             <button
+              type="button"
               key={tab.id}
               onClick={() => handleFilter(tab.id)}
-              className={`px-2 py-0.5 text-[10px] font-mono tracking-wider transition-colors border ${
+              aria-pressed={activeFilter === tab.id}
+              aria-label={`Filter fleet by ${tab.label}`}
+              className={`px-2 py-1 text-[10px] font-mono tracking-wider transition-colors border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange ${
                 activeFilter === tab.id
                   ? 'bg-forge-black text-white border-forge-black font-semibold'
                   : 'bg-white text-forge-steel border-forge-aluminum hover:text-forge-black'
@@ -89,8 +92,17 @@ export const MachineFleetGrid: React.FC<MachineFleetGridProps> = ({
           return (
             <div
               key={machine.id}
+              role="button"
+              tabIndex={0}
+              aria-label={`Spindle ${machine.id}: ${machine.name}, state ${machine.state}, OEE ${machine.oee.overall}%`}
               onClick={() => onSelectMachine(machine.id)}
-              className={`border p-3.5 cursor-pointer transition-all hover:shadow-flat relative flex flex-col justify-between ${cardBorder}`}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onSelectMachine(machine.id);
+                }
+              }}
+              className={`border p-3.5 cursor-pointer transition-all hover:shadow-flat relative flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange ${cardBorder}`}
             >
               <div>
                 {/* Header: Spindle ID, Axis & Machine State */}
@@ -104,76 +116,67 @@ export const MachineFleetGrid: React.FC<MachineFleetGridProps> = ({
                         {machine.axisCount}-AXIS
                       </span>
                     </div>
-                    <span className="text-[11px] text-forge-steel font-sans truncate block max-w-[160px]" title={machine.name}>
+                    <span className="text-[11px] text-forge-steel font-sans truncate block max-w-[150px]" title={machine.name}>
                       {machine.name}
                     </span>
                   </div>
+                  <StatusBadge type="machine" status={machine.state} size="sm" />
+                </div>
 
-                  <div className="flex flex-col items-end gap-1">
-                    <StatusBadge type="machine" status={machine.state} size="sm" />
-                    <StatusBadge type="connection" status={machine.connectionState} size="sm" showIcon={false} />
+                {/* Operator & Active Order */}
+                <div className="text-[11px] font-mono space-y-1 mb-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-forge-steel flex items-center gap-1">
+                      <User className="w-3 h-3 text-forge-steel flex-shrink-0" aria-hidden="true" />
+                      <span className="truncate max-w-[100px]">{machine.operator}</span>
+                    </span>
+                    <span className="text-[10px] text-forge-steel">
+                      {machine.uptimeHoursToday}h uptime
+                    </span>
+                  </div>
+
+                  <div className="p-1.5 bg-forge-alabaster border border-forge-aluminum/60 flex items-center justify-between">
+                    <span className="text-[10px] text-forge-steel">ORDER:</span>
+                    <span className="font-bold text-forge-black text-[10px] truncate max-w-[130px]">
+                      {machine.currentJobId ? machine.currentJobId : '— IDLE / SETUP —'}
+                    </span>
                   </div>
                 </div>
 
-                {/* 8-Hour State Timeline (Compact Visual) */}
-                <div className="my-2 py-1.5 border-t border-forge-aluminum/40">
-                  <div className="flex items-center justify-between text-[8px] font-mono text-forge-steel mb-1">
-                    <span>8H SHIFT HISTORY</span>
-                    <span>{machine.uptimeHoursToday}h UPTIME</span>
+                {/* 8-Hour State Timeline (Compact Shift View) */}
+                <div className="space-y-1 mb-2.5">
+                  <div className="flex justify-between text-[9px] font-mono text-forge-steel">
+                    <span>8H SHIFT TIMELINE</span>
+                    <span className="font-bold text-forge-black">06:00 - 14:00</span>
                   </div>
                   <ShiftTimeline intervals={machine.stateHistory} compact={true} />
                 </div>
 
-                {/* Live Telemetry Linear Gauges */}
-                <div className="space-y-1.5 py-1.5 border-t border-forge-aluminum/40">
+                {/* Real-time Spindle RPM Linear Gauge */}
+                <div className="pt-2 border-t border-forge-aluminum/40">
                   <LinearGauge
-                    label="SPINDLE SPEED"
+                    label="SPINDLE ROTATION"
                     value={machine.spindleRpm}
                     max={maxRpm}
                     unit="RPM"
+                    nominalTarget={12000}
                     color={machine.state === 'RUNNING' ? 'orange' : 'slate'}
                     showTicks={false}
                   />
-
-                  <LinearGauge
-                    label="FEED OVERRIDE"
-                    value={machine.feedOverridePct}
-                    max={120}
-                    unit="%"
-                    nominalTarget={100}
-                    color={machine.feedOverridePct >= 95 ? 'emerald' : 'orange'}
-                    showTicks={false}
-                  />
-                </div>
-
-                {/* OEE & Current Active Job */}
-                <div className="pt-2 border-t border-forge-aluminum/40 text-[11px] font-mono space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-forge-steel text-[10px]">GROUNDED OEE:</span>
-                    <span className={`font-bold ${machine.oee.overall >= 85 ? 'text-emerald-700' : 'text-forge-black'}`}>
-                      {machine.oee.overall}%
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-1 text-forge-steel truncate text-[10px]">
-                    <Activity className="w-3 h-3 text-forge-orange flex-shrink-0" />
-                    <span className="text-forge-black font-semibold truncate">
-                      {machine.currentJobId ? machine.currentJobId : 'NO ACTIVE WORK ORDER'}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-1 text-forge-steel truncate text-[9px]">
-                    <User className="w-3 h-3 flex-shrink-0" />
-                    <span>OPERATOR: {machine.operator}</span>
-                  </div>
                 </div>
               </div>
 
-              {/* Card Footer: Timestamp & Drilldown */}
-              <div className="pt-2 mt-2 border-t border-forge-aluminum/30 flex items-center justify-between text-[9px] font-mono text-forge-steel">
-                <span>{machine.telemetryTimestamp}</span>
-                <span className="font-bold text-forge-black hover:text-forge-orange flex items-center gap-0.5">
-                  TELEMETRY <ArrowRight className="w-2.5 h-2.5" />
+              {/* Footer: OEE & Inspect Trigger */}
+              <div className="pt-2.5 mt-2 border-t border-forge-aluminum/40 flex items-center justify-between font-mono text-xs">
+                <div>
+                  <span className="text-[9px] text-forge-steel uppercase block">OEE</span>
+                  <span className="font-bold text-forge-black text-sm">
+                    {machine.oee.overall}%
+                  </span>
+                </div>
+
+                <span className="text-forge-orange font-bold text-[11px] hover:underline flex items-center gap-0.5">
+                  DETAILS <ArrowRight className="w-3 h-3" aria-hidden="true" />
                 </span>
               </div>
             </div>

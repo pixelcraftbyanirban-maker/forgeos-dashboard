@@ -122,31 +122,37 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({
         title="MANUFACTURING WORK ORDERS & OPERATION PROCESS FLOW"
         tag="HMLV SHOP FLOOR"
         action={
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {/* View Mode Toggle */}
-            <div className="flex items-center border border-forge-aluminum bg-white">
+            <div className="flex items-center border border-forge-aluminum bg-white" role="group" aria-label="View mode">
               <button
+                type="button"
                 onClick={() => setViewMode('pipeline')}
-                className={`flex items-center gap-1 px-2 py-1 text-[10px] font-mono transition-colors ${
+                aria-pressed={viewMode === 'pipeline'}
+                aria-label="Pipeline view"
+                className={`flex items-center gap-1 px-2.5 py-1 text-[10px] font-mono transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange ${
                   viewMode === 'pipeline'
                     ? 'bg-forge-black text-white font-semibold'
                     : 'text-forge-steel hover:text-forge-black'
                 }`}
                 title="Graphical Pipeline Process Flow"
               >
-                <Layers className="w-3 h-3" />
+                <Layers className="w-3 h-3" aria-hidden="true" />
                 <span>PIPELINE</span>
               </button>
               <button
+                type="button"
                 onClick={() => setViewMode('table')}
-                className={`flex items-center gap-1 px-2 py-1 text-[10px] font-mono transition-colors ${
+                aria-pressed={viewMode === 'table'}
+                aria-label="Table view"
+                className={`flex items-center gap-1 px-2.5 py-1 text-[10px] font-mono transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange ${
                   viewMode === 'table'
                     ? 'bg-forge-black text-white font-semibold'
                     : 'text-forge-steel hover:text-forge-black'
                 }`}
                 title="Dense Data Table"
               >
-                <List className="w-3 h-3" />
+                <List className="w-3 h-3" aria-hidden="true" />
                 <span>TABLE</span>
               </button>
             </div>
@@ -161,13 +167,14 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({
           <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 border-b border-forge-aluminum/60 pb-3">
             {/* Search Input */}
             <div className="relative flex-1 max-w-sm">
-              <Search className="w-3.5 h-3.5 text-forge-steel absolute left-2.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-3.5 h-3.5 text-forge-steel absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
               <input
                 type="text"
+                aria-label="Filter work orders by Order ID, Part name, Material, or Spindle"
                 placeholder="Filter by Order, Part, Material, Spindle..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-8 pr-3 py-1 bg-forge-alabaster border border-forge-aluminum text-xs font-mono text-forge-black placeholder:text-forge-steel/60 focus:outline-none focus:border-forge-orange"
+                className="w-full pl-8 pr-3 py-1.5 bg-forge-alabaster border border-forge-aluminum text-xs font-mono text-forge-black placeholder:text-forge-steel/70 focus:outline-none focus:border-forge-orange focus:bg-white"
               />
             </div>
 
@@ -180,9 +187,11 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({
                 { id: 'NOT_STARTED', label: 'QUEUED' }
               ].map((tab) => (
                 <button
+                  type="button"
                   key={tab.id}
                   onClick={() => setStateFilter(tab.id)}
-                  className={`px-2.5 py-1 text-[10px] font-mono tracking-wider transition-colors border ${
+                  aria-pressed={stateFilter === tab.id}
+                  className={`px-2.5 py-1 text-[10px] font-mono tracking-wider transition-colors border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange ${
                     stateFilter === tab.id
                       ? 'bg-forge-black text-white border-forge-black font-semibold'
                       : 'bg-white text-forge-steel border-forge-aluminum hover:text-forge-black'
@@ -192,13 +201,14 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({
                 </button>
               ))}
 
-              <span className="text-forge-aluminum mx-1 hidden sm:inline">|</span>
+              <span className="text-forge-aluminum mx-1 hidden sm:inline" aria-hidden="true">|</span>
 
               {/* Priority Filter */}
               <select
+                aria-label="Filter work orders by priority level"
                 value={priorityFilter}
                 onChange={(e) => setPriorityFilter(e.target.value)}
-                className="px-2 py-1 text-[10px] font-mono bg-white border border-forge-aluminum text-forge-black focus:outline-none"
+                className="px-2 py-1 text-[10px] font-mono bg-white border border-forge-aluminum text-forge-black focus:outline-none focus:border-forge-orange"
               >
                 <option value="ALL">ALL PRIORITIES</option>
                 <option value="URGENT">URGENT</option>
@@ -208,7 +218,7 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({
             </div>
           </div>
 
-          {/* Graphical Pipeline View (Section 07.B) */}
+          {/* Graphical Pipeline View */}
           {viewMode === 'pipeline' ? (
             <div className="space-y-4">
               {sortedJobs.map((job) => {
@@ -217,7 +227,7 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({
                 return (
                   <div
                     key={job.id}
-                    className={`border p-4 transition-all bg-white relative space-y-3 ${
+                    className={`border p-3.5 sm:p-4 transition-all bg-white relative space-y-3 ${
                       isDelayed
                         ? 'border-amber-400 bg-amber-50/20 shadow-flat'
                         : 'border-forge-aluminum hover:border-forge-steel'
@@ -230,12 +240,12 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({
                           {job.orderNumber}
                         </span>
                         {job.priority === 'URGENT' && (
-                          <span className="text-[9px] px-1.5 py-0.2 bg-rose-100 text-rose-800 border border-rose-300 font-bold font-mono">
+                          <span className="text-[9px] px-1.5 py-0.2 bg-rose-100 text-rose-900 border border-rose-300 font-bold font-mono">
                             URGENT
                           </span>
                         )}
                         {job.priority === 'HIGH' && (
-                          <span className="text-[9px] px-1.5 py-0.2 bg-amber-100 text-amber-800 border border-amber-300 font-semibold font-mono">
+                          <span className="text-[9px] px-1.5 py-0.2 bg-amber-100 text-amber-950 border border-amber-300 font-semibold font-mono">
                             HIGH
                           </span>
                         )}
@@ -249,16 +259,18 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({
                         )}
                       </div>
 
-                      <div className="flex items-center gap-3">
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                         <span className="font-mono text-[10px] text-forge-steel">
                           SPINDLE: <strong className="text-forge-black">{job.targetMachineId}</strong>
                         </span>
                         <StatusBadge type="production" status={job.state} size="sm" />
                         <button
+                          type="button"
                           onClick={() => onSelectJob(job.id)}
-                          className="font-mono text-[10px] text-forge-orange hover:underline font-bold flex items-center gap-1"
+                          aria-label={`Inspect full details for order ${job.orderNumber}`}
+                          className="font-mono text-[10px] text-forge-orange hover:underline font-bold flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
                         >
-                          INSPECT <ArrowRight className="w-3 h-3" />
+                          INSPECT <ArrowRight className="w-3 h-3" aria-hidden="true" />
                         </button>
                       </div>
                     </div>
@@ -277,14 +289,14 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({
                           {job.quantityCompleted} / {job.quantityTarget} Pieces
                         </span>
                         {job.quantityScrapped > 0 && (
-                          <span className="text-rose-600 text-[10px] ml-1">
+                          <span className="text-rose-700 text-[10px] ml-1">
                             ({job.quantityScrapped} rej)
                           </span>
                         )}
                       </div>
                       <div>
                         <span className="text-forge-steel text-[9px] block">ACTIVE OPERATION</span>
-                        <span className="font-semibold text-forge-orange truncate block">
+                        <span className="font-semibold text-amber-950 truncate block">
                           {job.currentOperation}
                         </span>
                       </div>
@@ -311,43 +323,53 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({
             </div>
           ) : (
             /* High Density Table View */
-            <div className="overflow-x-auto">
-              <table className="w-full text-left font-mono text-xs">
+            <div 
+              className="overflow-x-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
+              tabIndex={0}
+              role="region"
+              aria-label="Manufacturing work orders data table (scrollable horizontally)"
+            >
+              <table className="w-full text-left font-mono text-xs min-w-[760px]">
                 <thead>
                   <tr className="border-b border-forge-aluminum text-[10px] text-forge-steel uppercase tracking-wider bg-forge-alabaster/50">
-                    <th className="py-2.5 px-3 font-semibold w-8"></th>
-                    <th
-                      onClick={() => toggleSort('order')}
-                      className="py-2.5 px-3 font-semibold cursor-pointer hover:text-forge-black"
-                    >
-                      <div className="flex items-center gap-1">
+                    <th scope="col" className="py-2.5 px-3 font-semibold w-8">
+                      <span className="sr-only">Expand</span>
+                    </th>
+                    <th scope="col" className="py-2.5 px-3 font-semibold">
+                      <button
+                        type="button"
+                        onClick={() => toggleSort('order')}
+                        className="flex items-center gap-1 hover:text-forge-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
+                      >
                         Order / Part
-                        <ArrowUpDown className="w-2.5 h-2.5" />
-                      </div>
+                        <ArrowUpDown className="w-2.5 h-2.5" aria-hidden="true" />
+                      </button>
                     </th>
-                    <th className="py-2.5 px-3 font-semibold">Material / Spec</th>
-                    <th className="py-2.5 px-3 font-semibold">Spindle</th>
-                    <th className="py-2.5 px-3 font-semibold text-center">Qty (Done/Tgt)</th>
-                    <th
-                      onClick={() => toggleSort('progress')}
-                      className="py-2.5 px-3 font-semibold cursor-pointer hover:text-forge-black"
-                    >
-                      <div className="flex items-center gap-1">
+                    <th scope="col" className="py-2.5 px-3 font-semibold">Material / Spec</th>
+                    <th scope="col" className="py-2.5 px-3 font-semibold">Spindle</th>
+                    <th scope="col" className="py-2.5 px-3 font-semibold text-center">Qty (Done/Tgt)</th>
+                    <th scope="col" className="py-2.5 px-3 font-semibold">
+                      <button
+                        type="button"
+                        onClick={() => toggleSort('progress')}
+                        className="flex items-center gap-1 hover:text-forge-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
+                      >
                         Progress & Operation
-                        <ArrowUpDown className="w-2.5 h-2.5" />
-                      </div>
+                        <ArrowUpDown className="w-2.5 h-2.5" aria-hidden="true" />
+                      </button>
                     </th>
-                    <th
-                      onClick={() => toggleSort('completion')}
-                      className="py-2.5 px-3 font-semibold cursor-pointer hover:text-forge-black"
-                    >
-                      <div className="flex items-center gap-1">
+                    <th scope="col" className="py-2.5 px-3 font-semibold">
+                      <button
+                        type="button"
+                        onClick={() => toggleSort('completion')}
+                        className="flex items-center gap-1 hover:text-forge-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
+                      >
                         Est. Dispatch (IST)
-                        <ArrowUpDown className="w-2.5 h-2.5" />
-                      </div>
+                        <ArrowUpDown className="w-2.5 h-2.5" aria-hidden="true" />
+                      </button>
                     </th>
-                    <th className="py-2.5 px-3 font-semibold text-right">Unit Cost (INR)</th>
-                    <th className="py-2.5 px-3 font-semibold text-center">State</th>
+                    <th scope="col" className="py-2.5 px-3 font-semibold text-right">Unit Cost (INR)</th>
+                    <th scope="col" className="py-2.5 px-3 font-semibold text-center">State</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-forge-aluminum/40">
@@ -358,46 +380,54 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({
                     return (
                       <React.Fragment key={job.id}>
                         <tr
-                          className={`hover:bg-forge-alabaster/70 transition-colors cursor-pointer ${
+                          className={`hover:bg-forge-alabaster/70 transition-colors ${
                             isDelayed ? 'bg-amber-50/30' : ''
                           }`}
                         >
-                          <td
-                            className="py-3 px-3 text-center text-forge-steel hover:text-forge-black"
-                            onClick={() => setExpandedJobId(isExpanded ? null : job.id)}
-                          >
-                            {isExpanded ? (
-                              <ChevronDown className="w-3.5 h-3.5 text-forge-orange" />
-                            ) : (
-                              <ChevronRight className="w-3.5 h-3.5" />
-                            )}
+                          <td className="py-3 px-3 text-center text-forge-steel">
+                            <button
+                              type="button"
+                              onClick={() => setExpandedJobId(isExpanded ? null : job.id)}
+                              aria-expanded={isExpanded}
+                              aria-label={isExpanded ? `Collapse routing for ${job.orderNumber}` : `Expand routing for ${job.orderNumber}`}
+                              className="p-1 hover:text-forge-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
+                            >
+                              {isExpanded ? (
+                                <ChevronDown className="w-3.5 h-3.5 text-forge-orange" aria-hidden="true" />
+                              ) : (
+                                <ChevronRight className="w-3.5 h-3.5" aria-hidden="true" />
+                              )}
+                            </button>
                           </td>
 
-                          <td
-                            className="py-3 px-3"
-                            onClick={() => onSelectJob(job.id)}
-                          >
-                            <div className="flex items-center gap-2">
-                              <span className="font-bold text-forge-black">
-                                {job.orderNumber}
-                              </span>
-                              {job.priority === 'URGENT' && (
-                                <span className="text-[9px] px-1 bg-rose-100 text-rose-800 border border-rose-300 font-bold">
-                                  URGENT
+                          <td className="py-3 px-3">
+                            <button
+                              type="button"
+                              onClick={() => onSelectJob(job.id)}
+                              className="text-left hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
+                            >
+                              <div className="flex items-center gap-2">
+                                <span className="font-bold text-forge-black">
+                                  {job.orderNumber}
                                 </span>
-                              )}
-                              {job.priority === 'HIGH' && (
-                                <span className="text-[9px] px-1 bg-amber-100 text-amber-800 border border-amber-300 font-semibold">
-                                  HIGH
-                                </span>
-                              )}
-                            </div>
-                            <div className="text-xs text-forge-steel font-sans font-medium truncate max-w-[200px]">
-                              {job.partName}
-                            </div>
-                            <div className="text-[10px] text-forge-steel/80">
-                              {job.customerName || job.customerCode}
-                            </div>
+                                {job.priority === 'URGENT' && (
+                                  <span className="text-[9px] px-1 bg-rose-100 text-rose-900 border border-rose-300 font-bold">
+                                    URGENT
+                                  </span>
+                                )}
+                                {job.priority === 'HIGH' && (
+                                  <span className="text-[9px] px-1 bg-amber-100 text-amber-950 border border-amber-300 font-semibold">
+                                    HIGH
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-xs text-forge-steel font-sans font-medium truncate max-w-[200px]">
+                                {job.partName}
+                              </div>
+                              <div className="text-[10px] text-forge-steel/80">
+                                {job.customerName || job.customerCode}
+                              </div>
+                            </button>
                           </td>
 
                           <td className="py-3 px-3 text-forge-black text-[11px]">
@@ -414,7 +444,7 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({
                           <td className="py-3 px-3 text-center font-bold text-forge-black">
                             {job.quantityCompleted} / {job.quantityTarget}
                             {job.quantityScrapped > 0 && (
-                              <span className="text-rose-600 font-normal text-[10px] block">
+                              <span className="text-rose-700 font-normal text-[10px] block">
                                 ({job.quantityScrapped} rej)
                               </span>
                             )}
@@ -430,7 +460,14 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({
                                   {job.progressPercent}%
                                 </span>
                               </div>
-                              <div className="h-1.5 bg-forge-alabaster border border-forge-aluminum overflow-hidden">
+                              <div 
+                                role="progressbar"
+                                aria-valuenow={job.progressPercent}
+                                aria-valuemin={0}
+                                aria-valuemax={100}
+                                aria-label={`Progress: ${job.progressPercent}%`}
+                                className="h-1.5 bg-forge-alabaster border border-forge-aluminum overflow-hidden"
+                              >
                                 <div
                                   className={`h-full ${isDelayed ? 'bg-amber-500' : 'bg-forge-orange'}`}
                                   style={{ width: `${job.progressPercent}%` }}
@@ -441,7 +478,7 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({
 
                           <td className="py-3 px-3 text-[11px] text-forge-steel">
                             <div className="flex items-center gap-1">
-                              <Clock className="w-3 h-3" />
+                              <Clock className="w-3 h-3" aria-hidden="true" />
                               {job.estCompletion}
                             </div>
                           </td>
@@ -458,15 +495,16 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({
                         {/* Expanded Operations Breakdown Row */}
                         {isExpanded && (
                           <tr className="bg-forge-alabaster/40 border-b border-forge-aluminum/80">
-                            <td colSpan={9} className="py-3 px-8">
+                            <td colSpan={9} className="py-3 px-4 sm:px-8">
                               <div className="p-3 bg-white border border-forge-aluminum space-y-3">
-                                <div className="flex items-center justify-between border-b border-forge-aluminum/40 pb-2">
+                                <div className="flex flex-wrap items-center justify-between border-b border-forge-aluminum/40 pb-2 gap-2">
                                   <span className="font-mono text-[10px] font-bold tracking-wider uppercase text-forge-black">
                                     ROUTING SHEET • {job.orderNumber} ({job.partName})
                                   </span>
                                   <button
+                                    type="button"
                                     onClick={() => onSelectJob(job.id)}
-                                    className="text-[10px] font-mono text-forge-orange hover:underline font-bold"
+                                    className="text-[10px] font-mono text-forge-orange hover:underline font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
                                   >
                                     OPEN FULL INSPECTOR →
                                   </button>

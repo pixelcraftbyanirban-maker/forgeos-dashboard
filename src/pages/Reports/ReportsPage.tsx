@@ -90,8 +90,8 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ auditHistory }) => {
         />
       </div>
 
-      {/* 2. Graphical Performance Analytics Row (Section 09 & 11) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      {/* 2. Graphical Performance Analytics Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
         {/* Factory OEE Breakdown */}
         <div className="lg:col-span-7">
           <OeeComponentBreakdown
@@ -120,20 +120,27 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ auditHistory }) => {
               <div className="space-y-3 pt-2">
                 {downtimeLossCategories.map((cat) => (
                   <div key={cat.label} className="space-y-1">
-                    <div className="flex justify-between items-center text-[11px]">
+                    <div className="flex flex-wrap justify-between items-center text-[11px] gap-1">
                       <span className="font-bold text-forge-black">{cat.label}</span>
                       <span className="text-forge-steel font-bold">{cat.minutes}m ({cat.pct}%)</span>
                     </div>
-                    <div className="h-3 bg-forge-alabaster border border-forge-aluminum overflow-hidden flex items-center">
+                    <div 
+                      role="progressbar"
+                      aria-valuenow={cat.pct}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                      aria-label={`${cat.label}: ${cat.minutes} minutes (${cat.pct}%)`}
+                      className="h-3 bg-forge-alabaster border border-forge-aluminum overflow-hidden flex items-center"
+                    >
                       <div className={`h-full ${cat.color}`} style={{ width: `${cat.pct}%` }} />
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className="pt-3 border-t border-forge-aluminum/40 text-[10px] text-forge-steel flex justify-between">
+              <div className="pt-3 border-t border-forge-aluminum/40 text-[10px] text-forge-steel flex flex-wrap justify-between gap-1">
                 <span>BENCHMARK TARGET: &lt; 380 MIN</span>
-                <span className="font-bold text-amber-700">+70 MIN VARIANCE</span>
+                <span className="font-bold text-amber-900">+70 MIN VARIANCE</span>
               </div>
             </div>
           </ChamferCard>
@@ -146,35 +153,42 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ auditHistory }) => {
         tag="HOWRAH DISPATCH"
         action={
           <button
+            type="button"
             onClick={handleExportCSV}
-            className="px-3 py-1.5 bg-forge-black text-white hover:bg-zinc-800 text-xs font-mono font-semibold uppercase flex items-center gap-1.5 transition-colors"
+            aria-label="Export audit history records as CSV file"
+            className="px-3 py-1.5 bg-forge-black text-white hover:bg-zinc-800 text-xs font-mono font-semibold uppercase flex items-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
           >
-            <Download className="w-3.5 h-3.5 text-forge-orange" />
+            <Download className="w-3.5 h-3.5 text-forge-orange" aria-hidden="true" />
             EXPORT AUDIT CSV (INR)
           </button>
         }
       >
         <div className="space-y-4">
-          <div className="p-3 bg-emerald-50 border border-emerald-300 text-xs font-mono text-emerald-900 flex items-center justify-between">
+          <div className="p-3 bg-emerald-50 border border-emerald-300 text-xs font-mono text-emerald-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+              <ShieldCheck className="w-4 h-4 text-emerald-600 flex-shrink-0" aria-hidden="true" />
               <span>All manufacturing records are timestamped with operator credentials, spindle ID, and CMM inspection logs for Indian industrial compliance.</span>
             </div>
-            <span className="font-bold flex-shrink-0">GST & ISO 9001 COMPLIANT</span>
+            <span className="font-bold flex-shrink-0 bg-white px-2 py-0.5 border border-emerald-400">GST & ISO 9001 COMPLIANT</span>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left font-mono text-xs">
+          <div 
+            className="overflow-x-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
+            tabIndex={0}
+            role="region"
+            aria-label="Historical production audit trail and compliance table (scrollable horizontally)"
+          >
+            <table className="w-full text-left font-mono text-xs min-w-[760px]">
               <thead>
                 <tr className="border-b border-forge-aluminum text-[10px] text-forge-steel uppercase tracking-wider bg-forge-alabaster/50">
-                  <th className="py-2.5 px-3 font-semibold">Work Order / Customer</th>
-                  <th className="py-2.5 px-3 font-semibold">Completed Pieces</th>
-                  <th className="py-2.5 px-3 font-semibold">Spindle Cell</th>
-                  <th className="py-2.5 px-3 font-semibold">Completion (IST)</th>
-                  <th className="py-2.5 px-3 font-semibold">Quality Lead (QC)</th>
-                  <th className="py-2.5 px-3 font-semibold">Delivery Challan / HSN</th>
-                  <th className="py-2.5 px-3 font-semibold text-right">Job Value (INR)</th>
-                  <th className="py-2.5 px-3 font-semibold text-center">Status</th>
+                  <th scope="col" className="py-2.5 px-3 font-semibold">Work Order / Customer</th>
+                  <th scope="col" className="py-2.5 px-3 font-semibold">Completed Pieces</th>
+                  <th scope="col" className="py-2.5 px-3 font-semibold">Spindle Cell</th>
+                  <th scope="col" className="py-2.5 px-3 font-semibold">Completion (IST)</th>
+                  <th scope="col" className="py-2.5 px-3 font-semibold">Quality Lead (QC)</th>
+                  <th scope="col" className="py-2.5 px-3 font-semibold">Delivery Challan / HSN</th>
+                  <th scope="col" className="py-2.5 px-3 font-semibold text-right">Job Value (INR)</th>
+                  <th scope="col" className="py-2.5 px-3 font-semibold text-center">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-forge-aluminum/40">
@@ -182,7 +196,7 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ auditHistory }) => {
                   <tr key={rec.id} className="hover:bg-forge-alabaster/70 transition-colors">
                     <td className="py-3 px-3 font-bold text-forge-black">
                       <div className="flex items-center gap-2">
-                        <FileText className="w-3.5 h-3.5 text-forge-steel flex-shrink-0" />
+                        <FileText className="w-3.5 h-3.5 text-forge-steel flex-shrink-0" aria-hidden="true" />
                         <div>
                           <span>{rec.orderNumber}</span>
                           {rec.customerName && (
@@ -209,7 +223,7 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ auditHistory }) => {
                     </td>
 
                     <td className="py-3 px-3 text-forge-steel flex items-center gap-1.5">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" aria-hidden="true" />
                       <span>{rec.verifiedBy}</span>
                     </td>
 
@@ -223,7 +237,7 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ auditHistory }) => {
                     </td>
 
                     <td className="py-3 px-3 text-center">
-                      <span className="font-mono text-[10px] px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-300 font-semibold">
+                      <span className="font-mono text-[10px] px-2 py-0.5 bg-emerald-50 text-emerald-900 border border-emerald-300 font-semibold">
                         COMPLETED
                       </span>
                     </td>

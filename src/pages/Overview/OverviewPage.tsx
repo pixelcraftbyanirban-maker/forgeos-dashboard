@@ -54,7 +54,7 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
 
   return (
     <div className="space-y-5">
-      {/* 1. Industrial Telemetry Data Status Banner (Rule 12 & Section 06.E) */}
+      {/* 1. Industrial Telemetry Data Status Banner */}
       <DataStatusBanner
         connectionState={kpis.connectionStatus}
         lastRefresh={kpis.lastDataRefresh}
@@ -64,14 +64,14 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
         disconnectedCount={disconnectedMachinesCount}
       />
 
-      {/* 2. Operational Orientation Banner (Swiss Industrial Modernism - Indian Facility) */}
-      <div className="bg-white border border-forge-aluminum p-4 relative">
-        <span className="absolute top-1 left-1 text-forge-aluminum font-mono text-[9px]">+</span>
-        <span className="absolute bottom-1 right-1 text-forge-aluminum font-mono text-[9px]">+</span>
+      {/* 2. Operational Orientation Banner */}
+      <div className="bg-white border border-forge-aluminum p-4 sm:p-5 relative">
+        <span className="absolute top-1 left-1 text-forge-aluminum font-mono text-[9px] select-none pointer-events-none" aria-hidden="true">+</span>
+        <span className="absolute bottom-1 right-1 text-forge-aluminum font-mono text-[9px] select-none pointer-events-none" aria-hidden="true">+</span>
 
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
+          <div className="space-y-1.5 min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="font-mono text-[10px] px-1.5 py-0.5 bg-forge-black text-white font-bold tracking-widest uppercase">
                 SHREE GANESH PRECISION ENGINEERING
               </span>
@@ -79,19 +79,19 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
                 HOWRAH, WB • 24 SPINDLES (3 SECTIONS)
               </span>
             </div>
-            <h2 className="font-display font-bold text-xl lg:text-2xl text-forge-black tracking-tight">
+            <h2 className="font-display font-bold text-xl sm:text-2xl text-forge-black tracking-tight">
               THE SINGLE SOURCE OF OPERATIONAL TRUTH.
             </h2>
-            <p className="text-xs text-forge-steel font-sans max-w-3xl">
+            <p className="text-xs text-forge-steel font-sans max-w-3xl leading-relaxed">
               Unified shop-floor operations record for Indian precision manufacturing. Real-time telemetry across 24 CNC spindles in Howrah, verified unit economics (INR), multi-operation process routing, and live deviation tracking.
             </p>
           </div>
 
           <div className="flex items-center gap-3 border-t lg:border-t-0 lg:border-l border-forge-aluminum/60 pt-3 lg:pt-0 lg:pl-6 font-mono text-xs flex-shrink-0">
-            <div className="space-y-1 text-right">
-              <div className="text-[10px] text-forge-steel uppercase">ACTIVE SPINDLE CUTTING RATIO</div>
-              <div className="flex items-center gap-2 justify-end">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+            <div className="space-y-1 text-left lg:text-right">
+              <div className="text-[10px] text-forge-steel uppercase font-semibold">ACTIVE SPINDLE CUTTING RATIO</div>
+              <div className="flex items-center gap-2 justify-start lg:justify-end">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
                 <span className="font-bold text-forge-black text-sm">
                   {runningCount} / {machines.length} CUTTING METAL
                 </span>
@@ -104,14 +104,14 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
         </div>
       </div>
 
-      {/* 3. Graphical Fleet State Distribution Bar (Instant 3-Second Comprehension) */}
+      {/* 3. Graphical Fleet State Distribution Bar */}
       <FleetDistributionBar
         machines={machines}
         selectedState={fleetFilterState}
         onFilterState={setFleetFilterState}
       />
 
-      {/* 4. Primary KPI Display (Numerical Hierarchy without fluff) */}
+      {/* 4. Primary KPI Display */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <MetricCard
           category="REAL TIME"
@@ -152,8 +152,7 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
       </div>
 
       {/* 5. Operational Execution & Costs Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column: Current Running Job with Multi-Step Flow & Next Queue */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
         <div className="lg:col-span-7">
           <ProductionQueueCard
             currentJob={currentRunningJob}
@@ -163,13 +162,12 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
           />
         </div>
 
-        {/* Right Column: Real-Time Costs Breakdown */}
         <div className="lg:col-span-5">
           <RealTimeCostsChart costs={kpis.costs} />
         </div>
       </div>
 
-      {/* 6. Spindle Fleet Grid (12 Spindles with Compact Shift Timelines & Gauges) */}
+      {/* 6. Spindle Fleet Grid */}
       <div>
         <MachineFleetGrid
           machines={machines}
@@ -180,7 +178,7 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
       </div>
 
       {/* 7. Bottom Split: Exceptions & Immutable Production History */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
         <div className="lg:col-span-6">
           <ExceptionsCard
             exceptions={exceptions}

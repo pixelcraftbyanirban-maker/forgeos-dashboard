@@ -88,17 +88,17 @@ export const ExceptionsPage: React.FC<ExceptionsPageProps> = ({
         />
 
         <MetricCard
-          category="MTBF / INCIDENT INTERVAL"
-          value="18.4h"
-          subtext="Mean operating time between halts"
-          trend={{ value: "+2.1h vs Shift B", isPositive: true }}
+          category="COMPLIANCE AUDIT SIGN-OFF"
+          value={`${exceptions.length - unackCount} / ${exceptions.length}`}
+          unit="VERIFIED"
+          subtext="Shift supervisor ledger stamped"
           accentColor="emerald"
-          badge="STABILITY"
+          badge="ISO 9001"
         />
       </div>
 
       {/* 2. Main Two-Column Investigation Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
         {/* Left Column: Exceptions List */}
         <div className="lg:col-span-5 space-y-4">
           <ChamferCard
@@ -114,13 +114,14 @@ export const ExceptionsPage: React.FC<ExceptionsPageProps> = ({
               {/* Search & Filter */}
               <div className="space-y-2">
                 <div className="relative">
-                  <Search className="w-3.5 h-3.5 text-forge-steel absolute left-2.5 top-1/2 -translate-y-1/2" />
+                  <Search className="w-3.5 h-3.5 text-forge-steel absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
                   <input
                     type="text"
+                    aria-label="Search deviation register by title, machine, or work order"
                     placeholder="Search exceptions, machines, work orders..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="w-full pl-8 pr-3 py-1 bg-forge-alabaster border border-forge-aluminum text-xs font-mono text-forge-black placeholder:text-forge-steel/60 focus:outline-none focus:border-forge-orange"
+                    className="w-full pl-8 pr-3 py-1.5 bg-forge-alabaster border border-forge-aluminum text-xs font-mono text-forge-black placeholder:text-forge-steel/70 focus:outline-none focus:border-forge-orange focus:bg-white"
                   />
                 </div>
 
@@ -132,9 +133,11 @@ export const ExceptionsPage: React.FC<ExceptionsPageProps> = ({
                     { id: 'WARNING', label: `WARN (${warningCount})` }
                   ].map((tab) => (
                     <button
+                      type="button"
                       key={tab.id}
                       onClick={() => setSeverityFilter(tab.id)}
-                      className={`px-2 py-0.5 text-[9px] font-mono tracking-wider transition-colors border ${
+                      aria-pressed={severityFilter === tab.id}
+                      className={`px-2 py-1 text-[9px] font-mono tracking-wider transition-colors border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange ${
                         severityFilter === tab.id
                           ? 'bg-forge-black text-white border-forge-black font-semibold'
                           : 'bg-white text-forge-steel border-forge-aluminum hover:text-forge-black'
@@ -146,35 +149,42 @@ export const ExceptionsPage: React.FC<ExceptionsPageProps> = ({
                 </div>
               </div>
 
-              {/* Exception Items */}
-              <div className="space-y-2 max-h-[580px] overflow-y-auto pr-1">
+              {/* Exception Items List */}
+              <div 
+                className="space-y-2 max-h-[580px] overflow-y-auto pr-1"
+                role="region"
+                aria-label="Deviation items list"
+              >
                 {filteredExceptions.map((ex) => {
                   const isSelected = activeSelected?.id === ex.id;
                   const isCritical = ex.severity === 'CRITICAL';
                   const isWarning = ex.severity === 'WARNING';
 
                   return (
-                    <div
+                    <button
+                      type="button"
                       key={ex.id}
                       onClick={() => setSelectedExceptionId(ex.id)}
-                      className={`p-3 border transition-all cursor-pointer relative space-y-1.5 ${
+                      aria-pressed={isSelected}
+                      aria-label={`Exception ${ex.id} on ${ex.machineId}: ${ex.title}, severity ${ex.severity}`}
+                      className={`w-full text-left p-3 border transition-all cursor-pointer relative space-y-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange ${
                         isSelected
                           ? 'border-forge-black bg-forge-alabaster shadow-flat ring-1 ring-forge-black'
                           : isCritical
-                          ? 'border-rose-300 bg-rose-50/20 hover:border-rose-400'
+                          ? 'border-rose-300 bg-rose-50/30 hover:border-rose-500'
                           : isWarning
-                          ? 'border-amber-300 bg-amber-50/20 hover:border-amber-400'
+                          ? 'border-amber-300 bg-amber-50/30 hover:border-amber-500'
                           : 'border-forge-aluminum bg-white hover:border-forge-steel'
                       }`}
                     >
                       <div className="flex items-center justify-between text-[10px] font-mono">
                         <span className="font-bold text-forge-black flex items-center gap-1.5">
                           {isCritical ? (
-                            <AlertCircle className="w-3.5 h-3.5 text-rose-600 flex-shrink-0" />
+                            <AlertCircle className="w-3.5 h-3.5 text-rose-600 flex-shrink-0" aria-hidden="true" />
                           ) : isWarning ? (
-                            <AlertTriangle className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
+                            <AlertTriangle className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" aria-hidden="true" />
                           ) : (
-                            <Info className="w-3.5 h-3.5 text-blue-600 flex-shrink-0" />
+                            <Info className="w-3.5 h-3.5 text-blue-600 flex-shrink-0" aria-hidden="true" />
                           )}
                           <span>{ex.machineId}</span>
                           {ex.jobId && <span className="text-forge-steel">• {ex.jobId}</span>}
@@ -183,10 +193,10 @@ export const ExceptionsPage: React.FC<ExceptionsPageProps> = ({
                         <span
                           className={`px-1.5 py-0.2 border uppercase text-[8px] font-bold ${
                             isCritical
-                              ? 'bg-rose-100 text-rose-800 border-rose-300'
+                              ? 'bg-rose-100 text-rose-900 border-rose-300'
                               : isWarning
-                              ? 'bg-amber-100 text-amber-800 border-amber-300'
-                              : 'bg-blue-100 text-blue-800 border-blue-300'
+                              ? 'bg-amber-100 text-amber-950 border-amber-300'
+                              : 'bg-blue-100 text-blue-900 border-blue-300'
                           }`}
                         >
                           {ex.category.replace('_', ' ')}
@@ -200,16 +210,16 @@ export const ExceptionsPage: React.FC<ExceptionsPageProps> = ({
                       <div className="flex items-center justify-between text-[9px] font-mono text-forge-steel pt-1 border-t border-forge-aluminum/40">
                         <span>{ex.timestamp}</span>
                         {ex.acknowledged ? (
-                          <span className="text-emerald-700 font-semibold flex items-center gap-1">
-                            <Check className="w-3 h-3" /> VERIFIED
+                          <span className="text-emerald-800 font-semibold flex items-center gap-1">
+                            <Check className="w-3 h-3" aria-hidden="true" /> VERIFIED
                           </span>
                         ) : (
-                          <span className="text-rose-600 font-bold animate-pulse">
+                          <span className="text-rose-700 font-bold animate-pulse">
                             UNACKNOWLEDGED
                           </span>
                         )}
                       </div>
-                    </div>
+                    </button>
                   );
                 })}
               </div>
@@ -217,28 +227,32 @@ export const ExceptionsPage: React.FC<ExceptionsPageProps> = ({
           </ChamferCard>
         </div>
 
-        {/* Right Column: Deep Chronological Investigation Panel (Section 10) */}
+        {/* Right Column: Deep Chronological Investigation Panel */}
         <div className="lg:col-span-7 space-y-4">
           {activeSelected ? (
             <ChamferCard
               title={`INVESTIGATION • ${activeSelected.id} (${activeSelected.category})`}
               tag="DIAGNOSTIC TRACE"
               action={
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <button
+                    type="button"
                     onClick={() => onSelectMachine(activeSelected.machineId)}
-                    className="px-2 py-0.5 bg-white border border-forge-aluminum text-[10px] font-mono text-forge-black hover:border-forge-black font-semibold flex items-center gap-1"
+                    aria-label={`Inspect spindle ${activeSelected.machineId}`}
+                    className="px-2 py-1 bg-white border border-forge-aluminum text-[10px] font-mono text-forge-black hover:border-forge-black font-semibold flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
                   >
-                    <Cpu className="w-3 h-3 text-forge-orange" />
+                    <Cpu className="w-3 h-3 text-forge-orange flex-shrink-0" aria-hidden="true" />
                     <span>INSPECT {activeSelected.machineId}</span>
                   </button>
 
                   {activeSelected.jobId && (
                     <button
+                      type="button"
                       onClick={() => onSelectJob(activeSelected.jobId!)}
-                      className="px-2 py-0.5 bg-white border border-forge-aluminum text-[10px] font-mono text-forge-black hover:border-forge-black font-semibold flex items-center gap-1"
+                      aria-label={`Inspect order ${activeSelected.jobId}`}
+                      className="px-2 py-1 bg-white border border-forge-aluminum text-[10px] font-mono text-forge-black hover:border-forge-black font-semibold flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
                     >
-                      <FileText className="w-3 h-3 text-forge-orange" />
+                      <FileText className="w-3 h-3 text-forge-orange flex-shrink-0" aria-hidden="true" />
                       <span>INSPECT {activeSelected.jobId}</span>
                     </button>
                   )}
@@ -248,7 +262,7 @@ export const ExceptionsPage: React.FC<ExceptionsPageProps> = ({
               <div className="space-y-4 font-mono">
                 {/* Exception Overview Box */}
                 <div className="p-3.5 bg-forge-alabaster border border-forge-aluminum space-y-2">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-wrap items-center justify-between gap-1">
                     <span className="font-display font-bold text-base text-forge-black">
                       {activeSelected.title}
                     </span>
@@ -261,21 +275,25 @@ export const ExceptionsPage: React.FC<ExceptionsPageProps> = ({
                   </p>
                 </div>
 
-                {/* Supporting Chronological Sensor Timeline (Section 10) */}
+                {/* Supporting Chronological Sensor Timeline */}
                 <div className="space-y-2">
                   <span className="text-xs font-bold text-forge-black uppercase tracking-wider block">
                     CHRONOLOGICAL SENSOR EVENT LOG
                   </span>
 
                   {activeSelected.events && activeSelected.events.length > 0 ? (
-                    <div className="border border-forge-aluminum divide-y divide-forge-aluminum/50 bg-white">
+                    <div 
+                      className="border border-forge-aluminum divide-y divide-forge-aluminum/50 bg-white"
+                      role="feed"
+                      aria-label="Chronological sensor event entries"
+                    >
                       {activeSelected.events.map((ev, i) => (
                         <div key={i} className="p-3 flex items-start gap-3 text-xs">
-                          <div className="w-16 font-bold text-forge-black text-[11px] pt-0.5">
+                          <div className="w-16 font-bold text-forge-black text-[11px] pt-0.5 flex-shrink-0">
                             {ev.time}
                           </div>
                           <div className="flex-1 space-y-1">
-                            <div className="flex items-center justify-between">
+                            <div className="flex flex-wrap items-center justify-between gap-1">
                               <span className="font-semibold text-forge-black">
                                 {ev.source}
                               </span>
@@ -289,7 +307,7 @@ export const ExceptionsPage: React.FC<ExceptionsPageProps> = ({
                               {ev.message}
                             </div>
                             {ev.sensorValue && (
-                              <div className="text-[10px] text-forge-orange font-bold">
+                              <div className="text-[10px] text-amber-950 font-bold bg-amber-50 inline-block px-1 border border-amber-300">
                                 SENSOR READING: {ev.sensorValue}
                               </div>
                             )}
@@ -306,7 +324,7 @@ export const ExceptionsPage: React.FC<ExceptionsPageProps> = ({
 
                 {/* Supervisor Sign-Off & Verification Box */}
                 <div className="p-3.5 border border-forge-aluminum bg-white space-y-3">
-                  <div className="flex items-center justify-between border-b border-forge-aluminum/40 pb-2">
+                  <div className="flex flex-wrap items-center justify-between border-b border-forge-aluminum/40 pb-2 gap-1">
                     <span className="font-bold text-xs text-forge-black uppercase">
                       SUPERVISOR SIGN-OFF & CORRECTIVE ACTION
                     </span>
@@ -316,31 +334,37 @@ export const ExceptionsPage: React.FC<ExceptionsPageProps> = ({
                   </div>
 
                   {activeSelected.acknowledged ? (
-                    <div className="p-3 bg-emerald-50 border border-emerald-300 text-xs text-emerald-900 space-y-1">
+                    <div className="p-3 bg-emerald-50 border border-emerald-300 text-xs text-emerald-950 space-y-1">
                       <div className="flex items-center gap-1.5 font-bold">
-                        <Check className="w-4 h-4 text-emerald-700" />
+                        <Check className="w-4 h-4 text-emerald-700 flex-shrink-0" aria-hidden="true" />
                         <span>VERIFIED & ACKNOWLEDGED BY: {activeSelected.acknowledgedBy || 'Arindam Chatterjee (Production Manager)'}</span>
                       </div>
-                      <div className="text-[11px] text-emerald-800 font-sans">
+                      <div className="text-[11px] text-emerald-900 font-sans">
                         Audit trail stamped for Howrah plant. Telemetry logged into Indian manufacturing compliance ledger.
                       </div>
                     </div>
                   ) : (
                     <div className="space-y-2">
+                      <label htmlFor={`supervisor-notes-${activeSelected.id}`} className="sr-only">
+                        Supervisor corrective action notes
+                      </label>
                       <textarea
+                        id={`supervisor-notes-${activeSelected.id}`}
                         rows={2}
                         placeholder="Enter supervisor corrective notes (e.g. Swarf cleared from coolant reservoir, dial indicator trueing completed by Sourav Das)..."
                         value={signOffNotes[activeSelected.id] || ''}
                         onChange={(e) => setSignOffNotes({ ...signOffNotes, [activeSelected.id]: e.target.value })}
-                        className="w-full p-2 bg-forge-alabaster border border-forge-aluminum text-xs font-mono text-forge-black focus:outline-none focus:border-forge-orange"
+                        className="w-full p-2 bg-forge-alabaster border border-forge-aluminum text-xs font-mono text-forge-black focus:outline-none focus:border-forge-orange focus:bg-white"
                       />
 
                       <div className="flex justify-end">
                         <button
+                          type="button"
                           onClick={() => handleSignOff(activeSelected.id)}
-                          className="px-4 py-1.5 bg-forge-orange hover:bg-forge-orange-hover text-white text-xs font-bold tracking-wider uppercase transition-colors flex items-center gap-1.5"
+                          aria-label={`Sign off deviation for ${activeSelected.machineId}`}
+                          className="px-4 py-2 bg-forge-orange hover:bg-forge-orange-hover text-white text-xs font-bold tracking-wider uppercase transition-colors flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
                         >
-                          <Check className="w-3.5 h-3.5" />
+                          <Check className="w-3.5 h-3.5" aria-hidden="true" />
                           <span>SIGN OFF DEVIATION</span>
                         </button>
                       </div>

@@ -41,32 +41,32 @@ export const ChamferCard: React.FC<ChamferCardProps> = ({
       className={`border relative transition-colors ${bgClass} ${chamferClass} ${className}`}
     >
       {/* Corner crosshairs for technical drafting aesthetic */}
-      <span className="absolute -top-1.5 -left-1.5 text-forge-aluminum font-mono text-[10px] select-none pointer-events-none">+</span>
-      <span className="absolute -bottom-1.5 -right-1.5 text-forge-aluminum font-mono text-[10px] select-none pointer-events-none">+</span>
+      <span className="absolute -top-1.5 -left-1.5 text-forge-aluminum font-mono text-[10px] select-none pointer-events-none" aria-hidden="true">+</span>
+      <span className="absolute -bottom-1.5 -right-1.5 text-forge-aluminum font-mono text-[10px] select-none pointer-events-none" aria-hidden="true">+</span>
 
       {(title || tag || action) && (
         <div
-          className={`flex items-center justify-between px-4 py-2.5 ${
+          className={`flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 px-3.5 sm:px-4 py-2.5 ${
             headerBorder ? (variant === 'dark' ? 'border-b border-forge-steel/30' : 'border-b border-forge-aluminum/60') : ''
           }`}
         >
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {tag && (
-              <span className="font-mono text-[10px] tracking-wider uppercase px-1.5 py-0.5 bg-forge-aluminum/30 text-forge-steel font-semibold border border-forge-aluminum">
+              <span className="font-mono text-[10px] tracking-wider uppercase px-1.5 py-0.5 bg-forge-aluminum/30 text-forge-steel font-semibold border border-forge-aluminum flex-shrink-0">
                 {tag}
               </span>
             )}
             {title && (
-              <h3 className="font-display font-semibold text-xs tracking-wider uppercase text-forge-black">
+              <h3 className="font-display font-semibold text-xs tracking-wider uppercase text-forge-black break-words">
                 {title}
               </h3>
             )}
           </div>
-          {action && <div>{action}</div>}
+          {action && <div className="flex-shrink-0 self-start sm:self-auto">{action}</div>}
         </div>
       )}
 
-      <div className="p-4">{children}</div>
+      <div className="p-3.5 sm:p-4">{children}</div>
     </div>
   );
 };

@@ -27,6 +27,10 @@ export const ShiftTimeline: React.FC<ShiftTimelineProps> = ({
     { startHour: "06:00", durationMinutes: 480, state: "RUNNING", reason: "Standard continuous production run" }
   ];
 
+  const ariaDescription = effectiveIntervals
+    .map(i => `${i.state} from ${i.startHour} for ${i.durationMinutes} minutes`)
+    .join(', ');
+
   return (
     <div className={`space-y-1 ${className}`}>
       {!compact && (
@@ -40,7 +44,11 @@ export const ShiftTimeline: React.FC<ShiftTimelineProps> = ({
       )}
 
       {/* Main Timeline Bar */}
-      <div className={`w-full bg-forge-alabaster border border-forge-aluminum flex overflow-hidden relative ${compact ? 'h-2.5' : 'h-4'}`}>
+      <div 
+        role="img"
+        aria-label={`8-hour shift timeline: ${ariaDescription}`}
+        className={`w-full bg-forge-alabaster border border-forge-aluminum flex overflow-hidden relative ${compact ? 'h-2.5' : 'h-4'}`}
+      >
         {effectiveIntervals.map((interval, idx) => {
           const widthPct = (interval.durationMinutes / totalShiftMinutes) * 100;
           const styling = STATE_COLORS[interval.state] || { bg: 'bg-slate-400', text: 'text-slate-600' };
@@ -62,21 +70,21 @@ export const ShiftTimeline: React.FC<ShiftTimelineProps> = ({
       </div>
 
       {!compact && (
-        <div className="flex items-center justify-between font-mono text-[8px] text-forge-steel pt-0.5">
+        <div className="flex flex-wrap items-center justify-between font-mono text-[8px] text-forge-steel pt-0.5 gap-1">
           <span className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 bg-emerald-600 inline-block" /> RUNNING
+            <span className="w-1.5 h-1.5 bg-emerald-600 inline-block" aria-hidden="true" /> RUNNING
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 bg-blue-600 inline-block" /> SETUP
+            <span className="w-1.5 h-1.5 bg-blue-600 inline-block" aria-hidden="true" /> SETUP
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 bg-amber-500 inline-block" /> IDLE
+            <span className="w-1.5 h-1.5 bg-amber-500 inline-block" aria-hidden="true" /> IDLE
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 bg-slate-500 inline-block" /> STOPPED
+            <span className="w-1.5 h-1.5 bg-slate-500 inline-block" aria-hidden="true" /> STOPPED
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 bg-rose-600 inline-block" /> ALARM
+            <span className="w-1.5 h-1.5 bg-rose-600 inline-block" aria-hidden="true" /> ALARM
           </span>
         </div>
       )}

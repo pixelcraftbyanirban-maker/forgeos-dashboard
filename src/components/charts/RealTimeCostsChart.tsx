@@ -13,7 +13,7 @@ export const RealTimeCostsChart: React.FC<RealTimeCostsChartProps> = ({ costs })
 
   const items = [
     { label: 'RAW MATERIAL (En-8D / SS 304)', value: costs.materialCost, color: 'bg-forge-steel', hex: '#475569' },
-    { label: 'DIRECT SHOP OPERATOR LABOR', value: costs.laborCost, color: 'bg-forge-aluminum', hex: '#CBD5E1' },
+    { label: 'DIRECT SHOP OPERATOR LABOR', value: costs.laborCost, color: 'bg-slate-400', hex: '#94A3B8' },
     { label: 'SPINDLE MACHINE TIME (POWER & OVERHEAD)', value: costs.machineCost, color: 'bg-forge-orange', hex: '#F25C19' },
   ];
 
@@ -22,15 +22,15 @@ export const RealTimeCostsChart: React.FC<RealTimeCostsChartProps> = ({ costs })
       title="JOB DIRECT MANUFACTURING COSTS"
       tag="JOB ECONOMICS (INR)"
       action={
-        <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 border border-emerald-300 text-emerald-800 text-[10px] font-mono font-semibold">
-          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+        <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 border border-emerald-300 text-emerald-900 text-[10px] font-mono font-semibold">
+          <CheckCircle2 className="w-3 h-3 text-emerald-600 flex-shrink-0" aria-hidden="true" />
           <span>UNIT_COST: VERIFIED (INR)</span>
         </div>
       }
     >
       <div className="space-y-4">
         {/* Cost Summary Header */}
-        <div className="flex items-baseline justify-between border-b border-forge-aluminum/40 pb-3">
+        <div className="flex flex-wrap items-baseline justify-between border-b border-forge-aluminum/40 pb-3 gap-2">
           <div>
             <span className="font-mono text-[10px] uppercase text-forge-steel tracking-wider block">
               Active Batch Incurred Cost
@@ -61,7 +61,7 @@ export const RealTimeCostsChart: React.FC<RealTimeCostsChartProps> = ({ costs })
             const percentage = (item.value / maxCost) * 100;
             return (
               <div key={item.label} className="space-y-1">
-                <div className="flex justify-between items-center text-xs font-mono">
+                <div className="flex flex-wrap justify-between items-center text-xs font-mono gap-1">
                   <span className="text-forge-steel text-[11px] tracking-wide">
                     {item.label}
                   </span>
@@ -70,12 +70,19 @@ export const RealTimeCostsChart: React.FC<RealTimeCostsChartProps> = ({ costs })
                   </span>
                 </div>
                 {/* Bar Track */}
-                <div className="h-4 bg-forge-alabaster border border-forge-aluminum relative overflow-hidden flex items-center">
+                <div 
+                  role="progressbar"
+                  aria-valuenow={item.value}
+                  aria-valuemin={0}
+                  aria-valuemax={maxCost}
+                  aria-label={`${item.label}: ${formatINR(item.value)}`}
+                  className="h-4 bg-forge-alabaster border border-forge-aluminum relative overflow-hidden flex items-center"
+                >
                   <div
                     className={`h-full ${item.color} transition-all duration-500`}
                     style={{ width: `${percentage}%` }}
                   />
-                  <span className="absolute right-2 font-mono text-[9px] text-forge-steel">
+                  <span className="absolute right-2 font-mono text-[9px] text-forge-steel font-semibold">
                     {((item.value / costs.totalCost) * 100).toFixed(0)}%
                   </span>
                 </div>
@@ -85,7 +92,7 @@ export const RealTimeCostsChart: React.FC<RealTimeCostsChartProps> = ({ costs })
         </div>
 
         {/* Footnote definition */}
-        <div className="pt-2 text-[10px] font-mono text-forge-steel border-t border-forge-aluminum/30 flex justify-between">
+        <div className="pt-2 text-[10px] font-mono text-forge-steel border-t border-forge-aluminum/30 flex flex-col sm:flex-row justify-between gap-1">
           <span>* Machine time billed @ ₹3,200/hr spindle rate</span>
           <span className="text-forge-black font-semibold">TOLERANCE: CLASS 1 ISO</span>
         </div>

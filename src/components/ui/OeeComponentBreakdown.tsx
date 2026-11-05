@@ -48,9 +48,9 @@ export const OeeComponentBreakdown: React.FC<OeeComponentBreakdownProps> = ({
   ];
 
   return (
-    <div className={`border border-forge-aluminum bg-white p-4 space-y-4 font-mono ${className}`}>
+    <div className={`border border-forge-aluminum bg-white p-3.5 sm:p-4 space-y-4 font-mono ${className}`}>
       {/* Header with Overall Score */}
-      <div className="flex items-center justify-between border-b border-forge-aluminum/50 pb-3">
+      <div className="flex flex-wrap items-center justify-between border-b border-forge-aluminum/50 pb-3 gap-2">
         <div>
           <span className="text-[10px] text-forge-steel uppercase tracking-wider block">
             {title}
@@ -61,7 +61,7 @@ export const OeeComponentBreakdown: React.FC<OeeComponentBreakdownProps> = ({
         </div>
         <div className="text-right">
           <span className="text-[10px] text-forge-steel uppercase block">WORLD CLASS BENCHMARK</span>
-          <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 border border-emerald-300">
+          <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 border border-emerald-300">
             ≥ 85.0%
           </span>
         </div>
@@ -81,14 +81,21 @@ export const OeeComponentBreakdown: React.FC<OeeComponentBreakdownProps> = ({
                   <span className="text-[10px] text-forge-steel">
                     Target: {comp.target.toFixed(1)}%
                   </span>
-                  <span className={`font-bold ${isAboveTarget ? 'text-emerald-700' : 'text-amber-700'}`}>
+                  <span className={`font-bold ${isAboveTarget ? 'text-emerald-800' : 'text-amber-900'}`}>
                     {comp.value.toFixed(1)}%
                   </span>
                 </div>
               </div>
 
               {/* Graphical Progress Bar with Target Notch */}
-              <div className="h-3 bg-forge-alabaster border border-forge-aluminum relative overflow-hidden flex items-center">
+              <div 
+                role="progressbar"
+                aria-valuenow={comp.value}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label={`${comp.name}: ${comp.value.toFixed(1)}%, Target: ${comp.target}%`}
+                className="h-3 bg-forge-alabaster border border-forge-aluminum relative overflow-hidden flex items-center"
+              >
                 <div
                   className={`h-full ${comp.color} transition-all duration-300`}
                   style={{ width: `${comp.value}%` }}
@@ -101,8 +108,8 @@ export const OeeComponentBreakdown: React.FC<OeeComponentBreakdownProps> = ({
                 />
               </div>
 
-              <div className="flex justify-between text-[9px] text-forge-steel">
-                <span className="truncate max-w-[220px]">{comp.description}</span>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[9px] text-forge-steel gap-0.5">
+                <span className="truncate max-w-full sm:max-w-[220px]">{comp.description}</span>
                 <span className="text-[8px] uppercase">{comp.lossCategory}</span>
               </div>
             </div>
@@ -112,7 +119,7 @@ export const OeeComponentBreakdown: React.FC<OeeComponentBreakdownProps> = ({
 
       {showFormula && (
         <div className="p-2.5 bg-forge-alabaster border border-forge-aluminum text-[10px] text-forge-steel space-y-1">
-          <div className="font-bold text-forge-black">
+          <div className="font-bold text-forge-black break-words">
             OEE FORMULA: {oee.availability.toFixed(1)}% (A) × {oee.performance.toFixed(1)}% (P) × {oee.quality.toFixed(1)}% (Q) = <span className="text-forge-orange font-extrabold">{oee.overall.toFixed(1)}%</span>
           </div>
           <div className="text-[9px]">

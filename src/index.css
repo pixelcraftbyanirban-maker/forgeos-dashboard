@@ -4,13 +4,29 @@
 
 @layer base {
   body {
-    @apply bg-forge-alabaster text-forge-black font-sans antialiased;
+    @apply bg-forge-alabaster text-forge-black font-sans antialiased overflow-x-hidden;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
   /* Monospaced numerals for tabular data */
   .font-mono {
     font-variant-numeric: tabular-nums;
+  }
+
+  /* High contrast focus rings for WCAG 2.4.7 (Focus Visible) */
+  :focus-visible {
+    outline: 2px solid #F25C19;
+    outline-offset: 2px;
+  }
+}
+
+/* Reduced motion preference for WCAG 2.3.3 */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 

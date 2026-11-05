@@ -1,5 +1,5 @@
-import React from 'react';
-import { Search, RefreshCw, AlertCircle, Clock } from 'lucide-react';
+import React, { useState } from 'react';
+import { Search, RefreshCw, AlertCircle, Clock, Menu, X } from 'lucide-react';
 import { ConnectionState } from '../../types';
 
 interface TopBarProps {
@@ -13,6 +13,8 @@ interface TopBarProps {
   isRefreshing: boolean;
   activeExceptionsCount: number;
   onExceptionsClick: () => void;
+  onToggleMobileNav?: () => void;
+  isMobileNavOpen?: boolean;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
@@ -25,96 +27,163 @@ export const TopBar: React.FC<TopBarProps> = ({
   onManualRefresh,
   isRefreshing,
   activeExceptionsCount,
-  onExceptionsClick
+  onExceptionsClick,
+  onToggleMobileNav,
+  isMobileNavOpen = false
 }) => {
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+
   return (
-    <header className="h-16 bg-white border-b border-forge-aluminum px-6 flex items-center justify-between gap-4 sticky top-0 z-20">
-      {/* Title & Context */}
-      <div className="flex items-center gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="font-display font-bold text-lg text-forge-black tracking-tight uppercase">
-              {title}
-            </h1>
-            <span className="font-mono text-[9px] px-1.5 py-0.5 bg-forge-alabaster border border-forge-aluminum text-forge-steel font-semibold uppercase">
-              HOWRAH • 24 SPINDLES
-            </span>
-          </div>
-          {subtitle && (
-            <p className="text-xs text-forge-steel font-sans truncate">
-              {subtitle}
-            </p>
+    <header className="sticky top-0 z-20 bg-white border-b border-forge-aluminum transition-shadow">
+      <div className="min-h-16 px-3 sm:px-6 py-2.5 flex items-center justify-between gap-3 sm:gap-4">
+        {/* Left: Mobile Menu Toggle & Title */}
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          {onToggleMobileNav && (
+            <button
+              type="button"
+              onClick={onToggleMobileNav}
+              aria-label={isMobileNavOpen ? "Close navigation menu" : "Open navigation menu"}
+              aria-expanded={isMobileNavOpen}
+              aria-controls="mobile-navigation-drawer"
+              className="lg:hidden p-2 text-forge-black hover:bg-forge-alabaster border border-forge-aluminum flex-shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
+            >
+              {isMobileNavOpen ? (
+                <X className="w-4 h-4" aria-hidden="true" />
+              ) : (
+                <Menu className="w-4 h-4" aria-hidden="true" />
+              )}
+            </button>
           )}
+
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <h1 className="font-display font-bold text-base sm:text-lg text-forge-black tracking-tight uppercase truncate">
+                {title}
+              </h1>
+              <span className="font-mono text-[9px] px-1.5 py-0.5 bg-forge-alabaster border border-forge-aluminum text-forge-steel font-semibold uppercase flex-shrink-0 hidden xs:inline-block">
+                HOWRAH • 24 SPINDLES
+              </span>
+            </div>
+            {subtitle && (
+              <p className="text-[11px] sm:text-xs text-forge-steel font-sans truncate max-w-xs sm:max-w-md md:max-w-xl">
+                {subtitle}
+              </p>
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Center Search Input */}
-      <div className="flex-1 max-w-md hidden md:block">
-        <div className="relative">
-          <Search className="w-4 h-4 text-forge-steel absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            placeholder="Search orders (e.g. JOB-2026-001), spindles (e.g. VMC-02), materials, parts..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-9 pr-12 py-1.5 bg-forge-alabaster border border-forge-aluminum text-xs font-mono text-forge-black placeholder:text-forge-steel/60 focus:outline-none focus:border-forge-orange focus:bg-white transition-colors"
-          />
-          <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 font-mono text-[10px] text-forge-steel px-1 bg-white border border-forge-aluminum">
-            /
-          </kbd>
+        {/* Center Search Input (Desktop & Tablet) */}
+        <div className="flex-1 max-w-md hidden md:block">
+          <div className="relative">
+            <Search className="w-4 h-4 text-forge-steel absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
+            <input
+              type="text"
+              aria-label="Search work orders, spindles, materials, and parts"
+              placeholder="Search orders, spindles, materials, parts... (/)"
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="w-full pl-9 pr-10 py-1.5 bg-forge-alabaster border border-forge-aluminum text-xs font-mono text-forge-black placeholder:text-forge-steel/70 focus:outline-none focus:border-forge-orange focus:bg-white transition-colors"
+            />
+            <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 font-mono text-[10px] text-forge-steel px-1 bg-white border border-forge-aluminum select-none" aria-hidden="true">
+              /
+            </kbd>
+          </div>
         </div>
-      </div>
 
-      {/* Right Action & Telemetry Controls */}
-      <div className="flex items-center gap-3">
-        {/* Sample Data Disclaimer Tag */}
-        <span className="hidden xl:inline-flex items-center gap-1 font-mono text-[10px] text-amber-800 bg-amber-50 border border-amber-300 px-2 py-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-          HOWRAH DEMO FACILITY
-        </span>
+        {/* Right Action & Telemetry Controls */}
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+          {/* Mobile Search Toggle Button */}
+          <button
+            type="button"
+            onClick={() => setIsMobileSearchOpen(prev => !prev)}
+            aria-label={isMobileSearchOpen ? "Close search bar" : "Open search bar"}
+            aria-expanded={isMobileSearchOpen}
+            className="md:hidden p-2 bg-forge-alabaster hover:bg-forge-aluminum/30 border border-forge-aluminum text-forge-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
+          >
+            <Search className="w-4 h-4" aria-hidden="true" />
+          </button>
 
-        {/* Data Freshness Indicator */}
-        <div className="hidden lg:flex items-center gap-2 px-2.5 py-1 bg-forge-alabaster border border-forge-aluminum text-xs font-mono">
-          <div className="flex items-center gap-1.5">
-            <span className={`w-2 h-2 rounded-full ${
-              connectionState === 'CURRENT' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'
-            }`} />
-            <span className="text-[11px] text-forge-steel">
-              SYNC: <strong className="text-forge-black">{connectionState}</strong>
+          {/* Sample Data Disclaimer Tag */}
+          <span className="hidden xl:inline-flex items-center gap-1 font-mono text-[10px] text-amber-950 bg-amber-50 border border-amber-300 px-2 py-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden="true" />
+            HOWRAH FACILITY
+          </span>
+
+          {/* Data Freshness Indicator */}
+          <div className="hidden lg:flex items-center gap-2 px-2.5 py-1 bg-forge-alabaster border border-forge-aluminum text-xs font-mono">
+            <div className="flex items-center gap-1.5">
+              <span className={`w-2 h-2 rounded-full ${
+                connectionState === 'CURRENT' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'
+              }`} aria-hidden="true" />
+              <span className="text-[11px] text-forge-steel">
+                SYNC: <strong className="text-forge-black">{connectionState}</strong>
+              </span>
+            </div>
+            <span className="text-forge-aluminum" aria-hidden="true">|</span>
+            <span className="text-[10px] text-forge-steel flex items-center gap-1">
+              <Clock className="w-3 h-3" aria-hidden="true" />
+              {lastRefresh.includes('IST') ? lastRefresh : `${lastRefresh} IST`}
             </span>
           </div>
-          <span className="text-forge-aluminum">|</span>
-          <span className="text-[10px] text-forge-steel flex items-center gap-1">
-            <Clock className="w-3 h-3" />
-            {lastRefresh.includes('IST') ? lastRefresh : `${lastRefresh} IST`}
-          </span>
+
+          {/* Refresh Action */}
+          <button
+            type="button"
+            onClick={onManualRefresh}
+            disabled={isRefreshing}
+            aria-label={isRefreshing ? "Refreshing spindle telemetry data..." : "Refresh telemetry data now"}
+            title="Manual Telemetry Poll"
+            className="p-2 sm:p-1.5 bg-forge-alabaster hover:bg-forge-aluminum/30 border border-forge-aluminum text-forge-black transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
+          >
+            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-forge-orange' : 'text-forge-black'}`} aria-hidden="true" />
+          </button>
+
+          {/* Exceptions Quick Pill */}
+          <button
+            type="button"
+            onClick={onExceptionsClick}
+            aria-label={`View ${activeExceptionsCount} production exceptions and alarms`}
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 sm:py-1 text-xs font-mono border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange ${
+              activeExceptionsCount > 0
+                ? 'bg-rose-50 text-rose-950 border-rose-400 hover:bg-rose-100'
+                : 'bg-forge-alabaster text-forge-steel border-forge-aluminum hover:text-forge-black'
+            }`}
+          >
+            <AlertCircle className="w-3.5 h-3.5 text-rose-600 flex-shrink-0" aria-hidden="true" />
+            <span className="font-semibold text-[10px] sm:text-[11px] whitespace-nowrap">
+              {activeExceptionsCount} <span className="hidden sm:inline">EXCEPTIONS</span>
+            </span>
+          </button>
         </div>
-
-        {/* Refresh Action */}
-        <button
-          onClick={onManualRefresh}
-          disabled={isRefreshing}
-          title="Manual Telemetry Poll"
-          className="p-1.5 bg-forge-alabaster hover:bg-forge-aluminum/30 border border-forge-aluminum text-forge-black transition-colors disabled:opacity-50"
-        >
-          <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-forge-orange' : 'text-forge-black'}`} />
-        </button>
-
-        {/* Exceptions Quick Pill */}
-        <button
-          onClick={onExceptionsClick}
-          className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono border transition-colors ${
-            activeExceptionsCount > 0
-              ? 'bg-rose-50 text-rose-800 border-rose-300 hover:bg-rose-100'
-              : 'bg-forge-alabaster text-forge-steel border-forge-aluminum hover:text-forge-black'
-          }`}
-        >
-          <AlertCircle className="w-3.5 h-3.5 text-rose-600" />
-          <span className="font-semibold text-[11px]">
-            {activeExceptionsCount} EXCEPTIONS
-          </span>
-        </button>
       </div>
+
+      {/* Expandable Mobile Search Drawer */}
+      {isMobileSearchOpen && (
+        <div className="p-3 bg-forge-alabaster border-t border-forge-aluminum md:hidden animate-in slide-in-from-top-2 duration-150">
+          <div className="relative">
+            <Search className="w-4 h-4 text-forge-steel absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
+            <input
+              type="text"
+              autoFocus
+              aria-label="Search work orders, spindles, materials, and parts"
+              placeholder="Search orders, spindles, parts, materials..."
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="w-full pl-9 pr-8 py-2 bg-white border border-forge-aluminum text-xs font-mono text-forge-black placeholder:text-forge-steel/70 focus:outline-none focus:border-forge-orange"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => onSearchChange('')}
+                aria-label="Clear search input"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-forge-steel hover:text-forge-black p-1"
+              >
+                <X className="w-3.5 h-3.5" aria-hidden="true" />
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </header>
   );
 };

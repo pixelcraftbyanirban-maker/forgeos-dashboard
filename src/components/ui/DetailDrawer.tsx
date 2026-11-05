@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { X, Cpu, Workflow } from 'lucide-react';
 import { Machine, Job } from '../../types';
 import { StatusBadge } from './StatusBadge';
@@ -21,37 +21,72 @@ export const DetailDrawer: React.FC<DetailDrawerProps> = ({
   machine,
   job
 }) => {
+  // Listen for Escape key
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
+  // Lock body scroll when drawer is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   if (!isOpen || (!machine && !job)) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-black/40 backdrop-blur-xs flex justify-end">
-      <div className="w-full max-w-xl bg-white border-l border-forge-aluminum h-full shadow-2xl flex flex-col justify-between animate-in slide-in-from-right duration-200">
+    <div 
+      className="fixed inset-0 z-50 overflow-hidden bg-black/60 backdrop-blur-xs flex justify-end"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="detail-drawer-heading"
+      onClick={onClose}
+    >
+      <div 
+        className="w-full max-w-full sm:max-w-xl bg-white border-l border-forge-aluminum h-full shadow-2xl flex flex-col justify-between animate-in slide-in-from-right duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Drawer Header */}
-        <div className="p-4 border-b border-forge-aluminum flex items-center justify-between bg-forge-alabaster">
-          <div className="flex items-center gap-2">
-            <span className="p-1.5 bg-forge-black text-white">
+        <div className="p-4 border-b border-forge-aluminum flex items-center justify-between bg-forge-alabaster gap-2">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <span className="p-1.5 bg-forge-black text-white flex-shrink-0" aria-hidden="true">
               {machine ? <Cpu className="w-4 h-4 text-forge-orange" /> : <Workflow className="w-4 h-4 text-forge-orange" />}
             </span>
-            <div>
+            <div className="min-w-0">
               <span className="font-mono text-[10px] uppercase text-forge-steel tracking-wider font-semibold block">
                 {machine ? 'SPINDLE TELEMETRY INSPECTOR' : 'WORK ORDER DETAIL'}
               </span>
-              <h2 className="font-display font-bold text-base text-forge-black">
+              <h2 id="detail-drawer-heading" className="font-display font-bold text-base text-forge-black truncate">
                 {machine ? `${machine.id} • ${machine.name}` : `${job?.orderNumber} • ${job?.partName}`}
               </h2>
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1.5 hover:bg-white border border-forge-aluminum text-forge-steel hover:text-forge-black transition-colors"
+            aria-label="Close detail inspector"
+            className="p-1.5 hover:bg-white border border-forge-aluminum text-forge-steel hover:text-forge-black transition-colors flex-shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
             title="Close Inspector (Esc)"
           >
-            <X className="w-4 h-4" />
+            <X className="w-4 h-4" aria-hidden="true" />
           </button>
         </div>
 
         {/* Drawer Body */}
-        <div className="p-5 overflow-y-auto flex-1 space-y-5">
+        <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-5">
           {machine && (
             <div className="space-y-4">
               {/* State & Connection Summary */}
@@ -158,7 +193,7 @@ export const DetailDrawer: React.FC<DetailDrawerProps> = ({
                 </div>
                 <div className="text-right">
                   <span className="text-[10px] font-mono text-forge-steel uppercase block">Dispatch Priority</span>
-                  <span className="font-mono text-xs font-bold text-forge-orange">{job.priority}</span>
+                  <span className="font-mono text-xs font-bold text-amber-950 bg-amber-50 px-1.5 py-0.5 border border-amber-300">{job.priority}</span>
                 </div>
               </div>
 
@@ -218,13 +253,14 @@ export const DetailDrawer: React.FC<DetailDrawerProps> = ({
         </div>
 
         {/* Drawer Footer */}
-        <div className="p-3 border-t border-forge-aluminum bg-forge-alabaster flex justify-between items-center font-mono text-[10px]">
+        <div className="p-3.5 border-t border-forge-aluminum bg-forge-alabaster flex justify-between items-center font-mono text-[10px]">
           <span className="text-forge-steel">
             SHREE GANESH PRECISION • MES v1.0
           </span>
           <button
+            type="button"
             onClick={onClose}
-            className="px-4 py-1.5 bg-forge-black text-white text-xs font-mono font-semibold uppercase hover:bg-zinc-800 transition-colors"
+            className="px-4 py-2 bg-forge-black text-white text-xs font-mono font-semibold uppercase hover:bg-zinc-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
           >
             Close Inspector
           </button>

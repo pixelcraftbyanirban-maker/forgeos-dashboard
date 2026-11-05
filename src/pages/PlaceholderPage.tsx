@@ -21,29 +21,30 @@ export const PlaceholderPage: React.FC<PlaceholderPageProps> = ({ tab, onBackToO
 
   return (
     <ChamferCard title={info.title} tag={info.phase}>
-      <div className="py-12 px-6 text-center max-w-xl mx-auto space-y-4">
+      <div className="py-12 px-4 sm:px-6 text-center max-w-xl mx-auto space-y-4">
         <div className="w-12 h-12 bg-forge-alabaster border border-forge-aluminum flex items-center justify-center mx-auto text-forge-orange">
-          <Construction className="w-6 h-6" />
+          <Construction className="w-6 h-6" aria-hidden="true" />
         </div>
 
-        <div className="space-y-1">
-          <span className="font-mono text-[10px] px-2 py-0.5 bg-amber-50 border border-amber-300 text-amber-800 font-bold uppercase">
+        <div className="space-y-1.5">
+          <span className="font-mono text-[10px] px-2 py-0.5 bg-amber-50 border border-amber-300 text-amber-950 font-bold uppercase inline-block">
             PLANNED FOR {info.phase}
           </span>
           <h3 className="font-display font-bold text-xl text-forge-black">
             {info.title}
           </h3>
-          <p className="text-xs text-forge-steel font-sans">
-            {info.desc} Per execution instructions, Phase 01 (Foundations) and Phase 02 (Factory Overview) are implemented first for review.
+          <p className="text-xs text-forge-steel font-sans leading-relaxed">
+            {info.desc}
           </p>
         </div>
 
         <div className="pt-4">
           <button
+            type="button"
             onClick={onBackToOverview}
-            className="px-4 py-2 bg-forge-black text-white hover:bg-zinc-800 text-xs font-mono font-semibold uppercase flex items-center gap-2 mx-auto transition-colors"
+            className="px-4 py-2 bg-forge-black text-white hover:bg-zinc-800 text-xs font-mono font-semibold uppercase flex items-center gap-2 mx-auto transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
           >
-            <ArrowLeft className="w-3.5 h-3.5 text-forge-orange" />
+            <ArrowLeft className="w-3.5 h-3.5 text-forge-orange" aria-hidden="true" />
             RETURN TO FACTORY OVERVIEW
           </button>
         </div>

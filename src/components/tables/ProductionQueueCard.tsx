@@ -29,13 +29,22 @@ export const ProductionQueueCard: React.FC<ProductionQueueCardProps> = ({
       }
     >
       <div className="space-y-4">
-        {/* Active Production Item (Featured prominently like Page 5/22) */}
+        {/* Active Production Item (Featured prominently) */}
         <div
+          role="button"
+          tabIndex={0}
+          aria-label={`Inspect active work order ${currentJob.orderNumber}: ${currentJob.partName}`}
           onClick={() => onSelectJob(currentJob.id)}
-          className="p-3.5 bg-forge-alabaster border border-forge-aluminum space-y-3 cursor-pointer hover:border-forge-orange transition-all"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onSelectJob(currentJob.id);
+            }
+          }}
+          className="p-3.5 bg-forge-alabaster border border-forge-aluminum space-y-3 cursor-pointer hover:border-forge-orange transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
         >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
               <span className="font-mono text-[10px] px-1.5 py-0.5 bg-forge-orange text-white font-bold tracking-wider uppercase">
                 ACTIVE IN SPINDLE
               </span>
@@ -66,7 +75,7 @@ export const ProductionQueueCard: React.FC<ProductionQueueCardProps> = ({
               </span>
             </div>
 
-            <div className="text-left md:text-right font-mono text-[11px] text-forge-steel">
+            <div className="text-left md:text-right font-mono text-[11px] text-forge-steel flex-shrink-0">
               <div>SPINDLE: <strong className="text-forge-black">{currentJob.targetMachineId}</strong></div>
               <div>EST DISPATCH: <strong className="text-forge-black">{currentJob.estCompletion}</strong></div>
             </div>
@@ -75,14 +84,21 @@ export const ProductionQueueCard: React.FC<ProductionQueueCardProps> = ({
           {/* Progress bar with numerical clarity */}
           <div className="space-y-1 pt-1">
             <div className="flex justify-between items-center font-mono text-[11px]">
-              <span className="text-forge-steel font-semibold">
+              <span className="text-forge-steel font-semibold truncate max-w-[200px]">
                 {currentJob.currentOperation}
               </span>
-              <span className="font-bold text-forge-orange">
-                {currentJob.progressPercent}% PROGRESS ({currentJob.quantityCompleted} / {currentJob.quantityTarget} PIECES)
+              <span className="font-bold text-amber-950 bg-amber-50 px-1 py-0.2 border border-amber-300">
+                {currentJob.progressPercent}% PROGRESS ({currentJob.quantityCompleted} / {currentJob.quantityTarget} PCS)
               </span>
             </div>
-            <div className="h-2.5 bg-white border border-forge-aluminum relative overflow-hidden">
+            <div 
+              role="progressbar"
+              aria-valuenow={currentJob.progressPercent}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label={`Order ${currentJob.orderNumber} completion progress: ${currentJob.progressPercent}%`}
+              className="h-2.5 bg-white border border-forge-aluminum relative overflow-hidden"
+            >
               <div
                 className="h-full bg-forge-orange transition-all duration-500"
                 style={{ width: `${currentJob.progressPercent}%` }}
@@ -99,85 +115,105 @@ export const ProductionQueueCard: React.FC<ProductionQueueCardProps> = ({
               />
             </div>
           )}
+
+          <div className="flex items-center justify-between text-[10px] font-mono text-forge-steel pt-1 border-t border-forge-aluminum/30">
+            <span className="flex items-center gap-1">
+              <PlayCircle className="w-3 h-3 text-emerald-600" aria-hidden="true" /> Live machining telemetry streaming
+            </span>
+            <span className="font-bold text-forge-orange hover:underline flex items-center gap-0.5">
+              INSPECT BATCH <ArrowRight className="w-3 h-3" aria-hidden="true" />
+            </span>
+          </div>
         </div>
 
-        {/* Two Column Layout: Next in Queue & Delayed/Attention Job */}
+        {/* Secondary Execution Queue Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {/* Next Queue Card */}
+          {/* Next Queued Order */}
           <div
+            role="button"
+            tabIndex={0}
+            aria-label={`Inspect queued order ${nextJob.orderNumber}: ${nextJob.partName}`}
             onClick={() => onSelectJob(nextJob.id)}
-            className="p-3 bg-white border border-forge-aluminum space-y-2 cursor-pointer hover:border-blue-500 transition-all flex flex-col justify-between"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onSelectJob(nextJob.id);
+              }
+            }}
+            className="p-3 bg-white border border-forge-aluminum hover:border-forge-steel transition-all space-y-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
           >
-            <div>
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-[10px] tracking-wider uppercase text-forge-steel font-bold flex items-center gap-1.5">
-                  <PlayCircle className="w-3.5 h-3.5 text-blue-600" />
-                  NEXT IN QUEUE
-                </span>
-                <span className="font-mono text-[10px] text-blue-700 bg-blue-50 border border-blue-200 px-1 py-0.2">
-                  STAGED
-                </span>
-              </div>
-
-              <div className="mt-2">
-                <div className="font-mono text-xs font-bold text-forge-black">
-                  {nextJob.orderNumber}
-                </div>
-                <div className="text-xs font-semibold text-forge-black font-sans truncate">
-                  {nextJob.partName}
-                </div>
-                <div className="text-[10px] text-forge-steel font-mono">
-                  {nextJob.material} • {nextJob.quantityTarget} Units
-                </div>
-              </div>
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-[9px] px-1.5 py-0.2 bg-zinc-100 border border-zinc-300 text-zinc-800 font-bold uppercase">
+                NEXT QUEUED
+              </span>
+              <span className="font-mono text-[10px] text-forge-steel">
+                FOR {nextJob.targetMachineId}
+              </span>
             </div>
 
-            <div className="pt-2 border-t border-forge-aluminum/40 flex items-center justify-between font-mono text-[10px] text-forge-steel">
-              <span>TARGET: {nextJob.targetMachineId}</span>
-              <span className="text-forge-black font-bold flex items-center gap-1">
-                VIEW ORDER <ArrowRight className="w-3 h-3 text-forge-orange" />
+            <div>
+              <span className="font-mono text-xs font-bold text-forge-black block">
+                {nextJob.orderNumber}
               </span>
+              <span className="font-sans text-xs text-forge-black font-semibold truncate block">
+                {nextJob.partName}
+              </span>
+              <span className="font-mono text-[10px] text-forge-steel">
+                {nextJob.customerName || nextJob.customerCode} • {nextJob.quantityTarget} Pcs
+              </span>
+            </div>
+
+            <div className="pt-2 border-t border-forge-aluminum/40 flex justify-between items-center text-[10px] font-mono text-forge-steel">
+              <span>EST START: 14:15 IST</span>
+              <span className="text-forge-orange font-bold">VIEW SETUP</span>
             </div>
           </div>
 
-          {/* Delayed / Attention Job Card */}
+          {/* Delayed / Attention Order */}
           {delayedJob ? (
             <div
+              role="button"
+              tabIndex={0}
+              aria-label={`Inspect delayed order ${delayedJob.orderNumber}: ${delayedJob.partName}`}
               onClick={() => onSelectJob(delayedJob.id)}
-              className="p-3 bg-amber-50/40 border border-amber-300 space-y-2 cursor-pointer hover:border-amber-500 transition-all flex flex-col justify-between"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onSelectJob(delayedJob.id);
+                }
+              }}
+              className="p-3 bg-amber-50/40 border border-amber-300 hover:border-amber-500 transition-all space-y-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
             >
-              <div>
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-[10px] tracking-wider uppercase text-amber-900 font-bold flex items-center gap-1.5">
-                    <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
-                    DEVIATION ATTENTION
-                  </span>
-                  <StatusBadge type="production" status={delayedJob.state} size="sm" />
-                </div>
-
-                <div className="mt-2">
-                  <div className="font-mono text-xs font-bold text-forge-black">
-                    {delayedJob.orderNumber}
-                  </div>
-                  <div className="text-xs font-semibold text-forge-black font-sans truncate">
-                    {delayedJob.partName}
-                  </div>
-                  <div className="text-[10px] text-amber-800 font-mono">
-                    {delayedJob.currentOperation}
-                  </div>
-                </div>
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-[9px] px-1.5 py-0.2 bg-amber-100 border border-amber-400 text-amber-950 font-bold uppercase flex items-center gap-1">
+                  <AlertTriangle className="w-2.5 h-2.5 text-amber-600" aria-hidden="true" />
+                  ON HOLD / DELAYED
+                </span>
+                <span className="font-mono text-[10px] text-amber-900 font-semibold">
+                  {delayedJob.targetMachineId}
+                </span>
               </div>
 
-              <div className="pt-2 border-t border-amber-200 flex items-center justify-between font-mono text-[10px] text-amber-900">
-                <span>DELAY: +35 MIN</span>
-                <span className="font-bold text-forge-orange flex items-center gap-1">
-                  INVESTIGATE <ArrowRight className="w-3 h-3" />
+              <div>
+                <span className="font-mono text-xs font-bold text-forge-black block">
+                  {delayedJob.orderNumber}
                 </span>
+                <span className="font-sans text-xs text-forge-black font-semibold truncate block">
+                  {delayedJob.partName}
+                </span>
+                <span className="font-mono text-[10px] text-forge-steel">
+                  Waiting on tool insert change (Sourav Das)
+                </span>
+              </div>
+
+              <div className="pt-2 border-t border-amber-200 flex justify-between items-center text-[10px] font-mono">
+                <span className="text-amber-900 font-bold">+45m variance</span>
+                <span className="text-forge-orange font-bold">RESOLVE</span>
               </div>
             </div>
           ) : (
             <div className="p-3 bg-white border border-forge-aluminum flex items-center justify-center font-mono text-xs text-forge-steel">
-              NO PRODUCTION DEVIATIONS
+              No orders currently delayed on shop floor.
             </div>
           )}
         </div>
