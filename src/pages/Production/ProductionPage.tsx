@@ -5,6 +5,7 @@ import { MetricCard } from '../../components/ui/MetricCard';
 import { OperationFlowBar } from '../../components/ui/OperationFlowBar';
 import { Job, JobPriority } from '../../types';
 import { Search, ChevronDown, ChevronRight, Clock, ArrowUpDown, List, Layers, ArrowRight } from 'lucide-react';
+import { formatINR, formatNumberIN } from '../../utils/formatters';
 
 interface ProductionPageProps {
   jobs: Job[];
@@ -29,6 +30,7 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({
       job.orderNumber.toLowerCase().includes(search.toLowerCase()) ||
       job.partName.toLowerCase().includes(search.toLowerCase()) ||
       job.material.toLowerCase().includes(search.toLowerCase()) ||
+      (job.customerName && job.customerName.toLowerCase().includes(search.toLowerCase())) ||
       (job.customerCode && job.customerCode.toLowerCase().includes(search.toLowerCase())) ||
       job.targetMachineId.toLowerCase().includes(search.toLowerCase());
 
@@ -80,27 +82,27 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <MetricCard
           category="PRODUCTION VOLUME"
-          value={totalCompletedUnits}
-          unit={`/ ${totalTargetUnits} UNITS`}
-          subtext="Total shift parts produced"
+          value={formatNumberIN(totalCompletedUnits)}
+          unit={`/ ${formatNumberIN(totalTargetUnits)} PIECES`}
+          subtext="Total shift parts produced (Howrah)"
           accentColor="orange"
-          badge="SHIFT 01"
+          badge="SHIFT 01 IST"
         />
 
         <MetricCard
           category="SCHEDULE ADHERENCE"
-          value="94.2%"
-          subtext="1 delayed • 9 on track"
+          value="93.8%"
+          subtext="1 delayed (VMC-02) • 9 on track"
           trend={{ value: "Target: 95%", isPositive: true }}
           accentColor="emerald"
-          badge="HMLV"
+          badge="HMLV INDIA"
         />
 
         <MetricCard
           category="QUALITY SCRAP RATE"
           value={`${scrapRatePct}%`}
-          unit={`(${totalScrappedUnits} SCRAPPED)`}
-          subtext="Strict tolerance verification"
+          unit={`(${totalScrappedUnits} REJECTED)`}
+          subtext="Strict CMM tolerance check"
           trend={{ value: "Max Limit: 1.5%", isPositive: true }}
           accentColor="black"
           badge="QA VERIFIED"
@@ -223,7 +225,7 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({
                   >
                     {/* Job Header */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-forge-aluminum/40 pb-2.5">
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <span className="font-mono text-sm font-bold text-forge-black">
                           {job.orderNumber}
                         </span>
@@ -240,9 +242,11 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({
                         <span className="font-display font-bold text-sm text-forge-black">
                           {job.partName}
                         </span>
-                        <span className="text-forge-steel text-[11px] font-mono hidden md:inline">
-                          ({job.partNumber})
-                        </span>
+                        {job.customerName && (
+                          <span className="text-forge-steel text-[10px] font-mono px-1.5 py-0.2 bg-forge-alabaster border border-forge-aluminum">
+                            {job.customerName}
+                          </span>
+                        )}
                       </div>
 
                       <div className="flex items-center gap-3">
@@ -262,28 +266,30 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({
                     {/* Operational Details Row */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono text-[11px] p-2 bg-forge-alabaster border border-forge-aluminum/50">
                       <div>
-                        <span className="text-forge-steel text-[9px] block">MATERIAL / ALLOY</span>
-                        <span className="font-semibold text-forge-black">{job.material}</span>
+                        <span className="text-forge-steel text-[9px] block">MATERIAL / HSN</span>
+                        <span className="font-semibold text-forge-black truncate block">
+                          {job.material} {job.hsnCode && `(HSN: ${job.hsnCode})`}
+                        </span>
                       </div>
                       <div>
                         <span className="text-forge-steel text-[9px] block">QUANTITY PROGRESS</span>
                         <span className="font-bold text-forge-black">
-                          {job.quantityCompleted} / {job.quantityTarget} Units
+                          {job.quantityCompleted} / {job.quantityTarget} Pieces
                         </span>
                         {job.quantityScrapped > 0 && (
                           <span className="text-rose-600 text-[10px] ml-1">
-                            ({job.quantityScrapped} scrap)
+                            ({job.quantityScrapped} rej)
                           </span>
                         )}
                       </div>
                       <div>
-                        <span className="text-forge-steel text-[9px] block">CURRENT ACTIVE OP</span>
+                        <span className="text-forge-steel text-[9px] block">ACTIVE OPERATION</span>
                         <span className="font-semibold text-forge-orange truncate block">
                           {job.currentOperation}
                         </span>
                       </div>
                       <div>
-                        <span className="text-forge-steel text-[9px] block">EST. COMPLETION</span>
+                        <span className="text-forge-steel text-[9px] block">EST. DISPATCH (IST)</span>
                         <span className="font-bold text-forge-black">{job.estCompletion}</span>
                       </div>
                     </div>
@@ -336,11 +342,11 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({
                       className="py-2.5 px-3 font-semibold cursor-pointer hover:text-forge-black"
                     >
                       <div className="flex items-center gap-1">
-                        Est. Completion
+                        Est. Dispatch (IST)
                         <ArrowUpDown className="w-2.5 h-2.5" />
                       </div>
                     </th>
-                    <th className="py-2.5 px-3 font-semibold text-right">Unit Cost</th>
+                    <th className="py-2.5 px-3 font-semibold text-right">Unit Cost (INR)</th>
                     <th className="py-2.5 px-3 font-semibold text-center">State</th>
                   </tr>
                 </thead>
@@ -390,12 +396,13 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({
                               {job.partName}
                             </div>
                             <div className="text-[10px] text-forge-steel/80">
-                              {job.partNumber} • {job.customerCode}
+                              {job.customerName || job.customerCode}
                             </div>
                           </td>
 
                           <td className="py-3 px-3 text-forge-black text-[11px]">
                             <div>{job.material}</div>
+                            {job.hsnCode && <div className="text-[9px] text-forge-steel">HSN: {job.hsnCode}</div>}
                           </td>
 
                           <td className="py-3 px-3">
@@ -408,7 +415,7 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({
                             {job.quantityCompleted} / {job.quantityTarget}
                             {job.quantityScrapped > 0 && (
                               <span className="text-rose-600 font-normal text-[10px] block">
-                                ({job.quantityScrapped} scrap)
+                                ({job.quantityScrapped} rej)
                               </span>
                             )}
                           </td>
@@ -435,15 +442,12 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({
                           <td className="py-3 px-3 text-[11px] text-forge-steel">
                             <div className="flex items-center gap-1">
                               <Clock className="w-3 h-3" />
-                              {job.estCompletion.split(' ')[1] || job.estCompletion}
-                            </div>
-                            <div className="text-[9px] text-forge-steel/70">
-                              Planned: {job.plannedStart.split(' ')[1]}
+                              {job.estCompletion}
                             </div>
                           </td>
 
                           <td className="py-3 px-3 text-right font-bold text-forge-black">
-                            ${job.verifiedUnitCost.toFixed(2)}
+                            {formatINR(job.verifiedUnitCost, true)}
                           </td>
 
                           <td className="py-3 px-3 text-center">

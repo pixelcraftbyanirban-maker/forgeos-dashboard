@@ -93,7 +93,7 @@ export const MachinesPage: React.FC<MachinesPageProps> = ({
       {/* 3. Machine Fleet Main Container */}
       <ChamferCard
         title="SPINDLE FLEET DIRECTORY & TELEMETRY FEEDS"
-        tag="12 SPINDLES"
+        tag={`${machines.length} SPINDLES • 3 SECTIONS`}
         action={
           <div className="flex items-center gap-2">
             {/* View Mode Switcher */}

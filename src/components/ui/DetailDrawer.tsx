@@ -6,6 +6,7 @@ import { ShiftTimeline } from './ShiftTimeline';
 import { LinearGauge } from './GaugeIndicator';
 import { OeeComponentBreakdown } from './OeeComponentBreakdown';
 import { OperationFlowBar } from './OperationFlowBar';
+import { formatINR } from '../../utils/formatters';
 
 interface DetailDrawerProps {
   isOpen: boolean;
@@ -69,7 +70,7 @@ export const DetailDrawer: React.FC<DetailDrawerProps> = ({
               <div className="border border-forge-aluminum p-3.5 space-y-2 bg-white">
                 <div className="flex items-center justify-between font-mono text-[10px]">
                   <span className="font-bold text-forge-black uppercase">
-                    8-HOUR SHIFT 01 TIMELINE
+                    8-HOUR SHIFT 01 TIMELINE (06:00 - 14:00 IST)
                   </span>
                   <span className="text-forge-steel">
                     Uptime: <strong className="text-forge-black">{machine.uptimeHoursToday}h</strong>
@@ -88,7 +89,7 @@ export const DetailDrawer: React.FC<DetailDrawerProps> = ({
               {/* Real-time Telemetry Linear Gauges */}
               <div className="border border-forge-aluminum p-4 space-y-3 bg-white">
                 <span className="font-mono text-xs font-bold text-forge-black uppercase block border-b border-forge-aluminum/40 pb-2">
-                  LIVE SPINDLE SENSOR CHANNELS
+                  LIVE SPINDLE SENSOR CHANNELS (HOWRAH CELL)
                 </span>
 
                 <div className="space-y-2.5">
@@ -121,6 +122,10 @@ export const DetailDrawer: React.FC<DetailDrawerProps> = ({
                 </div>
 
                 <div className="pt-2 border-t border-forge-aluminum/40 font-mono text-xs space-y-1.5">
+                  <div className="flex justify-between py-1 border-b border-forge-aluminum/20">
+                    <span className="text-forge-steel">Machine Section:</span>
+                    <span className="font-bold text-forge-black">{machine.section || 'CNC Machining Cell'}</span>
+                  </div>
                   <div className="flex justify-between py-1 border-b border-forge-aluminum/20">
                     <span className="text-forge-steel">Current Operator:</span>
                     <span className="font-bold text-forge-black">{machine.operator}</span>
@@ -160,31 +165,39 @@ export const DetailDrawer: React.FC<DetailDrawerProps> = ({
               {/* Part & Material Info */}
               <div className="border border-forge-aluminum p-4 space-y-2 font-mono text-xs bg-white">
                 <span className="font-mono text-xs font-bold text-forge-black uppercase block border-b border-forge-aluminum/40 pb-2">
-                  ORDER SPECIFICATIONS
+                  ORDER SPECIFICATIONS (INDIAN ENGINEERING)
                 </span>
                 <div className="flex justify-between py-1 border-b border-forge-aluminum/20">
                   <span className="text-forge-steel">Part Number:</span>
                   <span className="font-bold text-forge-black">{job.partNumber}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-forge-aluminum/20">
-                  <span className="text-forge-steel">Material Alloy:</span>
+                  <span className="text-forge-steel">Material Grade:</span>
                   <span className="font-bold text-forge-black">{job.material}</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-forge-aluminum/20">
-                  <span className="text-forge-steel">Customer Code:</span>
-                  <span className="font-bold text-forge-black">{job.customerCode || 'STANDARD'}</span>
-                </div>
+                {job.customerName && (
+                  <div className="flex justify-between py-1 border-b border-forge-aluminum/20">
+                    <span className="text-forge-steel">Customer:</span>
+                    <span className="font-bold text-forge-black">{job.customerName}</span>
+                  </div>
+                )}
+                {job.hsnCode && (
+                  <div className="flex justify-between py-1 border-b border-forge-aluminum/20">
+                    <span className="text-forge-steel">HSN Classification:</span>
+                    <span className="font-bold text-forge-black">{job.hsnCode}</span>
+                  </div>
+                )}
                 <div className="flex justify-between py-1 border-b border-forge-aluminum/20">
                   <span className="text-forge-steel">Target Spindle:</span>
                   <span className="font-bold text-forge-black">{job.targetMachineId}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-forge-aluminum/20">
                   <span className="text-forge-steel">Batch Quantity:</span>
-                  <span className="font-bold text-forge-black">{job.quantityCompleted} / {job.quantityTarget} units</span>
+                  <span className="font-bold text-forge-black">{job.quantityCompleted} / {job.quantityTarget} pieces</span>
                 </div>
                 <div className="flex justify-between py-1">
                   <span className="text-forge-steel">Verified Unit Cost:</span>
-                  <span className="font-bold text-forge-orange">${job.verifiedUnitCost.toFixed(2)} / unit</span>
+                  <span className="font-bold text-forge-orange">{formatINR(job.verifiedUnitCost, true)} / piece</span>
                 </div>
               </div>
 
@@ -192,7 +205,7 @@ export const DetailDrawer: React.FC<DetailDrawerProps> = ({
               {job.operations && job.operations.length > 0 && (
                 <div className="border border-forge-aluminum p-4 space-y-3 bg-white">
                   <span className="font-mono text-xs font-bold text-forge-black uppercase block border-b border-forge-aluminum/40 pb-2">
-                    ROUTING PROCESS FLOW
+                    ROUTING PROCESS FLOW (HOWRAH CELL)
                   </span>
                   <OperationFlowBar
                     operations={job.operations}
@@ -207,7 +220,7 @@ export const DetailDrawer: React.FC<DetailDrawerProps> = ({
         {/* Drawer Footer */}
         <div className="p-3 border-t border-forge-aluminum bg-forge-alabaster flex justify-between items-center font-mono text-[10px]">
           <span className="text-forge-steel">
-            FORGEOS MES v1.0 • PRECISION DATA
+            SHREE GANESH PRECISION • MES v1.0
           </span>
           <button
             onClick={onClose}

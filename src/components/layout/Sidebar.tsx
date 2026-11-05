@@ -47,9 +47,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="px-5 py-3 border-b border-forge-steel/20 bg-black/40">
           <div className="flex items-center gap-1.5 text-forge-aluminum">
             <Radio className="w-3 h-3 text-emerald-400 animate-pulse" />
-            <span className="font-mono text-[10px] tracking-wider uppercase">
-              PLANT 01 • SPINDLE NETWORK
+            <span className="font-mono text-[10px] tracking-wider uppercase font-semibold text-zinc-200">
+              SHREE GANESH PRECISION • HOWRAH
             </span>
+          </div>
+          <div className="text-[9px] font-mono text-zinc-400 pt-0.5">
+            24-SPINDLE HMLV FACILITY • WB, INDIA
           </div>
         </div>
 
@@ -104,8 +107,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
           <div className="mt-1 text-[10px] font-mono text-zinc-400 flex justify-between">
             <span>MTConnect Bridge</span>
-            <span className="text-zinc-300">12/12 Spindles</span>
+            <span className="text-zinc-300">24/24 Spindles</span>
           </div>
+        </div>
+
+        {/* User Context */}
+        <div className="px-2.5 py-2 bg-zinc-900/60 border border-zinc-800/80 font-mono text-[10px]">
+          <div className="text-zinc-400">LOGGED IN:</div>
+          <div className="text-zinc-200 font-bold truncate">Arindam Chatterjee</div>
+          <div className="text-forge-orange text-[9px]">PRODUCTION MANAGER</div>
         </div>
 
         {/* Settings button */}

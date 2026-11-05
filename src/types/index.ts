@@ -28,6 +28,7 @@ export interface Job {
   id: string;
   orderNumber: string;
   customerCode?: string;
+  customerName?: string;
   partName: string;
   partNumber: string;
   material: string;
@@ -39,10 +40,11 @@ export interface Job {
   targetMachineId: string;
   plannedStart: string;
   estCompletion: string;
-  verifiedUnitCost: number; // In currency units, e.g. $12.50
+  verifiedUnitCost: number; // In INR (₹)
   currentOperation: string;
   progressPercent: number;
   operations?: Operation[];
+  hsnCode?: string;
 }
 
 export interface MachineStateInterval {
@@ -55,6 +57,7 @@ export interface MachineStateInterval {
 export interface Machine {
   id: string; // e.g. "CNC-01"
   name: string; // e.g. "Hermle C42 5-Axis"
+  section?: string; // e.g. "Section 1: VMC & Milling"
   axisCount: 3 | 4 | 5;
   state: MachineState;
   connectionState: ConnectionState;
@@ -130,10 +133,13 @@ export interface FactoryKPIs {
 export interface AuditRecord {
   id: string;
   orderNumber: string;
+  customerName?: string;
   units: number;
   completionDate: string;
   status: 'COMPLETED';
   machineId: string;
   verifiedBy: string;
-  totalCost: number;
+  totalCost: number; // In INR (₹)
+  challanNumber?: string;
+  hsnCode?: string;
 }

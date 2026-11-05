@@ -37,7 +37,7 @@ export const TopBar: React.FC<TopBarProps> = ({
               {title}
             </h1>
             <span className="font-mono text-[9px] px-1.5 py-0.5 bg-forge-alabaster border border-forge-aluminum text-forge-steel font-semibold uppercase">
-              HMLV CELL
+              HOWRAH • 24 SPINDLES
             </span>
           </div>
           {subtitle && (
@@ -54,7 +54,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           <Search className="w-4 h-4 text-forge-steel absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search orders, machines (e.g. CNC-01), materials, parts..."
+            placeholder="Search orders (e.g. JOB-2026-001), spindles (e.g. VMC-02), materials, parts..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             className="w-full pl-9 pr-12 py-1.5 bg-forge-alabaster border border-forge-aluminum text-xs font-mono text-forge-black placeholder:text-forge-steel/60 focus:outline-none focus:border-forge-orange focus:bg-white transition-colors"
@@ -70,7 +70,7 @@ export const TopBar: React.FC<TopBarProps> = ({
         {/* Sample Data Disclaimer Tag */}
         <span className="hidden xl:inline-flex items-center gap-1 font-mono text-[10px] text-amber-800 bg-amber-50 border border-amber-300 px-2 py-1">
           <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-          CALIBRATED SAMPLE DATA
+          HOWRAH DEMO FACILITY
         </span>
 
         {/* Data Freshness Indicator */}
@@ -86,7 +86,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           <span className="text-forge-aluminum">|</span>
           <span className="text-[10px] text-forge-steel flex items-center gap-1">
             <Clock className="w-3 h-3" />
-            {lastRefresh}
+            {lastRefresh.includes('IST') ? lastRefresh : `${lastRefresh} IST`}
           </span>
         </div>
 

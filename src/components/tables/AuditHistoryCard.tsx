@@ -3,6 +3,7 @@ import { ChamferCard } from '../ui/ChamferCard';
 import { StatusBadge } from '../ui/StatusBadge';
 import { AuditRecord } from '../../types';
 import { ShieldCheck, FileText, ExternalLink } from 'lucide-react';
+import { formatINR } from '../../utils/formatters';
 
 interface AuditHistoryCardProps {
   history: AuditRecord[];
@@ -29,11 +30,11 @@ export const AuditHistoryCard: React.FC<AuditHistoryCardProps> = ({
           <thead>
             <tr className="border-b border-forge-aluminum/80 text-[10px] text-forge-steel uppercase tracking-wider">
               <th className="pb-2 font-semibold">Order ID</th>
-              <th className="pb-2 font-semibold">Completed Units</th>
+              <th className="pb-2 font-semibold">Completed</th>
               <th className="pb-2 font-semibold">Spindle</th>
-              <th className="pb-2 font-semibold">Completion Date</th>
+              <th className="pb-2 font-semibold">Completion (IST)</th>
               <th className="pb-2 font-semibold">QC Sign-off</th>
-              <th className="pb-2 font-semibold text-right">Job Cost</th>
+              <th className="pb-2 font-semibold text-right">Job Cost (INR)</th>
               <th className="pb-2 font-semibold text-center">Status</th>
             </tr>
           </thead>
@@ -42,10 +43,17 @@ export const AuditHistoryCard: React.FC<AuditHistoryCardProps> = ({
               <tr key={record.id} className="hover:bg-forge-alabaster/60 transition-colors">
                 <td className="py-2.5 font-bold text-forge-black flex items-center gap-1.5">
                   <FileText className="w-3 h-3 text-forge-steel" />
-                  {record.orderNumber}
+                  <div>
+                    <span>{record.orderNumber}</span>
+                    {record.customerName && (
+                      <span className="block text-[9px] text-forge-steel font-normal">
+                        {record.customerName}
+                      </span>
+                    )}
+                  </div>
                 </td>
                 <td className="py-2.5 text-forge-steel">
-                  <strong className="text-forge-black">{record.units}</strong> UNITS
+                  <strong className="text-forge-black">{record.units}</strong> PCS
                 </td>
                 <td className="py-2.5 text-forge-steel">
                   <span className="px-1.5 py-0.5 bg-forge-alabaster border border-forge-aluminum text-[10px]">
@@ -59,7 +67,7 @@ export const AuditHistoryCard: React.FC<AuditHistoryCardProps> = ({
                   {record.verifiedBy}
                 </td>
                 <td className="py-2.5 text-right font-semibold text-forge-black">
-                  ${record.totalCost.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                  {formatINR(record.totalCost, true)}
                 </td>
                 <td className="py-2.5 text-center">
                   <StatusBadge type="production" status={record.status} size="sm" />

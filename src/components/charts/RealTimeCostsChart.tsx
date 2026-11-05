@@ -2,28 +2,29 @@ import React from 'react';
 import { ChamferCard } from '../ui/ChamferCard';
 import { RealTimeCosts } from '../../types';
 import { CheckCircle2 } from 'lucide-react';
+import { formatINR } from '../../utils/formatters';
 
 interface RealTimeCostsChartProps {
   costs: RealTimeCosts;
 }
 
 export const RealTimeCostsChart: React.FC<RealTimeCostsChartProps> = ({ costs }) => {
-  const maxCost = Math.max(costs.materialCost, costs.laborCost, costs.machineCost, 1600);
+  const maxCost = Math.max(costs.materialCost, costs.laborCost, costs.machineCost, 500000);
 
   const items = [
-    { label: 'MATERIAL COST', value: costs.materialCost, color: 'bg-forge-steel', hex: '#475569' },
-    { label: 'LABOR COST', value: costs.laborCost, color: 'bg-forge-aluminum', hex: '#CBD5E1' },
-    { label: 'MACHINE TIME', value: costs.machineCost, color: 'bg-forge-orange', hex: '#F25C19' },
+    { label: 'RAW MATERIAL (En-8D / SS 304)', value: costs.materialCost, color: 'bg-forge-steel', hex: '#475569' },
+    { label: 'DIRECT SHOP OPERATOR LABOR', value: costs.laborCost, color: 'bg-forge-aluminum', hex: '#CBD5E1' },
+    { label: 'SPINDLE MACHINE TIME (POWER & OVERHEAD)', value: costs.machineCost, color: 'bg-forge-orange', hex: '#F25C19' },
   ];
 
   return (
     <ChamferCard
-      title="REAL-TIME COSTS"
-      tag="JOB ECONOMICS"
+      title="JOB DIRECT MANUFACTURING COSTS"
+      tag="JOB ECONOMICS (INR)"
       action={
         <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 border border-emerald-300 text-emerald-800 text-[10px] font-mono font-semibold">
           <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-          <span>UNIT_COST: VERIFIED</span>
+          <span>UNIT_COST: VERIFIED (INR)</span>
         </div>
       }
     >
@@ -32,23 +33,23 @@ export const RealTimeCostsChart: React.FC<RealTimeCostsChartProps> = ({ costs })
         <div className="flex items-baseline justify-between border-b border-forge-aluminum/40 pb-3">
           <div>
             <span className="font-mono text-[10px] uppercase text-forge-steel tracking-wider block">
-              Active Job Total Incurred
+              Active Batch Incurred Cost
             </span>
             <span className="font-display font-bold text-2xl text-forge-black">
-              ${costs.totalCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              {formatINR(costs.totalCost, true)}
             </span>
           </div>
 
           <div className="text-right">
             <span className="font-mono text-[10px] uppercase text-forge-steel tracking-wider block">
-              Calculated Unit Cost
+              Verified Unit Cost
             </span>
             <div className="flex items-baseline gap-1 justify-end">
               <span className="font-display font-bold text-xl text-forge-orange">
-                ${costs.unitCostVerified.toFixed(2)}
+                {formatINR(costs.unitCostVerified, true)}
               </span>
               <span className="font-mono text-[11px] text-forge-steel font-medium">
-                / UNIT
+                / PIECE
               </span>
             </div>
           </div>
@@ -65,7 +66,7 @@ export const RealTimeCostsChart: React.FC<RealTimeCostsChartProps> = ({ costs })
                     {item.label}
                   </span>
                   <span className="font-bold text-forge-black text-[12px]">
-                    ${item.value.toLocaleString()}
+                    {formatINR(item.value)}
                   </span>
                 </div>
                 {/* Bar Track */}
@@ -85,8 +86,8 @@ export const RealTimeCostsChart: React.FC<RealTimeCostsChartProps> = ({ costs })
 
         {/* Footnote definition */}
         <div className="pt-2 text-[10px] font-mono text-forge-steel border-t border-forge-aluminum/30 flex justify-between">
-          <span>* Machine time billed @ $95/hr standard spindle rate</span>
-          <span className="text-forge-black font-semibold">TOLERANCE: CLASS 1</span>
+          <span>* Machine time billed @ ₹3,200/hr spindle rate</span>
+          <span className="text-forge-black font-semibold">TOLERANCE: CLASS 1 ISO</span>
         </div>
       </div>
     </ChamferCard>

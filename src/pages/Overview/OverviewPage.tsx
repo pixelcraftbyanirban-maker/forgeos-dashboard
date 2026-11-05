@@ -8,6 +8,7 @@ import { AuditHistoryCard } from '../../components/tables/AuditHistoryCard';
 import { FleetDistributionBar } from '../../components/ui/FleetDistributionBar';
 import { DataStatusBanner } from '../../components/ui/DataStatusBanner';
 import { FactoryKPIs, Machine, Job, ProductionException, AuditRecord } from '../../types';
+import { formatINR } from '../../utils/formatters';
 
 interface OverviewPageProps {
   kpis: FactoryKPIs;
@@ -45,6 +46,12 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
   const delayedMachinesCount = machines.filter(m => m.connectionState === 'DELAYED').length;
   const disconnectedMachinesCount = machines.filter(m => m.connectionState === 'DISCONNECTED').length;
 
+  const runningCount = machines.filter(m => m.state === 'RUNNING').length;
+  const setupCount = machines.filter(m => m.state === 'SETUP').length;
+  const idleCount = machines.filter(m => m.state === 'IDLE').length;
+  const alarmCount = machines.filter(m => m.state === 'ALARM').length;
+  const stoppedCount = machines.filter(m => m.state === 'STOPPED').length;
+
   return (
     <div className="space-y-5">
       {/* 1. Industrial Telemetry Data Status Banner (Rule 12 & Section 06.E) */}
@@ -57,7 +64,7 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
         disconnectedCount={disconnectedMachinesCount}
       />
 
-      {/* 2. Operational Orientation Banner (Swiss Industrial Modernism) */}
+      {/* 2. Operational Orientation Banner (Swiss Industrial Modernism - Indian Facility) */}
       <div className="bg-white border border-forge-aluminum p-4 relative">
         <span className="absolute top-1 left-1 text-forge-aluminum font-mono text-[9px]">+</span>
         <span className="absolute bottom-1 right-1 text-forge-aluminum font-mono text-[9px]">+</span>
@@ -66,17 +73,17 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <span className="font-mono text-[10px] px-1.5 py-0.5 bg-forge-black text-white font-bold tracking-widest uppercase">
-                PLANT 01 • SHOP FLOOR OVERVIEW
+                SHREE GANESH PRECISION ENGINEERING
               </span>
               <span className="font-mono text-xs text-forge-steel">
-                HMLV PRECISION CNC MACHINING (12 SPINDLES)
+                HOWRAH, WB • 24 SPINDLES (3 SECTIONS)
               </span>
             </div>
             <h2 className="font-display font-bold text-xl lg:text-2xl text-forge-black tracking-tight">
               THE SINGLE SOURCE OF OPERATIONAL TRUTH.
             </h2>
             <p className="text-xs text-forge-steel font-sans max-w-3xl">
-              Unified shop-floor operations record. Real-time telemetry across 12 high-precision spindles, verified unit economics, multi-operation routing tracking, and live exception monitoring.
+              Unified shop-floor operations record for Indian precision manufacturing. Real-time telemetry across 24 CNC spindles in Howrah, verified unit economics (INR), multi-operation process routing, and live deviation tracking.
             </p>
           </div>
 
@@ -86,11 +93,11 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
               <div className="flex items-center gap-2 justify-end">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="font-bold text-forge-black text-sm">
-                  {kpis.activeSpindlesCount} / {kpis.totalSpindlesCount} CUTTING METAL
+                  {runningCount} / {machines.length} CUTTING METAL
                 </span>
               </div>
               <div className="text-[10px] text-forge-steel">
-                1 Setup • 1 Idle • 1 Stopped • 1 Alarm
+                {setupCount} Setup • {idleCount} Idle • {alarmCount} Alarm • {stoppedCount} Stopped
               </div>
             </div>
           </div>
@@ -108,9 +115,9 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <MetricCard
           category="REAL TIME"
-          value="122,770"
+          value="184,500"
           unit="RPM AGG"
-          subtext="Active spindle rotation rate"
+          subtext="Active spindle rotation rate (Howrah Cell)"
           accentColor="orange"
           badge="STREAM: LIVE"
         />
@@ -118,8 +125,8 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
         <MetricCard
           category="FACTORY OEE"
           value={`${kpis.factoryOeePct}%`}
-          subtext="A: 91.2% • P: 96.8% • Q: 99.1%"
-          trend={{ value: "+2.4% vs Shift B", isPositive: true }}
+          subtext="A: 89.4% • P: 95.2% • Q: 99.6%"
+          trend={{ value: "+1.8% vs Shift 02", isPositive: true }}
           accentColor="emerald"
           badge="GROUNDED OEE"
         />
@@ -127,20 +134,20 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
         <MetricCard
           category="SHOP UTILIZATION"
           value={`${kpis.shopUtilizationPct}%`}
-          subtext="8 of 12 spindles cutting active parts"
-          trend={{ value: "Target: 80.0%", isPositive: true }}
+          subtext={`${runningCount} of ${machines.length} spindles cutting active parts`}
+          trend={{ value: "Target: 75.0%", isPositive: true }}
           accentColor="black"
-          badge="SPINDLES"
+          badge="24 SPINDLES"
         />
 
         <MetricCard
           category="DATA FIDELITY"
-          value={`$${kpis.costs.unitCostVerified.toFixed(2)}`}
-          unit="/ UNIT"
-          subtext="Verified unit cost (Order #123442)"
+          value={formatINR(kpis.costs.unitCostVerified, true)}
+          unit="/ PIECE"
+          subtext="Verified unit cost (JOB-2026-001)"
           trend={{ value: "AUDIT SIGNED", isPositive: true }}
           accentColor="orange"
-          badge="VERIFIED"
+          badge="VERIFIED (INR)"
         />
       </div>
 

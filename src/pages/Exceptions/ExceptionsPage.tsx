@@ -319,17 +319,17 @@ export const ExceptionsPage: React.FC<ExceptionsPageProps> = ({
                     <div className="p-3 bg-emerald-50 border border-emerald-300 text-xs text-emerald-900 space-y-1">
                       <div className="flex items-center gap-1.5 font-bold">
                         <Check className="w-4 h-4 text-emerald-700" />
-                        <span>VERIFIED & ACKNOWLEDGED BY: {activeSelected.acknowledgedBy || 'Supervisor'}</span>
+                        <span>VERIFIED & ACKNOWLEDGED BY: {activeSelected.acknowledgedBy || 'Arindam Chatterjee (Production Manager)'}</span>
                       </div>
                       <div className="text-[11px] text-emerald-800 font-sans">
-                        Audit trail stamped. Telemetry logged into manufacturing compliance ledger.
+                        Audit trail stamped for Howrah plant. Telemetry logged into Indian manufacturing compliance ledger.
                       </div>
                     </div>
                   ) : (
                     <div className="space-y-2">
                       <textarea
                         rows={2}
-                        placeholder="Enter supervisor corrective notes (e.g. Cleared chip blockage, coolant pressure reset to 14 bar)..."
+                        placeholder="Enter supervisor corrective notes (e.g. Swarf cleared from coolant reservoir, dial indicator trueing completed by Sourav Das)..."
                         value={signOffNotes[activeSelected.id] || ''}
                         onChange={(e) => setSignOffNotes({ ...signOffNotes, [activeSelected.id]: e.target.value })}
                         className="w-full p-2 bg-forge-alabaster border border-forge-aluminum text-xs font-mono text-forge-black focus:outline-none focus:border-forge-orange"

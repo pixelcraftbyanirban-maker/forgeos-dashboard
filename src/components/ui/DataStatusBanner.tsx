@@ -35,11 +35,11 @@ export const DataStatusBanner: React.FC<DataStatusBannerProps> = ({
         </div>
 
         <div className="hidden sm:flex items-center gap-2 text-forge-steel border-l border-forge-aluminum/60 pl-3">
-          <span>PACKET: 0ms DROP</span>
+          <span>HOWRAH SUBSTATION 02</span>
           <span>•</span>
-          <span>POLL FREQ: 5s</span>
+          <span>POLL FREQ: 5s (120ms ping)</span>
           <span>•</span>
-          <span>LAST SYNC: {lastRefresh}</span>
+          <span>LAST SYNC: {lastRefresh.includes('IST') ? lastRefresh : `${lastRefresh} IST`}</span>
         </div>
       </div>
 
@@ -48,13 +48,13 @@ export const DataStatusBanner: React.FC<DataStatusBannerProps> = ({
         {delayedCount > 0 && (
           <div className="flex items-center gap-1 px-1.5 py-0.5 bg-amber-50 border border-amber-300 text-amber-800 text-[9px] font-semibold">
             <AlertTriangle className="w-3 h-3 text-amber-600" />
-            <span>{delayedCount} SPINDLE WITH DELAYED TELEMETRY (CNC-11)</span>
+            <span>{delayedCount} SPINDLE WITH DELAYED TELEMETRY (CNC-07)</span>
           </div>
         )}
 
         <div className="flex items-center gap-2">
           <span className="px-1.5 py-0.5 bg-white border border-forge-aluminum text-forge-steel text-[9px] uppercase tracking-wider font-semibold">
-            ILLUSTRATIVE HMLV DATASET
+            SHREE GANESH PRECISION (DEMO)
           </span>
 
           {onRefresh && (

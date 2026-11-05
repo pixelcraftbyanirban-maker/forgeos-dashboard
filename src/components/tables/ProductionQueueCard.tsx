@@ -42,11 +42,15 @@ export const ProductionQueueCard: React.FC<ProductionQueueCardProps> = ({
               <span className="font-mono text-xs font-bold text-forge-black">
                 {currentJob.orderNumber}
               </span>
-              {currentJob.customerCode && (
+              {currentJob.customerName ? (
+                <span className="font-mono text-[10px] px-1 bg-white border border-forge-aluminum text-forge-black font-semibold">
+                  {currentJob.customerName}
+                </span>
+              ) : currentJob.customerCode ? (
                 <span className="font-mono text-[10px] px-1 bg-white border border-forge-aluminum text-forge-steel">
                   {currentJob.customerCode}
                 </span>
-              )}
+              ) : null}
             </div>
             <StatusBadge type="production" status={currentJob.state} size="sm" />
           </div>
@@ -57,13 +61,14 @@ export const ProductionQueueCard: React.FC<ProductionQueueCardProps> = ({
                 {currentJob.partName}
               </span>
               <span className="font-mono text-[11px] text-forge-steel">
-                PN: <strong className="text-forge-black">{currentJob.partNumber}</strong> • MATERIAL: <strong className="text-forge-black">{currentJob.material}</strong>
+                PART NO: <strong className="text-forge-black">{currentJob.partNumber}</strong> • MATERIAL: <strong className="text-forge-black">{currentJob.material}</strong>
+                {currentJob.hsnCode && <span> • HSN: <strong className="text-forge-black">{currentJob.hsnCode}</strong></span>}
               </span>
             </div>
 
             <div className="text-left md:text-right font-mono text-[11px] text-forge-steel">
-              <div>TARGET SPINDLE: <strong className="text-forge-black">{currentJob.targetMachineId}</strong></div>
-              <div>EST COMPLETION: <strong className="text-forge-black">{currentJob.estCompletion}</strong></div>
+              <div>SPINDLE: <strong className="text-forge-black">{currentJob.targetMachineId}</strong></div>
+              <div>EST DISPATCH: <strong className="text-forge-black">{currentJob.estCompletion}</strong></div>
             </div>
           </div>
 
@@ -74,7 +79,7 @@ export const ProductionQueueCard: React.FC<ProductionQueueCardProps> = ({
                 {currentJob.currentOperation}
               </span>
               <span className="font-bold text-forge-orange">
-                {currentJob.progressPercent}% PROGRESS ({currentJob.quantityCompleted} / {currentJob.quantityTarget} UNITS)
+                {currentJob.progressPercent}% PROGRESS ({currentJob.quantityCompleted} / {currentJob.quantityTarget} PIECES)
               </span>
             </div>
             <div className="h-2.5 bg-white border border-forge-aluminum relative overflow-hidden">

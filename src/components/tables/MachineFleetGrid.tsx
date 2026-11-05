@@ -47,7 +47,7 @@ export const MachineFleetGrid: React.FC<MachineFleetGridProps> = ({
   return (
     <ChamferCard
       title="SPINDLE FLEET & REAL-TIME TELEMETRY"
-      tag="12 SPINDLES"
+      tag={`${machines.length} SPINDLES • HOWRAH CELL`}
       action={
         <div className="flex flex-wrap items-center gap-1">
           {[

@@ -69,6 +69,8 @@ export const AppShell: React.FC<AppShellProps> = ({
                 SYSTEM STATUS: ONLINE
               </span>
               <span className="text-forge-aluminum">|</span>
+              <span>SHREE GANESH PRECISION • HOWRAH, WB</span>
+              <span className="text-forge-aluminum">|</span>
               <span>SYNC: MTCONNECT STREAM (5s)</span>
               <span className="text-forge-aluminum">|</span>
               <span>AUDIT: IMMUTABLE LEDGER</span>

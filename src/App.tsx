@@ -24,7 +24,7 @@ export const App: React.FC = () => {
   const [exceptions, setExceptions] = useState<ProductionException[]>(INITIAL_EXCEPTIONS);
   const [kpis] = useState<FactoryKPIs>(INITIAL_FACTORY_KPIS);
   const [connectionState] = useState<ConnectionState>('CURRENT');
-  const [lastRefresh, setLastRefresh] = useState('Just now');
+  const [lastRefresh, setLastRefresh] = useState('14:30:00 IST');
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Inspector Drawer State
@@ -69,7 +69,7 @@ export const App: React.FC = () => {
 
       const now = new Date();
       const timeStr = now.toTimeString().split(' ')[0];
-      setLastRefresh(`${timeStr}`);
+      setLastRefresh(`${timeStr} IST`);
       setIsRefreshing(false);
     }, 450);
   };
@@ -109,7 +109,7 @@ export const App: React.FC = () => {
     setExceptions((prev) =>
       prev.map((ex) =>
         ex.id === id
-          ? { ...ex, acknowledged: true, acknowledgedBy: 'Prod Manager (You)' }
+          ? { ...ex, acknowledged: true, acknowledgedBy: 'Arindam Chatterjee (Prod. Mgr)' }
           : ex
       )
     );
@@ -135,7 +135,7 @@ export const App: React.FC = () => {
         }
         subtitle={
           currentTab === 'overview'
-            ? 'HMLV CNC Production Floor • 12 Active Spindles'
+            ? 'Shree Ganesh Precision Engineering • Howrah (24 Spindles)'
             : currentTab === 'production'
             ? 'Work Orders, Operation Routing & Progress'
             : currentTab === 'machines'
