@@ -8,11 +8,10 @@ interface LogoProps {
 }
 
 /**
- * FORGEOS Vector Monogram & Wordmark
- * Precise geometric reproduction according to Monogram Anatomy (Page 8-15)
- * - 45° left chamfer on Upper Blade (#F25C19)
- * - Central Locking Crossbar (#0A0D12 / #FFFFFF)
- * - Inverted Lower Wedge (#F25C19)
+ * FORGEOS Official Brand Logo Component
+ * Matches the official ForgeOS Brand Identity & typography:
+ * - Monogram "F" with Upper Blade (#FA611A), Locking Crossbar, and Lower Wedge (#FA611A)
+ * - Eurostile Bold typography: "orge" (Carbide Black / Daylight White) + "OS" (#FA611A)
  */
 export const Logo: React.FC<LogoProps> = ({
   variant = 'full',
@@ -22,47 +21,56 @@ export const Logo: React.FC<LogoProps> = ({
 }) => {
   const isDark = theme === 'dark';
   const crossbarColor = isDark ? '#FFFFFF' : '#0A0D12';
-  const forgeTextColor = isDark ? '#FFFFFF' : '#0A0D12';
-  const orange = '#F25C19';
+  const orange = '#FA611A';
+
+  if (variant === 'monogram') {
+    return (
+      <div className={`inline-flex items-center select-none ${className}`}>
+        <svg
+          height={height}
+          viewBox="104.75 121.47 37.79 36.93"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="flex-shrink-0"
+          aria-label="FORGEOS Monogram"
+        >
+          {/* Upper Blade - sheared chamfer */}
+          <polygon
+            points="142.54 121.47 134.63 129.05 117.6 129.05 104.75 141.9 104.75 132.79 116.08 121.47 142.54 121.47"
+            fill={orange}
+          />
+          {/* Central Locking Crossbar */}
+          <polygon
+            points="132.02 132.36 125.64 139.35 117.97 139.45 115.03 142.28 106.4 142.24 116.28 132.36 132.02 132.36"
+            fill={crossbarColor}
+          />
+          {/* Lower Wedge */}
+          <path
+            d="M106.9 143.5h8.19l4.15 4.15 1 10.75-14.12-14.12s.95-.78.78-.78Z"
+            fill={orange}
+          />
+        </svg>
+      </div>
+    );
+  }
+
+  // Full Wordmark Logo with official Eurostile typography
+  const logoSrc = isDark ? '/forgeos-logo-dark.png' : '/forgeos-logo-light.png';
+  const aspectRatio = 503 / 147;
+  const width = Math.round(height * aspectRatio);
 
   return (
-    <div className={`inline-flex items-center gap-2.5 select-none ${className}`}>
-      {/* Precision Geometric Monogram */}
-      <svg
+    <div className={`inline-flex items-center select-none ${className}`}>
+      <img
+        src={logoSrc}
+        alt="FORGEOS"
         height={height}
-        viewBox="0 0 100 100"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className="flex-shrink-0"
-      >
-        {/* Upper Blade - 45° left chamfer, sheared terminal */}
-        <polygon
-          points="20,15 90,15 72,37 32,37 18,22"
-          fill={orange}
-        />
-        {/* Locking Crossbar - Central structural polygon */}
-        <polygon
-          points="18,43 78,43 62,63 26,63"
-          fill={crossbarColor}
-        />
-        {/* Lower Wedge - Inverted base polygon */}
-        <polygon
-          points="15,69 35,69 42,95 24,95"
-          fill={orange}
-        />
-      </svg>
-
-      {/* Wordmark */}
-      {variant === 'full' && (
-        <div className="flex items-baseline tracking-tight font-sans font-bold leading-none" style={{ fontSize: `${height * 0.72}px` }}>
-          <span style={{ color: forgeTextColor }} className="font-extrabold tracking-tight">
-            forge
-          </span>
-          <span style={{ color: orange }} className="font-extrabold tracking-tight ml-0.5">
-            OS
-          </span>
-        </div>
-      )}
+        width={width}
+        style={{ height: `${height}px`, width: `${width}px` }}
+        className="object-contain flex-shrink-0"
+        loading="eager"
+        decoding="async"
+      />
     </div>
   );
 };

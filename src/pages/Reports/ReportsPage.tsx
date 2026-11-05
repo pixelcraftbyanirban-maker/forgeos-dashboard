@@ -1,6 +1,7 @@
 import React from 'react';
 import { ChamferCard } from '../../components/ui/ChamferCard';
 import { MetricCard } from '../../components/ui/MetricCard';
+import { OeeComponentBreakdown } from '../../components/ui/OeeComponentBreakdown';
 import { AuditRecord } from '../../types';
 import { Download, ShieldCheck, CheckCircle2, FileText } from 'lucide-react';
 
@@ -29,6 +30,20 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ auditHistory }) => {
     link.click();
     document.body.removeChild(link);
   };
+
+  const factoryOee = {
+    overall: 87.4,
+    availability: 91.2,
+    performance: 96.8,
+    quality: 99.1
+  };
+
+  const downtimeLossCategories = [
+    { label: "SETUP & FIXTURE DIAL-IN", minutes: 185, pct: 41, color: "bg-blue-600" },
+    { label: "THERMAL ALARMS & SHUTDOWN", minutes: 120, pct: 27, color: "bg-rose-600" },
+    { label: "TOOL WEAR TOUCH-OFF", minutes: 80, pct: 18, color: "bg-amber-500" },
+    { label: "CHIP VACUUM & CLEANING", minutes: 65, pct: 14, color: "bg-slate-500" },
+  ];
 
   return (
     <div className="space-y-6">
@@ -69,7 +84,57 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ auditHistory }) => {
         />
       </div>
 
-      {/* 2. Audit Trail Card */}
+      {/* 2. Graphical Performance Analytics Row (Section 09 & 11) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Factory OEE Breakdown */}
+        <div className="lg:col-span-7">
+          <OeeComponentBreakdown
+            oee={factoryOee}
+            title="FACTORY-WIDE GROUNDED OEE (SHIFT 01)"
+            showFormula={true}
+          />
+        </div>
+
+        {/* Downtime Pareto Loss Classification */}
+        <div className="lg:col-span-5">
+          <ChamferCard
+            title="DOWNTIME PARETO CLASSIFICATION"
+            tag="LOSS CATEGORIES"
+            action={
+              <span className="font-mono text-[10px] text-forge-steel font-semibold">
+                SHIFT 01: 450 MIN TOTAL
+              </span>
+            }
+          >
+            <div className="space-y-3 font-mono text-xs">
+              <p className="font-sans text-xs text-forge-steel">
+                Root operational loss breakdown categorized according to SEMI E10 equipment reliability standards.
+              </p>
+
+              <div className="space-y-3 pt-2">
+                {downtimeLossCategories.map((cat) => (
+                  <div key={cat.label} className="space-y-1">
+                    <div className="flex justify-between items-center text-[11px]">
+                      <span className="font-bold text-forge-black">{cat.label}</span>
+                      <span className="text-forge-steel font-bold">{cat.minutes}m ({cat.pct}%)</span>
+                    </div>
+                    <div className="h-3 bg-forge-alabaster border border-forge-aluminum overflow-hidden flex items-center">
+                      <div className={`h-full ${cat.color}`} style={{ width: `${cat.pct}%` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="pt-3 border-t border-forge-aluminum/40 text-[10px] text-forge-steel flex justify-between">
+                <span>BENCHMARK TARGET: &lt; 380 MIN</span>
+                <span className="font-bold text-amber-700">+70 MIN VARIANCE</span>
+              </div>
+            </div>
+          </ChamferCard>
+        </div>
+      </div>
+
+      {/* 3. Audit Trail Table */}
       <ChamferCard
         title="HISTORICAL PRODUCTION AUDIT TRAIL & COMPLIANCE RECORDS"
         tag="REPORTS"
@@ -86,10 +151,10 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ auditHistory }) => {
         <div className="space-y-4">
           <div className="p-3 bg-emerald-50 border border-emerald-300 text-xs font-mono text-emerald-900 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              <span>All manufacturing records are timestamped with operator credentials and CMM dimensional logs.</span>
+              <ShieldCheck className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+              <span>All manufacturing records are timestamped with operator credentials, spindle ID, and CMM dimensional inspection logs.</span>
             </div>
-            <span className="font-bold">REV 1.0 COMPLIANT</span>
+            <span className="font-bold flex-shrink-0">REV 1.0 COMPLIANT</span>
           </div>
 
           <div className="overflow-x-auto">

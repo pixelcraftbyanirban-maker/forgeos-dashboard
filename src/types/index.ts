@@ -45,6 +45,13 @@ export interface Job {
   operations?: Operation[];
 }
 
+export interface MachineStateInterval {
+  startHour: string; // e.g. "06:00"
+  durationMinutes: number;
+  state: MachineState;
+  reason?: string;
+}
+
 export interface Machine {
   id: string; // e.g. "CNC-01"
   name: string; // e.g. "Hermle C42 5-Axis"
@@ -54,7 +61,9 @@ export interface Machine {
   currentJobId: string | null;
   operator: string;
   spindleRpm: number;
+  maxRpm?: number;
   feedRateMmpm: number;
+  maxFeedRate?: number;
   feedOverridePct: number;
   oee: {
     overall: number; // Availability * Performance * Quality
@@ -65,6 +74,15 @@ export interface Machine {
   lastStateChange: string;
   telemetryTimestamp: string;
   uptimeHoursToday: number;
+  stateHistory?: MachineStateInterval[];
+}
+
+export interface ExceptionEvent {
+  time: string;
+  source: string;
+  message: string;
+  channel?: string;
+  sensorValue?: string;
 }
 
 export interface ProductionException {
@@ -78,6 +96,10 @@ export interface ProductionException {
   jobId?: string;
   acknowledged: boolean;
   acknowledgedBy?: string;
+  events?: ExceptionEvent[];
+  resolutionNotes?: string;
+  resolvedAt?: string;
+  resolvedBy?: string;
 }
 
 export interface RealTimeCosts {

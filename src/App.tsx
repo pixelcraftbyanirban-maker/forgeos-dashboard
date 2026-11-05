@@ -163,6 +163,8 @@ export const App: React.FC = () => {
             onSelectJob={handleSelectJob}
             onAcknowledgeException={handleAcknowledgeException}
             onNavigateToTab={setCurrentTab}
+            onRefresh={handleManualRefresh}
+            isRefreshing={isRefreshing}
           />
         )}
 

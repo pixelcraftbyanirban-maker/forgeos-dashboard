@@ -1,7 +1,11 @@
 import React from 'react';
-import { X } from 'lucide-react';
+import { X, Cpu, Workflow } from 'lucide-react';
 import { Machine, Job } from '../../types';
 import { StatusBadge } from './StatusBadge';
+import { ShiftTimeline } from './ShiftTimeline';
+import { LinearGauge } from './GaugeIndicator';
+import { OeeComponentBreakdown } from './OeeComponentBreakdown';
+import { OperationFlowBar } from './OperationFlowBar';
 
 interface DetailDrawerProps {
   isOpen: boolean;
@@ -20,100 +24,120 @@ export const DetailDrawer: React.FC<DetailDrawerProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden bg-black/40 backdrop-blur-xs flex justify-end">
-      <div className="w-full max-w-lg bg-white border-l border-forge-aluminum h-full shadow-2xl flex flex-col justify-between animate-in slide-in-from-right duration-200">
+      <div className="w-full max-w-xl bg-white border-l border-forge-aluminum h-full shadow-2xl flex flex-col justify-between animate-in slide-in-from-right duration-200">
         {/* Drawer Header */}
-        <div className="p-5 border-b border-forge-aluminum flex items-center justify-between bg-forge-alabaster">
-          <div>
-            <span className="font-mono text-[10px] uppercase text-forge-steel tracking-wider font-semibold block">
-              {machine ? 'SPINDLE TELEMETRY DETAIL' : 'MANUFACTURING WORK ORDER'}
+        <div className="p-4 border-b border-forge-aluminum flex items-center justify-between bg-forge-alabaster">
+          <div className="flex items-center gap-2">
+            <span className="p-1.5 bg-forge-black text-white">
+              {machine ? <Cpu className="w-4 h-4 text-forge-orange" /> : <Workflow className="w-4 h-4 text-forge-orange" />}
             </span>
-            <h2 className="font-display font-bold text-lg text-forge-black">
-              {machine ? `${machine.id} • ${machine.name}` : `${job?.orderNumber} • ${job?.partName}`}
-            </h2>
+            <div>
+              <span className="font-mono text-[10px] uppercase text-forge-steel tracking-wider font-semibold block">
+                {machine ? 'SPINDLE TELEMETRY INSPECTOR' : 'WORK ORDER DETAIL'}
+              </span>
+              <h2 className="font-display font-bold text-base text-forge-black">
+                {machine ? `${machine.id} • ${machine.name}` : `${job?.orderNumber} • ${job?.partName}`}
+              </h2>
+            </div>
           </div>
           <button
             onClick={onClose}
             className="p-1.5 hover:bg-white border border-forge-aluminum text-forge-steel hover:text-forge-black transition-colors"
+            title="Close Inspector (Esc)"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Drawer Body */}
-        <div className="p-6 overflow-y-auto flex-1 space-y-6">
+        <div className="p-5 overflow-y-auto flex-1 space-y-5">
           {machine && (
-            <div className="space-y-5">
+            <div className="space-y-4">
+              {/* State & Connection Summary */}
               <div className="flex items-center justify-between p-3 bg-forge-alabaster border border-forge-aluminum">
                 <div>
                   <span className="text-[10px] font-mono text-forge-steel uppercase block">Machine State</span>
                   <StatusBadge type="machine" status={machine.state} />
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] font-mono text-forge-steel uppercase block">Data Stream</span>
+                  <span className="text-[10px] font-mono text-forge-steel uppercase block">MTConnect Stream</span>
                   <StatusBadge type="connection" status={machine.connectionState} />
                 </div>
               </div>
 
-              {/* OEE Breakdown */}
-              <div className="border border-forge-aluminum p-4 space-y-3">
-                <div className="flex items-center justify-between border-b border-forge-aluminum/40 pb-2">
-                  <span className="font-mono text-xs font-bold text-forge-black uppercase">
-                    OEE BREAKDOWN
+              {/* 8-Hour State Timeline (Full Shift Inspection) */}
+              <div className="border border-forge-aluminum p-3.5 space-y-2 bg-white">
+                <div className="flex items-center justify-between font-mono text-[10px]">
+                  <span className="font-bold text-forge-black uppercase">
+                    8-HOUR SHIFT 01 TIMELINE
                   </span>
-                  <span className="font-display font-bold text-lg text-emerald-700">
-                    {machine.oee.overall}%
+                  <span className="text-forge-steel">
+                    Uptime: <strong className="text-forge-black">{machine.uptimeHoursToday}h</strong>
                   </span>
                 </div>
-
-                <div className="grid grid-cols-3 gap-2 font-mono text-center text-xs">
-                  <div className="p-2 bg-forge-alabaster border border-forge-aluminum">
-                    <span className="text-[10px] text-forge-steel block">AVAILABILITY</span>
-                    <span className="font-bold text-forge-black">{machine.oee.availability}%</span>
-                  </div>
-                  <div className="p-2 bg-forge-alabaster border border-forge-aluminum">
-                    <span className="text-[10px] text-forge-steel block">PERFORMANCE</span>
-                    <span className="font-bold text-forge-black">{machine.oee.performance}%</span>
-                  </div>
-                  <div className="p-2 bg-forge-alabaster border border-forge-aluminum">
-                    <span className="text-[10px] text-forge-steel block">QUALITY</span>
-                    <span className="font-bold text-forge-black">{machine.oee.quality}%</span>
-                  </div>
-                </div>
-                <div className="text-[10px] font-mono text-forge-steel">
-                  Formula: Availability × Performance × Quality = Grounded Shop Standard.
-                </div>
+                <ShiftTimeline intervals={machine.stateHistory} compact={false} />
               </div>
 
-              {/* Real-time Telemetry parameters */}
-              <div className="border border-forge-aluminum p-4 space-y-3">
+              {/* Graphical OEE Component Breakdown */}
+              <OeeComponentBreakdown
+                oee={machine.oee}
+                title={`${machine.id} GROUNDED OEE BREAKDOWN`}
+                showFormula={true}
+              />
+
+              {/* Real-time Telemetry Linear Gauges */}
+              <div className="border border-forge-aluminum p-4 space-y-3 bg-white">
                 <span className="font-mono text-xs font-bold text-forge-black uppercase block border-b border-forge-aluminum/40 pb-2">
-                  CNC SENSOR CHANNELS
+                  LIVE SPINDLE SENSOR CHANNELS
                 </span>
 
-                <div className="space-y-2 font-mono text-xs">
-                  <div className="flex justify-between py-1 border-b border-forge-aluminum/30">
-                    <span className="text-forge-steel">Spindle Speed:</span>
-                    <span className="font-bold text-forge-black">{machine.spindleRpm.toLocaleString()} RPM</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-forge-aluminum/30">
-                    <span className="text-forge-steel">Feed Rate:</span>
-                    <span className="font-bold text-forge-black">{machine.feedRateMmpm} mm/min</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-forge-aluminum/30">
-                    <span className="text-forge-steel">Feed Override:</span>
-                    <span className="font-bold text-forge-black">{machine.feedOverridePct}%</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-forge-aluminum/30">
+                <div className="space-y-2.5">
+                  <LinearGauge
+                    label="SPINDLE ROTATION SPEED"
+                    value={machine.spindleRpm}
+                    max={machine.maxRpm || 20000}
+                    unit="RPM"
+                    nominalTarget={12000}
+                    color={machine.state === 'RUNNING' ? 'orange' : 'slate'}
+                  />
+
+                  <LinearGauge
+                    label="AXIS FEED RATE"
+                    value={machine.feedRateMmpm}
+                    max={machine.maxFeedRate || 6000}
+                    unit="mm/min"
+                    nominalTarget={3500}
+                    color="blue"
+                  />
+
+                  <LinearGauge
+                    label="FEED OVERRIDE POTENTIOMETER"
+                    value={machine.feedOverridePct}
+                    max={120}
+                    unit="%"
+                    nominalTarget={100}
+                    color={machine.feedOverridePct >= 95 ? 'emerald' : 'orange'}
+                  />
+                </div>
+
+                <div className="pt-2 border-t border-forge-aluminum/40 font-mono text-xs space-y-1.5">
+                  <div className="flex justify-between py-1 border-b border-forge-aluminum/20">
                     <span className="text-forge-steel">Current Operator:</span>
                     <span className="font-bold text-forge-black">{machine.operator}</span>
                   </div>
-                  <div className="flex justify-between py-1 border-b border-forge-aluminum/30">
-                    <span className="text-forge-steel">Active Job:</span>
-                    <span className="font-bold text-forge-orange">{machine.currentJobId || 'None (Idle)'}</span>
+                  <div className="flex justify-between py-1 border-b border-forge-aluminum/20">
+                    <span className="text-forge-steel">Active Work Order:</span>
+                    <span className="font-bold text-forge-orange">
+                      {machine.currentJobId ? machine.currentJobId : '— No Active Job (Idle) —'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-forge-aluminum/20">
+                    <span className="text-forge-steel">Axis Configuration:</span>
+                    <span className="font-bold text-forge-black">{machine.axisCount}-Axis CNC Cell</span>
                   </div>
                   <div className="flex justify-between py-1">
-                    <span className="text-forge-steel">State Duration:</span>
-                    <span className="font-bold text-forge-black">{machine.lastStateChange}</span>
+                    <span className="text-forge-steel">Last Telemetry Packet:</span>
+                    <span className="font-bold text-forge-black">{machine.telemetryTimestamp}</span>
                   </div>
                 </div>
               </div>
@@ -121,63 +145,59 @@ export const DetailDrawer: React.FC<DetailDrawerProps> = ({
           )}
 
           {job && (
-            <div className="space-y-5">
+            <div className="space-y-4">
               <div className="flex items-center justify-between p-3 bg-forge-alabaster border border-forge-aluminum">
                 <div>
                   <span className="text-[10px] font-mono text-forge-steel uppercase block">Workflow State</span>
                   <StatusBadge type="production" status={job.state} />
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] font-mono text-forge-steel uppercase block">Priority</span>
+                  <span className="text-[10px] font-mono text-forge-steel uppercase block">Dispatch Priority</span>
                   <span className="font-mono text-xs font-bold text-forge-orange">{job.priority}</span>
                 </div>
               </div>
 
               {/* Part & Material Info */}
-              <div className="border border-forge-aluminum p-4 space-y-2 font-mono text-xs">
-                <div className="flex justify-between py-1 border-b border-forge-aluminum/30">
+              <div className="border border-forge-aluminum p-4 space-y-2 font-mono text-xs bg-white">
+                <span className="font-mono text-xs font-bold text-forge-black uppercase block border-b border-forge-aluminum/40 pb-2">
+                  ORDER SPECIFICATIONS
+                </span>
+                <div className="flex justify-between py-1 border-b border-forge-aluminum/20">
                   <span className="text-forge-steel">Part Number:</span>
                   <span className="font-bold text-forge-black">{job.partNumber}</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-forge-aluminum/30">
-                  <span className="text-forge-steel">Material:</span>
+                <div className="flex justify-between py-1 border-b border-forge-aluminum/20">
+                  <span className="text-forge-steel">Material Alloy:</span>
                   <span className="font-bold text-forge-black">{job.material}</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-forge-aluminum/30">
+                <div className="flex justify-between py-1 border-b border-forge-aluminum/20">
+                  <span className="text-forge-steel">Customer Code:</span>
+                  <span className="font-bold text-forge-black">{job.customerCode || 'STANDARD'}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-forge-aluminum/20">
                   <span className="text-forge-steel">Target Spindle:</span>
                   <span className="font-bold text-forge-black">{job.targetMachineId}</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-forge-aluminum/30">
-                  <span className="text-forge-steel">Quantity:</span>
+                <div className="flex justify-between py-1 border-b border-forge-aluminum/20">
+                  <span className="text-forge-steel">Batch Quantity:</span>
                   <span className="font-bold text-forge-black">{job.quantityCompleted} / {job.quantityTarget} units</span>
                 </div>
                 <div className="flex justify-between py-1">
                   <span className="text-forge-steel">Verified Unit Cost:</span>
-                  <span className="font-bold text-forge-orange">${job.verifiedUnitCost.toFixed(2)}</span>
+                  <span className="font-bold text-forge-orange">${job.verifiedUnitCost.toFixed(2)} / unit</span>
                 </div>
               </div>
 
-              {/* Operations Progress Routing */}
-              {job.operations && (
-                <div className="border border-forge-aluminum p-4 space-y-3">
+              {/* Graphical Operation Routing Flow */}
+              {job.operations && job.operations.length > 0 && (
+                <div className="border border-forge-aluminum p-4 space-y-3 bg-white">
                   <span className="font-mono text-xs font-bold text-forge-black uppercase block border-b border-forge-aluminum/40 pb-2">
-                    OPERATION ROUTING
+                    ROUTING PROCESS FLOW
                   </span>
-                  <div className="space-y-2">
-                    {job.operations.map((op) => (
-                      <div key={op.id} className="p-2 border border-forge-aluminum text-xs font-mono flex items-center justify-between">
-                        <div>
-                          <div className="font-bold text-forge-black">
-                            Op {op.stepNumber}: {op.name}
-                          </div>
-                          <div className="text-[10px] text-forge-steel">
-                            Cell: {op.machineType} • Planned: {op.plannedMinutes}m
-                          </div>
-                        </div>
-                        <StatusBadge type="production" status={op.state} size="sm" />
-                      </div>
-                    ))}
-                  </div>
+                  <OperationFlowBar
+                    operations={job.operations}
+                    currentOperationName={job.currentOperation}
+                  />
                 </div>
               )}
             </div>
@@ -185,10 +205,13 @@ export const DetailDrawer: React.FC<DetailDrawerProps> = ({
         </div>
 
         {/* Drawer Footer */}
-        <div className="p-4 border-t border-forge-aluminum bg-forge-alabaster flex justify-end">
+        <div className="p-3 border-t border-forge-aluminum bg-forge-alabaster flex justify-between items-center font-mono text-[10px]">
+          <span className="text-forge-steel">
+            FORGEOS MES v1.0 • PRECISION DATA
+          </span>
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-forge-black text-white text-xs font-mono font-semibold uppercase hover:bg-zinc-800 transition-colors"
+            className="px-4 py-1.5 bg-forge-black text-white text-xs font-mono font-semibold uppercase hover:bg-zinc-800 transition-colors"
           >
             Close Inspector
           </button>

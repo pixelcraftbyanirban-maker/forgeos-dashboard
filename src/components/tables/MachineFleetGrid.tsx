@@ -1,24 +1,39 @@
 import React, { useState } from 'react';
 import { ChamferCard } from '../ui/ChamferCard';
 import { StatusBadge } from '../ui/StatusBadge';
+import { ShiftTimeline } from '../ui/ShiftTimeline';
+import { LinearGauge } from '../ui/GaugeIndicator';
 import { Machine } from '../../types';
-import { Activity, User } from 'lucide-react';
+import { Activity, User, ArrowRight } from 'lucide-react';
 
 interface MachineFleetGridProps {
   machines: Machine[];
   onSelectMachine: (machineId: string) => void;
+  externalFilterState?: string;
+  onFilterStateChange?: (state: string) => void;
 }
 
 export const MachineFleetGrid: React.FC<MachineFleetGridProps> = ({
   machines,
-  onSelectMachine
+  onSelectMachine,
+  externalFilterState,
+  onFilterStateChange
 }) => {
-  const [filterState, setFilterState] = useState<string>('ALL');
+  const [internalFilterState, setInternalFilterState] = useState<string>('ALL');
+  const activeFilter = externalFilterState !== undefined ? externalFilterState : internalFilterState;
+
+  const handleFilter = (state: string) => {
+    if (onFilterStateChange) {
+      onFilterStateChange(state);
+    } else {
+      setInternalFilterState(state);
+    }
+  };
 
   const filteredMachines = machines.filter((m) => {
-    if (filterState === 'ALL') return true;
-    if (filterState === 'ATTENTION') return m.state === 'ALARM' || m.state === 'STOPPED';
-    return m.state === filterState;
+    if (activeFilter === 'ALL') return true;
+    if (activeFilter === 'ATTENTION') return m.state === 'ALARM' || m.state === 'STOPPED';
+    return m.state === activeFilter;
   });
 
   const stateCounts = {
@@ -31,10 +46,10 @@ export const MachineFleetGrid: React.FC<MachineFleetGridProps> = ({
 
   return (
     <ChamferCard
-      title="SPINDLE FLEET & TELEMETRY"
+      title="SPINDLE FLEET & REAL-TIME TELEMETRY"
       tag="12 SPINDLES"
       action={
-        <div className="flex items-center gap-1">
+        <div className="flex flex-wrap items-center gap-1">
           {[
             { id: 'ALL', label: `ALL (${stateCounts.all})` },
             { id: 'RUNNING', label: `RUNNING (${stateCounts.running})` },
@@ -44,9 +59,9 @@ export const MachineFleetGrid: React.FC<MachineFleetGridProps> = ({
           ].map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setFilterState(tab.id)}
+              onClick={() => handleFilter(tab.id)}
               className={`px-2 py-0.5 text-[10px] font-mono tracking-wider transition-colors border ${
-                filterState === tab.id
+                activeFilter === tab.id
                   ? 'bg-forge-black text-white border-forge-black font-semibold'
                   : 'bg-white text-forge-steel border-forge-aluminum hover:text-forge-black'
               }`}
@@ -60,20 +75,25 @@ export const MachineFleetGrid: React.FC<MachineFleetGridProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
         {filteredMachines.map((machine) => {
           const isAlarm = machine.state === 'ALARM';
+          const isStopped = machine.state === 'STOPPED';
           const cardBorder = isAlarm
-            ? 'border-rose-400 bg-rose-50/30'
+            ? 'border-rose-400 bg-rose-50/30 ring-1 ring-rose-400'
+            : isStopped
+            ? 'border-slate-400 bg-slate-50/40'
             : machine.state === 'RUNNING'
-            ? 'border-forge-aluminum hover:border-emerald-400 bg-white'
+            ? 'border-forge-aluminum hover:border-emerald-500 bg-white'
             : 'border-forge-aluminum bg-white';
+
+          const maxRpm = machine.maxRpm || 20000;
 
           return (
             <div
               key={machine.id}
               onClick={() => onSelectMachine(machine.id)}
-              className={`border p-3 cursor-pointer transition-all hover:shadow-flat relative flex flex-col justify-between ${cardBorder}`}
+              className={`border p-3.5 cursor-pointer transition-all hover:shadow-flat relative flex flex-col justify-between ${cardBorder}`}
             >
               <div>
-                {/* Header: Spindle ID & Machine State */}
+                {/* Header: Spindle ID, Axis & Machine State */}
                 <div className="flex items-start justify-between mb-2">
                   <div>
                     <div className="flex items-center gap-1.5">
@@ -84,7 +104,7 @@ export const MachineFleetGrid: React.FC<MachineFleetGridProps> = ({
                         {machine.axisCount}-AXIS
                       </span>
                     </div>
-                    <span className="text-[11px] text-forge-steel font-sans truncate block max-w-[150px]">
+                    <span className="text-[11px] text-forge-steel font-sans truncate block max-w-[160px]" title={machine.name}>
                       {machine.name}
                     </span>
                   </div>
@@ -95,47 +115,66 @@ export const MachineFleetGrid: React.FC<MachineFleetGridProps> = ({
                   </div>
                 </div>
 
-                {/* Telemetry Metrics */}
-                <div className="grid grid-cols-3 gap-1 py-2 my-2 border-y border-forge-aluminum/40 text-center font-mono">
-                  <div>
-                    <span className="text-[9px] text-forge-steel uppercase block">OEE</span>
-                    <span className={`text-xs font-bold ${machine.oee.overall > 85 ? 'text-emerald-700' : 'text-forge-black'}`}>
+                {/* 8-Hour State Timeline (Compact Visual) */}
+                <div className="my-2 py-1.5 border-t border-forge-aluminum/40">
+                  <div className="flex items-center justify-between text-[8px] font-mono text-forge-steel mb-1">
+                    <span>8H SHIFT HISTORY</span>
+                    <span>{machine.uptimeHoursToday}h UPTIME</span>
+                  </div>
+                  <ShiftTimeline intervals={machine.stateHistory} compact={true} />
+                </div>
+
+                {/* Live Telemetry Linear Gauges */}
+                <div className="space-y-1.5 py-1.5 border-t border-forge-aluminum/40">
+                  <LinearGauge
+                    label="SPINDLE SPEED"
+                    value={machine.spindleRpm}
+                    max={maxRpm}
+                    unit="RPM"
+                    color={machine.state === 'RUNNING' ? 'orange' : 'slate'}
+                    showTicks={false}
+                  />
+
+                  <LinearGauge
+                    label="FEED OVERRIDE"
+                    value={machine.feedOverridePct}
+                    max={120}
+                    unit="%"
+                    nominalTarget={100}
+                    color={machine.feedOverridePct >= 95 ? 'emerald' : 'orange'}
+                    showTicks={false}
+                  />
+                </div>
+
+                {/* OEE & Current Active Job */}
+                <div className="pt-2 border-t border-forge-aluminum/40 text-[11px] font-mono space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-forge-steel text-[10px]">GROUNDED OEE:</span>
+                    <span className={`font-bold ${machine.oee.overall >= 85 ? 'text-emerald-700' : 'text-forge-black'}`}>
                       {machine.oee.overall}%
                     </span>
                   </div>
-                  <div>
-                    <span className="text-[9px] text-forge-steel uppercase block">RPM</span>
-                    <span className="text-xs font-semibold text-forge-black">
-                      {machine.spindleRpm.toLocaleString()}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-[9px] text-forge-steel uppercase block">FEED</span>
-                    <span className="text-xs font-semibold text-forge-black">
-                      {machine.feedOverridePct}%
-                    </span>
-                  </div>
-                </div>
 
-                {/* Current Active Job or Idle Status */}
-                <div className="text-[11px] font-mono space-y-0.5">
-                  <div className="flex items-center gap-1 text-forge-steel truncate">
+                  <div className="flex items-center gap-1 text-forge-steel truncate text-[10px]">
                     <Activity className="w-3 h-3 text-forge-orange flex-shrink-0" />
-                    <span className="text-forge-black font-semibold">
-                      {machine.currentJobId ? machine.currentJobId : 'NO ACTIVE JOB'}
+                    <span className="text-forge-black font-semibold truncate">
+                      {machine.currentJobId ? machine.currentJobId : 'NO ACTIVE WORK ORDER'}
                     </span>
                   </div>
-                  <div className="flex items-center gap-1 text-forge-steel truncate text-[10px]">
+
+                  <div className="flex items-center gap-1 text-forge-steel truncate text-[9px]">
                     <User className="w-3 h-3 flex-shrink-0" />
-                    <span>OP: {machine.operator}</span>
+                    <span>OPERATOR: {machine.operator}</span>
                   </div>
                 </div>
               </div>
 
-              {/* Card Footer: Telemetry Timestamp */}
+              {/* Card Footer: Timestamp & Drilldown */}
               <div className="pt-2 mt-2 border-t border-forge-aluminum/30 flex items-center justify-between text-[9px] font-mono text-forge-steel">
-                <span>UPTIME: {machine.uptimeHoursToday}h</span>
                 <span>{machine.telemetryTimestamp}</span>
+                <span className="font-bold text-forge-black hover:text-forge-orange flex items-center gap-0.5">
+                  TELEMETRY <ArrowRight className="w-2.5 h-2.5" />
+                </span>
               </div>
             </div>
           );

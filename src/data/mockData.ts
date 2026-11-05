@@ -1,13 +1,47 @@
-import { Machine, Job, ProductionException, FactoryKPIs, AuditRecord } from '../types';
+import { Machine, Job, ProductionException, FactoryKPIs, AuditRecord, MachineStateInterval } from '../types';
 
 /**
  * FORGEOS Operational Dataset
  * Calibrated for a 12-spindle High-Mix Low-Volume (HMLV) CNC Machining Facility.
  * 
- * NOTE: Explicitly flagged as illustrative sample data per Section 6 Data Integrity Rules.
+ * NOTE: Explicitly flagged as illustrative sample data per Section 12 Data Integrity Rules.
  */
 export const IS_SAMPLE_DATA = true;
-export const DATA_DISCLAIMER = "Illustrative sample operational dataset calibrated for a 12-spindle HMLV CNC precision shop.";
+export const DATA_DISCLAIMER = "ILLUSTRATIVE SAMPLE OPERATIONAL DATA • 12-SPINDLE HMLV FACILITY";
+
+// Standard 8-Hour Shift State Interval Profiles (06:00 to 14:00)
+const SHIFT_PROFILES: Record<string, MachineStateInterval[]> = {
+  HIGH_UTILIZATION: [
+    { startHour: "06:00", durationMinutes: 30, state: "SETUP", reason: "Tool loading & offset probe" },
+    { startHour: "06:30", durationMinutes: 180, state: "RUNNING", reason: "Op 20 Roughing pass" },
+    { startHour: "09:30", durationMinutes: 15, state: "IDLE", reason: "Part flip & fixture blowoff" },
+    { startHour: "09:45", durationMinutes: 240, state: "RUNNING", reason: "Op 30 5-Axis finishing" },
+    { startHour: "13:45", durationMinutes: 15, state: "IDLE", reason: "In-process manual caliper check" }
+  ],
+  BALANCED_MILLING: [
+    { startHour: "06:00", durationMinutes: 45, state: "SETUP", reason: "Vise alignment & zero-point check" },
+    { startHour: "06:45", durationMinutes: 195, state: "RUNNING", reason: "Pocket clearing & contouring" },
+    { startHour: "10:00", durationMinutes: 30, state: "IDLE", reason: "Operator chip bin clearance" },
+    { startHour: "10:30", durationMinutes: 210, state: "RUNNING", reason: "Thread milling & chamfering" }
+  ],
+  SETUP_HEAVY: [
+    { startHour: "06:00", durationMinutes: 120, state: "SETUP", reason: "Custom 4-jaw chuck dial-in" },
+    { startHour: "08:00", durationMinutes: 150, state: "RUNNING", reason: "OD/ID turning cycle" },
+    { startHour: "10:30", durationMinutes: 90, state: "SETUP", reason: "Boring bar tool height touch-off" },
+    { startHour: "12:00", durationMinutes: 120, state: "RUNNING", reason: "Finish facing & groove cycle" }
+  ],
+  ALARM_HALTED: [
+    { startHour: "06:00", durationMinutes: 30, state: "SETUP", reason: "Pallet 2 clamp setup" },
+    { startHour: "06:30", durationMinutes: 180, state: "RUNNING", reason: "Heavy roughing pass" },
+    { startHour: "09:30", durationMinutes: 90, state: "ALARM", reason: "Spindle thermal overload (#2041)" },
+    { startHour: "11:00", durationMinutes: 180, state: "STOPPED", reason: "Awaiting maintenance technician" }
+  ],
+  IDLE_STARVED: [
+    { startHour: "06:00", durationMinutes: 180, state: "RUNNING", reason: "Batch run completion" },
+    { startHour: "09:00", durationMinutes: 45, state: "SETUP", reason: "Tear-down & vacuum clean" },
+    { startHour: "09:45", durationMinutes: 255, state: "IDLE", reason: "Awaiting material staging from saw" }
+  ]
+};
 
 export const INITIAL_MACHINES: Machine[] = [
   {
@@ -19,12 +53,15 @@ export const INITIAL_MACHINES: Machine[] = [
     currentJobId: "JOB-123442",
     operator: "M. Vance",
     spindleRpm: 14200,
+    maxRpm: 20000,
     feedRateMmpm: 3850,
+    maxFeedRate: 6000,
     feedOverridePct: 100,
     oee: { overall: 94.5, availability: 96.2, performance: 98.4, quality: 99.8 },
     lastStateChange: "1h 42m ago",
     telemetryTimestamp: "Just now",
-    uptimeHoursToday: 6.8
+    uptimeHoursToday: 6.8,
+    stateHistory: SHIFT_PROFILES.HIGH_UTILIZATION
   },
   {
     id: "CNC-02",
@@ -35,12 +72,15 @@ export const INITIAL_MACHINES: Machine[] = [
     currentJobId: "JOB-123448",
     operator: "R. Sharma",
     spindleRpm: 18000,
+    maxRpm: 24000,
     feedRateMmpm: 4200,
+    maxFeedRate: 7000,
     feedOverridePct: 100,
     oee: { overall: 91.2, availability: 93.0, performance: 98.1, quality: 100.0 },
     lastStateChange: "3h 10m ago",
     telemetryTimestamp: "Just now",
-    uptimeHoursToday: 7.1
+    uptimeHoursToday: 7.1,
+    stateHistory: SHIFT_PROFILES.HIGH_UTILIZATION
   },
   {
     id: "CNC-03",
@@ -51,12 +91,15 @@ export const INITIAL_MACHINES: Machine[] = [
     currentJobId: "JOB-123456",
     operator: "K. Lindqvist",
     spindleRpm: 0,
+    maxRpm: 18000,
     feedRateMmpm: 0,
+    maxFeedRate: 5000,
     feedOverridePct: 0,
     oee: { overall: 68.4, availability: 70.0, performance: 98.0, quality: 99.5 },
     lastStateChange: "24m ago",
     telemetryTimestamp: "12s ago",
-    uptimeHoursToday: 4.2
+    uptimeHoursToday: 4.2,
+    stateHistory: SHIFT_PROFILES.SETUP_HEAVY
   },
   {
     id: "CNC-04",
@@ -67,12 +110,15 @@ export const INITIAL_MACHINES: Machine[] = [
     currentJobId: "JOB-123460",
     operator: "T. Chen",
     spindleRpm: 12500,
+    maxRpm: 18000,
     feedRateMmpm: 3400,
+    maxFeedRate: 5500,
     feedOverridePct: 95,
     oee: { overall: 88.6, availability: 91.5, performance: 97.0, quality: 99.8 },
     lastStateChange: "2h 15m ago",
     telemetryTimestamp: "Just now",
-    uptimeHoursToday: 6.2
+    uptimeHoursToday: 6.2,
+    stateHistory: SHIFT_PROFILES.BALANCED_MILLING
   },
   {
     id: "CNC-05",
@@ -83,12 +129,15 @@ export const INITIAL_MACHINES: Machine[] = [
     currentJobId: "JOB-123465",
     operator: "D. Miller",
     spindleRpm: 11800,
+    maxRpm: 12000,
     feedRateMmpm: 2900,
+    maxFeedRate: 4500,
     feedOverridePct: 100,
     oee: { overall: 86.4, availability: 89.0, performance: 97.2, quality: 99.9 },
     lastStateChange: "4h 05m ago",
     telemetryTimestamp: "Just now",
-    uptimeHoursToday: 6.9
+    uptimeHoursToday: 6.9,
+    stateHistory: SHIFT_PROFILES.BALANCED_MILLING
   },
   {
     id: "CNC-06",
@@ -99,12 +148,15 @@ export const INITIAL_MACHINES: Machine[] = [
     currentJobId: "JOB-123458",
     operator: "J. Kowalski",
     spindleRpm: 0,
+    maxRpm: 14000,
     feedRateMmpm: 0,
+    maxFeedRate: 5000,
     feedOverridePct: 0,
     oee: { overall: 54.2, availability: 58.0, performance: 94.0, quality: 99.4 },
     lastStateChange: "14m ago",
     telemetryTimestamp: "4s ago",
-    uptimeHoursToday: 3.5
+    uptimeHoursToday: 3.5,
+    stateHistory: SHIFT_PROFILES.ALARM_HALTED
   },
   {
     id: "CNC-07",
@@ -115,12 +167,15 @@ export const INITIAL_MACHINES: Machine[] = [
     currentJobId: "JOB-123471",
     operator: "S. Patel",
     spindleRpm: 9800,
+    maxRpm: 12000,
     feedRateMmpm: 2400,
-    feedOverridePct: 100,
+    maxFeedRate: 4000,
+    feedOverridePct: 90,
     oee: { overall: 89.3, availability: 92.0, performance: 97.1, quality: 100.0 },
     lastStateChange: "1h 50m ago",
     telemetryTimestamp: "Just now",
-    uptimeHoursToday: 5.8
+    uptimeHoursToday: 5.8,
+    stateHistory: SHIFT_PROFILES.BALANCED_MILLING
   },
   {
     id: "CNC-08",
@@ -131,12 +186,15 @@ export const INITIAL_MACHINES: Machine[] = [
     currentJobId: null,
     operator: "Unassigned",
     spindleRpm: 0,
+    maxRpm: 4500,
     feedRateMmpm: 0,
+    maxFeedRate: 3000,
     feedOverridePct: 0,
     oee: { overall: 72.1, availability: 76.0, performance: 95.0, quality: 99.8 },
     lastStateChange: "38m ago",
     telemetryTimestamp: "Just now",
-    uptimeHoursToday: 4.1
+    uptimeHoursToday: 4.1,
+    stateHistory: SHIFT_PROFILES.IDLE_STARVED
   },
   {
     id: "CNC-09",
@@ -147,12 +205,15 @@ export const INITIAL_MACHINES: Machine[] = [
     currentJobId: "JOB-123477",
     operator: "A. Rossi",
     spindleRpm: 12000,
+    maxRpm: 15000,
     feedRateMmpm: 3100,
+    maxFeedRate: 5000,
     feedOverridePct: 100,
     oee: { overall: 92.8, availability: 94.2, performance: 98.6, quality: 99.9 },
     lastStateChange: "5h 12m ago",
     telemetryTimestamp: "Just now",
-    uptimeHoursToday: 7.2
+    uptimeHoursToday: 7.2,
+    stateHistory: SHIFT_PROFILES.HIGH_UTILIZATION
   },
   {
     id: "CNC-10",
@@ -163,12 +224,15 @@ export const INITIAL_MACHINES: Machine[] = [
     currentJobId: "JOB-123482",
     operator: "E. Jensen",
     spindleRpm: 8500,
+    maxRpm: 12000,
     feedRateMmpm: 2600,
+    maxFeedRate: 4500,
     feedOverridePct: 100,
     oee: { overall: 90.1, availability: 92.5, performance: 97.4, quality: 100.0 },
     lastStateChange: "2h 40m ago",
     telemetryTimestamp: "Just now",
-    uptimeHoursToday: 6.4
+    uptimeHoursToday: 6.4,
+    stateHistory: SHIFT_PROFILES.HIGH_UTILIZATION
   },
   {
     id: "CNC-11",
@@ -179,12 +243,15 @@ export const INITIAL_MACHINES: Machine[] = [
     currentJobId: null,
     operator: "H. Weber",
     spindleRpm: 0,
+    maxRpm: 4000,
     feedRateMmpm: 0,
+    maxFeedRate: 2500,
     feedOverridePct: 0,
     oee: { overall: 61.0, availability: 65.0, performance: 94.0, quality: 99.8 },
     lastStateChange: "1h 15m ago",
     telemetryTimestamp: "2m ago (Delayed)",
-    uptimeHoursToday: 3.8
+    uptimeHoursToday: 3.8,
+    stateHistory: SHIFT_PROFILES.ALARM_HALTED
   },
   {
     id: "CNC-12",
@@ -195,12 +262,15 @@ export const INITIAL_MACHINES: Machine[] = [
     currentJobId: "JOB-123490",
     operator: "L. Moreau",
     spindleRpm: 16000,
+    maxRpm: 24000,
     feedRateMmpm: 4500,
+    maxFeedRate: 8000,
     feedOverridePct: 100,
     oee: { overall: 93.4, availability: 95.0, performance: 98.4, quality: 99.9 },
     lastStateChange: "3h 30m ago",
     telemetryTimestamp: "Just now",
-    uptimeHoursToday: 6.7
+    uptimeHoursToday: 6.7,
+    stateHistory: SHIFT_PROFILES.HIGH_UTILIZATION
   }
 ];
 
@@ -322,7 +392,8 @@ export const INITIAL_JOBS: Job[] = [
     progressPercent: 30,
     operations: [
       { id: "OP-14", stepNumber: 10, name: "Blank Preparation", machineType: "3-Axis VMC", plannedMinutes: 30, actualMinutes: 29, state: "COMPLETED" },
-      { id: "OP-15", stepNumber: 15, name: "Deep Micro-Drilling", machineType: "5-Axis VMC", plannedMinutes: 140, actualMinutes: 42, state: "IN_PROGRESS" }
+      { id: "OP-15", stepNumber: 15, name: "Deep Micro-Drilling", machineType: "5-Axis VMC", plannedMinutes: 140, actualMinutes: 42, state: "IN_PROGRESS" },
+      { id: "OP-16", stepNumber: 25, name: "Flow Coefficient Verification", machineType: "Flow Bench", plannedMinutes: 20, actualMinutes: 0, state: "NOT_STARTED" }
     ]
   },
   {
@@ -342,7 +413,12 @@ export const INITIAL_JOBS: Job[] = [
     estCompletion: "2026-11-05 17:00",
     verifiedUnitCost: 38.50,
     currentOperation: "Op 25: Screw Hole Chamfering & Profile",
-    progressPercent: 60
+    progressPercent: 60,
+    operations: [
+      { id: "OP-17", stepNumber: 10, name: "Profile Roughing", machineType: "4-Axis VMC", plannedMinutes: 60, actualMinutes: 58, state: "COMPLETED" },
+      { id: "OP-18", stepNumber: 25, name: "Screw Hole Chamfering & Profile", machineType: "4-Axis VMC", plannedMinutes: 110, actualMinutes: 66, state: "IN_PROGRESS" },
+      { id: "OP-19", stepNumber: 35, name: "Electropolish & Laser Mark", machineType: "Finishing Cell", plannedMinutes: 45, actualMinutes: 0, state: "NOT_STARTED" }
+    ]
   },
   {
     id: "JOB-123471",
@@ -361,7 +437,12 @@ export const INITIAL_JOBS: Job[] = [
     estCompletion: "2026-11-05 14:30",
     verifiedUnitCost: 6.20,
     currentOperation: "Op 20: Line Bore Finish",
-    progressPercent: 70
+    progressPercent: 70,
+    operations: [
+      { id: "OP-20", stepNumber: 10, name: "Mating Face Mill", machineType: "3-Axis VMC", plannedMinutes: 50, actualMinutes: 48, state: "COMPLETED" },
+      { id: "OP-21", stepNumber: 20, name: "Line Bore Finish", machineType: "3-Axis VMC", plannedMinutes: 90, actualMinutes: 63, state: "IN_PROGRESS" },
+      { id: "OP-22", stepNumber: 30, name: "Washing & Rust Prevention", machineType: "Wash Cell", plannedMinutes: 15, actualMinutes: 0, state: "NOT_STARTED" }
+    ]
   },
   {
     id: "JOB-123477",
@@ -380,7 +461,12 @@ export const INITIAL_JOBS: Job[] = [
     estCompletion: "2026-11-05 16:15",
     verifiedUnitCost: 42.00,
     currentOperation: "Op 30: High-Speed Profiling",
-    progressPercent: 80
+    progressPercent: 80,
+    operations: [
+      { id: "OP-23", stepNumber: 10, name: "Bearing Pocket Bore", machineType: "3-Axis VMC", plannedMinutes: 40, actualMinutes: 38, state: "COMPLETED" },
+      { id: "OP-24", stepNumber: 20, name: "Lightweight Pocketing", machineType: "3-Axis VMC", plannedMinutes: 70, actualMinutes: 69, state: "COMPLETED" },
+      { id: "OP-25", stepNumber: 30, name: "High-Speed Profiling", machineType: "3-Axis VMC", plannedMinutes: 50, actualMinutes: 40, state: "IN_PROGRESS" }
+    ]
   },
   {
     id: "JOB-123482",
@@ -399,7 +485,12 @@ export const INITIAL_JOBS: Job[] = [
     estCompletion: "2026-11-05 19:30",
     verifiedUnitCost: 78.40,
     currentOperation: "Op 20: Mill-Turn Involute Spline Hobbing",
-    progressPercent: 40
+    progressPercent: 40,
+    operations: [
+      { id: "OP-26", stepNumber: 10, name: "Turn OD & Thread Ends", machineType: "Mill-Turn Lathe", plannedMinutes: 60, actualMinutes: 58, state: "COMPLETED" },
+      { id: "OP-27", stepNumber: 20, name: "Involute Spline Hobbing", machineType: "Mill-Turn Lathe", plannedMinutes: 90, actualMinutes: 36, state: "IN_PROGRESS" },
+      { id: "OP-28", stepNumber: 30, name: "Heat Treat H900 & Polish", machineType: "Thermal Cell", plannedMinutes: 180, actualMinutes: 0, state: "NOT_STARTED" }
+    ]
   },
   {
     id: "JOB-123490",
@@ -418,7 +509,12 @@ export const INITIAL_JOBS: Job[] = [
     estCompletion: "2026-11-05 16:45",
     verifiedUnitCost: 195.00,
     currentOperation: "Op 40: Diamond Ultrasonic Milling",
-    progressPercent: 60
+    progressPercent: 60,
+    operations: [
+      { id: "OP-29", stepNumber: 10, name: "Diamond Grinding Face", machineType: "Surface Grinder", plannedMinutes: 60, actualMinutes: 59, state: "COMPLETED" },
+      { id: "OP-30", stepNumber: 20, name: "Ultrasonic Vacuum Port Drill", machineType: "5-Axis Ultrasonic", plannedMinutes: 100, actualMinutes: 98, state: "COMPLETED" },
+      { id: "OP-31", stepNumber: 40, name: "Diamond Ultrasonic Milling", machineType: "5-Axis Ultrasonic", plannedMinutes: 120, actualMinutes: 72, state: "IN_PROGRESS" }
+    ]
   }
 ];
 
@@ -432,7 +528,12 @@ export const INITIAL_EXCEPTIONS: ProductionException[] = [
     timestamp: "14 mins ago",
     machineId: "CNC-06",
     jobId: "#123458",
-    acknowledged: false
+    acknowledged: false,
+    events: [
+      { time: "14:18:02", source: "PLC Main Alarm Channel", message: "SPINDLE_OVERLOAD_SHUTDOWN: Alarm 2041 active", channel: "S1_THERMAL", sensorValue: "88.4°C (Limit: 75°C)" },
+      { time: "14:17:48", source: "Coolant Pressure Transducer", message: "Pressure drop below safe cutoff threshold", channel: "COOLANT_BAR", sensorValue: "9.2 bar (Min: 12.0 bar)" },
+      { time: "14:15:10", source: "Spindle Drive Inverter", message: "Motor torque surge detected during roughing pass", channel: "DRIVE_TORQUE", sensorValue: "118% continuous" }
+    ]
   },
   {
     id: "EX-02",
@@ -444,7 +545,11 @@ export const INITIAL_EXCEPTIONS: ProductionException[] = [
     machineId: "CNC-03",
     jobId: "#123456",
     acknowledged: true,
-    acknowledgedBy: "K. Lindqvist"
+    acknowledgedBy: "K. Lindqvist",
+    events: [
+      { time: "14:08:12", source: "Shop Floor Workstation", message: "Operator flagged fixture runout > 0.005mm tolerance", channel: "DIAL_INDICATOR", sensorValue: "+0.012mm runout" },
+      { time: "13:45:00", source: "MES Job Scheduler", message: "Planned setup window elapsed (Target: 45 min, Actual: 80 min)", channel: "SETUP_TIMER", sensorValue: "+35 min variance" }
+    ]
   },
   {
     id: "EX-03",
@@ -456,7 +561,10 @@ export const INITIAL_EXCEPTIONS: ProductionException[] = [
     machineId: "CNC-01",
     jobId: "#123442",
     acknowledged: true,
-    acknowledgedBy: "M. Vance"
+    acknowledgedBy: "M. Vance",
+    events: [
+      { time: "13:47:30", source: "Tool Management System", message: "Tool Pocket #24 cut distance: 1,420 meters", channel: "TOOL_24_LIFE", sensorValue: "88% worn (Exp: 1,600m)" }
+    ]
   },
   {
     id: "EX-04",
@@ -467,7 +575,11 @@ export const INITIAL_EXCEPTIONS: ProductionException[] = [
     timestamp: "1h 10m ago",
     machineId: "CNC-07",
     jobId: "#123471",
-    acknowledged: false
+    acknowledged: false,
+    events: [
+      { time: "13:22:15", source: "Controller Feed Monitor", message: "Feed override set to 90% by operator", channel: "FEED_OVERRIDE", sensorValue: "90% (Std: 100%)" },
+      { time: "13:20:00", source: "Acoustic Emission Sensor", message: "Chatter vibration threshold reached, operator reduced feed", channel: "VIB_Z_RMS", sensorValue: "4.8 mm/s²" }
+    ]
   }
 ];
 
@@ -476,7 +588,7 @@ export const INITIAL_AUDIT_HISTORY: AuditRecord[] = [
     id: "AUD-01",
     orderNumber: "#123450",
     units: 100,
-    completionDate: "2024-05-20 16:45",
+    completionDate: "2026-11-05 16:45",
     status: "COMPLETED",
     machineId: "CNC-01",
     verifiedBy: "QC Lead: S. Harrison",
@@ -486,7 +598,7 @@ export const INITIAL_AUDIT_HISTORY: AuditRecord[] = [
     id: "AUD-02",
     orderNumber: "#123451",
     units: 75,
-    completionDate: "2024-05-10 14:15",
+    completionDate: "2026-11-04 14:15",
     status: "COMPLETED",
     machineId: "CNC-04",
     verifiedBy: "QC Lead: T. Chen",
@@ -496,7 +608,7 @@ export const INITIAL_AUDIT_HISTORY: AuditRecord[] = [
     id: "AUD-03",
     orderNumber: "#123447",
     units: 150,
-    completionDate: "2024-05-08 19:30",
+    completionDate: "2026-11-03 19:30",
     status: "COMPLETED",
     machineId: "CNC-02",
     verifiedBy: "QC Lead: S. Harrison",
