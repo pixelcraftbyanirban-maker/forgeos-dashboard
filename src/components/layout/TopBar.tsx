@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, RefreshCw, AlertCircle, Clock, Menu, X } from 'lucide-react';
+import { Search, RefreshCw, Clock, Menu, X, Calendar, ChevronDown, Bell } from 'lucide-react';
 import { ConnectionState } from '../../types';
 
 interface TopBarProps {
@@ -15,6 +15,8 @@ interface TopBarProps {
   onExceptionsClick: () => void;
   onToggleMobileNav?: () => void;
   isMobileNavOpen?: boolean;
+  selectedTimeframe?: string;
+  onTimeframeChange?: (t: string) => void;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
@@ -29,9 +31,14 @@ export const TopBar: React.FC<TopBarProps> = ({
   activeExceptionsCount,
   onExceptionsClick,
   onToggleMobileNav,
-  isMobileNavOpen = false
+  isMobileNavOpen = false,
+  selectedTimeframe = 'This Week',
+  onTimeframeChange
 }) => {
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const [isTimeframeOpen, setIsTimeframeOpen] = useState(false);
+
+  const timeframes = ['Today', 'This Shift', 'This Week', 'This Month'];
 
   return (
     <header className="sticky top-0 z-20 bg-white border-b border-forge-aluminum transition-shadow">
@@ -103,14 +110,43 @@ export const TopBar: React.FC<TopBarProps> = ({
             <Search className="w-4 h-4" aria-hidden="true" />
           </button>
 
-          {/* Sample Data Disclaimer Tag */}
-          <span className="hidden xl:inline-flex items-center gap-1 font-mono text-[10px] text-amber-950 bg-amber-50 border border-amber-300 px-2 py-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden="true" />
-            HOWRAH FACILITY
-          </span>
+          {/* Timeframe Dropdown (Design element: [ 📅 This Week ⌄ ]) */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setIsTimeframeOpen(prev => !prev)}
+              aria-expanded={isTimeframeOpen}
+              aria-label={`Timeframe filter: ${selectedTimeframe}`}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 sm:py-1 bg-white hover:bg-forge-alabaster border border-forge-aluminum text-forge-black font-sans text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
+            >
+              <Calendar className="w-3.5 h-3.5 text-forge-steel" aria-hidden="true" />
+              <span className="hidden sm:inline font-medium">{selectedTimeframe}</span>
+              <ChevronDown className={`w-3 h-3 text-forge-steel transition-transform ${isTimeframeOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
+            </button>
+
+            {isTimeframeOpen && (
+              <div className="absolute right-0 top-full mt-1 w-36 bg-white border border-forge-aluminum shadow-lg z-30 py-1 font-mono text-xs animate-in fade-in duration-150">
+                {timeframes.map((tf) => (
+                  <button
+                    type="button"
+                    key={tf}
+                    onClick={() => {
+                      if (onTimeframeChange) onTimeframeChange(tf);
+                      setIsTimeframeOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-1.5 hover:bg-forge-alabaster transition-colors ${
+                      selectedTimeframe === tf ? 'text-forge-orange font-bold bg-orange-50/50' : 'text-forge-black'
+                    }`}
+                  >
+                    {tf}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Data Freshness Indicator */}
-          <div className="hidden lg:flex items-center gap-2 px-2.5 py-1 bg-forge-alabaster border border-forge-aluminum text-xs font-mono">
+          <div className="hidden xl:flex items-center gap-2 px-2.5 py-1 bg-forge-alabaster border border-forge-aluminum text-xs font-mono">
             <div className="flex items-center gap-1.5">
               <span className={`w-2 h-2 rounded-full ${
                 connectionState === 'CURRENT' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'
@@ -138,22 +174,32 @@ export const TopBar: React.FC<TopBarProps> = ({
             <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-forge-orange' : 'text-forge-black'}`} aria-hidden="true" />
           </button>
 
-          {/* Exceptions Quick Pill */}
+          {/* Notification Bell (Design element: [ 🔔 1 ]) */}
           <button
             type="button"
             onClick={onExceptionsClick}
-            aria-label={`View ${activeExceptionsCount} production exceptions and alarms`}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 sm:py-1 text-xs font-mono border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange ${
-              activeExceptionsCount > 0
-                ? 'bg-rose-50 text-rose-950 border-rose-400 hover:bg-rose-100'
-                : 'bg-forge-alabaster text-forge-steel border-forge-aluminum hover:text-forge-black'
-            }`}
+            aria-label={`View ${activeExceptionsCount} production alerts and exceptions`}
+            title={`${activeExceptionsCount} Active Exceptions`}
+            className="relative p-2 sm:p-1.5 bg-forge-alabaster hover:bg-forge-aluminum/30 border border-forge-aluminum text-forge-black transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
           >
-            <AlertCircle className="w-3.5 h-3.5 text-rose-600 flex-shrink-0" aria-hidden="true" />
-            <span className="font-semibold text-[10px] sm:text-[11px] whitespace-nowrap">
-              {activeExceptionsCount} <span className="hidden sm:inline">EXCEPTIONS</span>
-            </span>
+            <Bell className="w-4 h-4 text-forge-black" aria-hidden="true" />
+            {activeExceptionsCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-forge-orange text-white text-[9px] font-mono font-bold rounded-full flex items-center justify-center shadow-sm">
+                {activeExceptionsCount}
+              </span>
+            )}
           </button>
+
+          {/* User Profile Avatar (Design element: [ AS ]) */}
+          <div className="flex items-center pl-1 sm:pl-2 border-l border-forge-aluminum/70">
+            <div
+              className="w-8 h-8 rounded-full bg-forge-black text-white font-mono font-bold text-xs flex items-center justify-center border border-forge-steel shadow-sm select-none cursor-pointer hover:border-forge-orange transition-colors"
+              title="Anirban Sarkar • Lead Production Engineer"
+              aria-label="User profile: Anirban Sarkar"
+            >
+              AS
+            </div>
+          </div>
         </div>
       </div>
 

@@ -11,8 +11,11 @@ interface PlaceholderPageProps {
 export const PlaceholderPage: React.FC<PlaceholderPageProps> = ({ tab, onBackToOverview }) => {
   const titles: Record<NavTab, { title: string; phase: string; desc: string }> = {
     overview: { title: 'Overview', phase: 'PHASE 02', desc: 'Current active module.' },
+    orders: { title: 'Active Work Orders', phase: 'ORDERS', desc: 'Work order routing, allocation and queue status.' },
     production: { title: 'Production Management', phase: 'PHASE 03', desc: 'Detailed job progress, operation-level routing, plan-vs-actual tracking, and part dispatching.' },
     machines: { title: 'Machine Spindle Telemetry', phase: 'PHASE 04', desc: 'Deep spindle diagnostics, historical OEE trends, sensor feeds, tool life tracking, and maintenance logs.' },
+    quality: { title: 'Quality & Deviations', phase: 'QUALITY', desc: 'Quality inspections, tolerance verifications, and alarms.' },
+    inventory: { title: 'Material & Tooling Inventory', phase: 'INVENTORY', desc: 'Raw billet stock and CNC spindle tooling lifecycle.' },
     exceptions: { title: 'Production Exceptions & Deviations', phase: 'PHASE 05', desc: 'Deviation event history, root cause investigation workflows, and manager sign-offs.' },
     reports: { title: 'Historical & Analytics Reports', phase: 'REPORTS', desc: 'Audit compliance, shift-over-shift OEE comparison, and job profitability analytics.' },
   };

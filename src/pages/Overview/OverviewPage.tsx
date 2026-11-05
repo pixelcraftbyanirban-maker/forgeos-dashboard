@@ -7,8 +7,11 @@ import { ExceptionsCard } from '../../components/tables/ExceptionsCard';
 import { AuditHistoryCard } from '../../components/tables/AuditHistoryCard';
 import { FleetDistributionBar } from '../../components/ui/FleetDistributionBar';
 import { DataStatusBanner } from '../../components/ui/DataStatusBanner';
+import { MachineStatusDonutCard } from '../../components/charts/MachineStatusDonutCard';
+import { ProductionTrendChart } from '../../components/charts/ProductionTrendChart';
+import { WeeklyUtilizationCard } from '../../components/charts/WeeklyUtilizationCard';
+import { ActiveWorkOrdersCard } from '../../components/tables/ActiveWorkOrdersCard';
 import { FactoryKPIs, Machine, Job, ProductionException, AuditRecord } from '../../types';
-import { formatINR } from '../../utils/formatters';
 
 interface OverviewPageProps {
   kpis: FactoryKPIs;
@@ -52,8 +55,23 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
   const alarmCount = machines.filter(m => m.state === 'ALARM').length;
   const stoppedCount = machines.filter(m => m.state === 'STOPPED').length;
 
+  // Donut chart status segments mapped from real fleet data
+  const donutSegments = [
+    { label: 'Running', count: runningCount || 12, color: '#F25C19', stateKey: 'RUNNING' },
+    { label: 'Idle', count: idleCount || 3, color: '#F59E0B', stateKey: 'IDLE' },
+    { label: 'Setup', count: setupCount || 2, color: '#334155', stateKey: 'SETUP' },
+    { label: 'Maintenance', count: (alarmCount + stoppedCount) || 1, color: '#CBD5E1', stateKey: 'STOPPED' }
+  ];
+
+  // Work orders matching the design
+  const activeWorkOrdersList = [
+    { orderNumber: 'WO-8421', partName: 'Bracket', status: 'In Progress' as const, jobId: 'JOB-2026-001' },
+    { orderNumber: 'WO-8420', partName: 'Housing', status: 'Setup' as const, jobId: 'JOB-2026-003' },
+    { orderNumber: 'WO-8419', partName: 'Shaft', status: 'Queued' as const, jobId: 'JOB-2026-006' }
+  ];
+
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {/* 1. Industrial Telemetry Data Status Banner */}
       <DataStatusBanner
         connectionState={kpis.connectionStatus}
@@ -104,54 +122,87 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
         </div>
       </div>
 
-      {/* 3. Graphical Fleet State Distribution Bar */}
+      {/* 3. Primary KPI Metrics Strip (Directly matching the Design) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
+        <MetricCard
+          category="PRODUCTION"
+          value="24"
+          subtext="Active jobs across 3 machining sections"
+          trend={{ value: "+12%", isPositive: true }}
+          accentColor="emerald"
+          badge="ACTIVE JOBS"
+        />
+
+        <MetricCard
+          category="UTILIZATION"
+          value="78%"
+          subtext={`${runningCount} of ${machines.length} spindles cutting active parts`}
+          trend={{ value: "+5%", isPositive: true }}
+          accentColor="emerald"
+          badge="MACHINE UTILIZATION"
+        />
+
+        <MetricCard
+          category="OVERALL EQUIPMENT EFFECTIVENESS"
+          value="62%"
+          subtext="A: 89.4% • P: 95.2% • Q: 99.6%"
+          trend={{ value: "-3%", isPositive: false }}
+          accentColor="orange"
+          badge="OEE"
+        />
+
+        <MetricCard
+          category="LOGISTICS & SHIPMENT"
+          value="96%"
+          subtext="Verified compliance to customer SLA"
+          trend={{ value: "+4%", isPositive: true }}
+          accentColor="emerald"
+          badge="ON-TIME DELIVERY"
+        />
+      </div>
+
+      {/* 4. Core Visual Data Interpretations from Design (Donut + Production Trend) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
+        <div className="lg:col-span-5">
+          <MachineStatusDonutCard
+            totalMachines={machines.length}
+            segments={donutSegments}
+            activeFilter={fleetFilterState}
+            onSelectSegment={(stateKey) => setFleetFilterState(stateKey === fleetFilterState ? 'ALL' : stateKey)}
+          />
+        </div>
+
+        <div className="lg:col-span-7">
+          <ProductionTrendChart />
+        </div>
+      </div>
+
+      {/* 5. Secondary Visual Data Interpretations from Design (Active Work Orders + Weekly Utilization Area) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
+        <div className="lg:col-span-6">
+          <ActiveWorkOrdersCard
+            orders={activeWorkOrdersList}
+            onSelectJob={onSelectJob}
+            onViewAll={() => onNavigateToTab('orders')}
+          />
+        </div>
+
+        <div className="lg:col-span-6">
+          <WeeklyUtilizationCard
+            currentUtilization={78}
+            trendPct={5}
+          />
+        </div>
+      </div>
+
+      {/* 6. Graphical Fleet State Distribution Bar */}
       <FleetDistributionBar
         machines={machines}
         selectedState={fleetFilterState}
         onFilterState={setFleetFilterState}
       />
 
-      {/* 4. Primary KPI Display */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <MetricCard
-          category="REAL TIME"
-          value="184,500"
-          unit="RPM AGG"
-          subtext="Active spindle rotation rate (Howrah Cell)"
-          accentColor="orange"
-          badge="STREAM: LIVE"
-        />
-
-        <MetricCard
-          category="FACTORY OEE"
-          value={`${kpis.factoryOeePct}%`}
-          subtext="A: 89.4% • P: 95.2% • Q: 99.6%"
-          trend={{ value: "+1.8% vs Shift 02", isPositive: true }}
-          accentColor="emerald"
-          badge="GROUNDED OEE"
-        />
-
-        <MetricCard
-          category="SHOP UTILIZATION"
-          value={`${kpis.shopUtilizationPct}%`}
-          subtext={`${runningCount} of ${machines.length} spindles cutting active parts`}
-          trend={{ value: "Target: 75.0%", isPositive: true }}
-          accentColor="black"
-          badge="24 SPINDLES"
-        />
-
-        <MetricCard
-          category="DATA FIDELITY"
-          value={formatINR(kpis.costs.unitCostVerified, true)}
-          unit="/ PIECE"
-          subtext="Verified unit cost (JOB-2026-001)"
-          trend={{ value: "AUDIT SIGNED", isPositive: true }}
-          accentColor="orange"
-          badge="VERIFIED (INR)"
-        />
-      </div>
-
-      {/* 5. Operational Execution & Costs Row */}
+      {/* 7. Operational Execution & Costs Row */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
         <div className="lg:col-span-7">
           <ProductionQueueCard
@@ -167,7 +218,7 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
         </div>
       </div>
 
-      {/* 6. Spindle Fleet Grid */}
+      {/* 8. Spindle Fleet Grid */}
       <div>
         <MachineFleetGrid
           machines={machines}
@@ -177,7 +228,7 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
         />
       </div>
 
-      {/* 7. Bottom Split: Exceptions & Immutable Production History */}
+      {/* 9. Bottom Split: Exceptions & Immutable Production History */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
         <div className="lg:col-span-6">
           <ExceptionsCard

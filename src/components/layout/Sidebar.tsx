@@ -3,16 +3,18 @@ import {
   LayoutDashboard, 
   Workflow, 
   Cpu, 
-  AlertTriangle, 
   BarChart3, 
-  Settings, 
-  Radio, 
+  ClipboardList,
+  ShieldCheck,
+  Boxes,
+  Radio,
+  Settings,
   ChevronRight,
   X 
 } from 'lucide-react';
 import { Logo } from '../ui/Logo';
 
-export type NavTab = 'overview' | 'production' | 'machines' | 'exceptions' | 'reports';
+export type NavTab = 'overview' | 'orders' | 'production' | 'machines' | 'quality' | 'inventory' | 'exceptions' | 'reports';
 
 interface SidebarProps {
   currentTab: NavTab;
@@ -30,10 +32,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onCloseMobile
 }) => {
   const navItems: { id: NavTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-    { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+    { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'orders', label: 'Orders', icon: ClipboardList },
     { id: 'production', label: 'Production', icon: Workflow },
     { id: 'machines', label: 'Machines', icon: Cpu },
-    { id: 'exceptions', label: 'Exceptions', icon: AlertTriangle },
+    { id: 'quality', label: 'Quality', icon: ShieldCheck },
+    { id: 'inventory', label: 'Inventory', icon: Boxes },
     { id: 'reports', label: 'Reports', icon: BarChart3 }
   ];
 
@@ -97,27 +101,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 key={item.id}
                 onClick={() => handleTabClick(item.id)}
                 aria-current={isActive ? 'page' : undefined}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs font-mono tracking-wider transition-colors relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange ${
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs font-mono tracking-wider transition-all relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange ${
                   isActive
-                    ? 'bg-white/10 text-white font-semibold border-l-2 border-forge-orange'
-                    : 'text-zinc-300 hover:text-white hover:bg-white/5 border-l-2 border-transparent'
+                    ? 'bg-forge-orange text-white font-bold shadow-md rounded-none'
+                    : 'text-zinc-300 hover:text-white hover:bg-white/10'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-forge-orange' : 'text-zinc-400'}`} aria-hidden="true" />
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-zinc-400'}`} aria-hidden="true" />
                   <span className="uppercase text-[11px]">{item.label}</span>
                 </div>
 
                 <div className="flex items-center gap-1.5">
-                  {item.id === 'exceptions' && exceptionsCount > 0 && (
+                  {item.id === 'quality' && exceptionsCount > 0 && (
                     <span 
                       aria-label={`${exceptionsCount} active exceptions`}
-                      className="font-mono text-[10px] font-bold px-1.5 py-0.2 bg-rose-600 text-white rounded-none border border-rose-400/50"
+                      className={`font-mono text-[10px] font-bold px-1.5 py-0.2 ${
+                        isActive ? 'bg-white text-forge-orange' : 'bg-rose-600 text-white'
+                      }`}
                     >
                       {exceptionsCount}
                     </span>
                   )}
-                  {isActive && <ChevronRight className="w-3.5 h-3.5 text-forge-orange" aria-hidden="true" />}
+                  {isActive && <ChevronRight className="w-3.5 h-3.5 text-white" aria-hidden="true" />}
                 </div>
               </button>
             );

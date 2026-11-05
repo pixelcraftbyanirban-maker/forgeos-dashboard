@@ -6,6 +6,7 @@ import { ProductionPage } from './pages/Production/ProductionPage';
 import { MachinesPage } from './pages/Machines/MachinesPage';
 import { ExceptionsPage } from './pages/Exceptions/ExceptionsPage';
 import { ReportsPage } from './pages/Reports/ReportsPage';
+import { InventoryPage } from './pages/Inventory/InventoryPage';
 import { DetailDrawer } from './components/ui/DetailDrawer';
 import {
   INITIAL_MACHINES,
@@ -124,24 +125,32 @@ export const App: React.FC = () => {
         onTabChange={setCurrentTab}
         title={
           currentTab === 'overview'
-            ? 'Factory Overview'
+            ? 'Shop-Floor Overview'
+            : currentTab === 'orders'
+            ? 'Active Work Orders'
             : currentTab === 'production'
             ? 'Production Schedule'
             : currentTab === 'machines'
             ? 'Spindle Fleet'
-            : currentTab === 'exceptions'
+            : currentTab === 'quality' || currentTab === 'exceptions'
             ? 'Exceptions & Deviations'
+            : currentTab === 'inventory'
+            ? 'Material & Tooling Inventory'
             : 'Analytics Reports'
         }
         subtitle={
           currentTab === 'overview'
-            ? 'Shree Ganesh Precision Engineering • Howrah (24 Spindles)'
+            ? 'Real-time performance across machines, jobs, and production.'
+            : currentTab === 'orders'
+            ? 'Work Order Routing, Part Allocation & Batch Progress'
             : currentTab === 'production'
             ? 'Work Orders, Operation Routing & Progress'
             : currentTab === 'machines'
             ? 'Telemetry Channels, Speed, Feeds & OEE Breakdown'
-            : currentTab === 'exceptions'
+            : currentTab === 'quality' || currentTab === 'exceptions'
             ? 'Active Alarms, Tool Wear & Supervisor Sign-off'
+            : currentTab === 'inventory'
+            ? 'Raw Billet Stock, Carbide Inserts & Tool Wear Status'
             : 'Historical Audit Trails & Shipped Part Certification'
         }
         searchQuery={searchQuery}
@@ -168,7 +177,7 @@ export const App: React.FC = () => {
           />
         )}
 
-        {currentTab === 'production' && (
+        {(currentTab === 'production' || currentTab === 'orders') && (
           <ProductionPage
             jobs={filteredJobs}
             onSelectJob={handleSelectJob}
@@ -182,13 +191,17 @@ export const App: React.FC = () => {
           />
         )}
 
-        {currentTab === 'exceptions' && (
+        {(currentTab === 'exceptions' || currentTab === 'quality') && (
           <ExceptionsPage
             exceptions={exceptions}
             onAcknowledge={handleAcknowledgeException}
             onSelectMachine={handleSelectMachine}
             onSelectJob={handleSelectJob}
           />
+        )}
+
+        {currentTab === 'inventory' && (
+          <InventoryPage />
         )}
 
         {currentTab === 'reports' && (
