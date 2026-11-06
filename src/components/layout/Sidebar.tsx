@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   LayoutDashboard, 
   Workflow, 
@@ -10,11 +10,23 @@ import {
   Radio,
   Settings,
   ChevronRight,
+  Terminal,
+  User,
   X 
 } from 'lucide-react';
 import { Logo } from '../ui/Logo';
+import { UserRole } from '../../types';
 
-export type NavTab = 'overview' | 'orders' | 'production' | 'machines' | 'quality' | 'inventory' | 'exceptions' | 'reports';
+export type NavTab = 
+  | 'overview' 
+  | 'orders' 
+  | 'production' 
+  | 'machines' 
+  | 'quality' 
+  | 'inventory' 
+  | 'exceptions' 
+  | 'reports' 
+  | 'operator';
 
 interface SidebarProps {
   currentTab: NavTab;
@@ -22,23 +34,39 @@ interface SidebarProps {
   exceptionsCount: number;
   isMobile?: boolean;
   onCloseMobile?: () => void;
+  currentRole?: UserRole;
+  onRoleChange?: (role: UserRole) => void;
 }
+
+export const ROLE_PERSONNEL: Record<UserRole, { name: string; title: string }> = {
+  PRODUCTION_MANAGER: { name: 'Arindam Chatterjee', title: 'PRODUCTION MANAGER' },
+  SHOP_SUPERVISOR: { name: 'Sourav Das', title: 'SHOP SUPERVISOR' },
+  MACHINE_OPERATOR: { name: 'Rahul Das', title: 'CNC OPERATOR (VMC-01)' },
+  QUALITY_MANAGER: { name: 'Priya Sharma', title: 'QUALITY LEAD (QC)' },
+  INVENTORY_MANAGER: { name: 'Alok Mukherjee', title: 'STORES & TOOLING' },
+  SYSTEM_ADMIN: { name: 'IT Infrastructure', title: 'SYSTEM ADMINISTRATOR' }
+};
 
 export const Sidebar: React.FC<SidebarProps> = ({
   currentTab,
   onTabChange,
   exceptionsCount,
   isMobile = false,
-  onCloseMobile
+  onCloseMobile,
+  currentRole = 'PRODUCTION_MANAGER',
+  onRoleChange
 }) => {
-  const navItems: { id: NavTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+  const [activeRole, setActiveRole] = useState<UserRole>(currentRole);
+
+  const navItems: { id: NavTab; label: string; icon: React.ComponentType<{ className?: string }>; badge?: number }[] = [
     { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'orders', label: 'Orders', icon: ClipboardList },
     { id: 'production', label: 'Production', icon: Workflow },
     { id: 'machines', label: 'Machines', icon: Cpu },
-    { id: 'quality', label: 'Quality', icon: ShieldCheck },
+    { id: 'quality', label: 'Quality', icon: ShieldCheck, badge: exceptionsCount },
     { id: 'inventory', label: 'Inventory', icon: Boxes },
-    { id: 'reports', label: 'Reports', icon: BarChart3 }
+    { id: 'reports', label: 'Reports', icon: BarChart3 },
+    { id: 'operator', label: 'Operator Console', icon: Terminal }
   ];
 
   const handleTabClick = (tabId: NavTab) => {
@@ -47,6 +75,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
       onCloseMobile();
     }
   };
+
+  const handleRoleSelect = (role: UserRole) => {
+    setActiveRole(role);
+    if (onRoleChange) onRoleChange(role);
+    if (role === 'MACHINE_OPERATOR') {
+      onTabChange('operator');
+    }
+  };
+
+  const user = ROLE_PERSONNEL[activeRole];
 
   return (
     <aside 
@@ -113,14 +151,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </div>
 
                 <div className="flex items-center gap-1.5">
-                  {item.id === 'quality' && exceptionsCount > 0 && (
+                  {item.badge !== undefined && item.badge > 0 && (
                     <span 
-                      aria-label={`${exceptionsCount} active exceptions`}
+                      aria-label={`${item.badge} active exceptions`}
                       className={`font-mono text-[10px] font-bold px-1.5 py-0.2 ${
                         isActive ? 'bg-white text-forge-orange' : 'bg-rose-600 text-white'
                       }`}
                     >
-                      {exceptionsCount}
+                      {item.badge}
                     </span>
                   )}
                   {isActive && <ChevronRight className="w-3.5 h-3.5 text-white" aria-hidden="true" />}
@@ -131,7 +169,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </nav>
       </div>
 
-      {/* Bottom Technical Status & Settings */}
+      {/* Bottom Technical Status, Role Selector & Settings */}
       <div className="border-t border-forge-steel/30 bg-black/60 p-4 space-y-3">
         {/* System Online Badge */}
         <div className="p-2.5 bg-zinc-900 border border-zinc-800">
@@ -152,17 +190,33 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
 
-        {/* User Context */}
-        <div className="px-2.5 py-2 bg-zinc-900/60 border border-zinc-800/80 font-mono text-[10px]">
-          <div className="text-zinc-400">LOGGED IN:</div>
-          <div className="text-zinc-100 font-bold truncate">Arindam Chatterjee</div>
-          <div className="text-forge-orange text-[9px]">PRODUCTION MANAGER</div>
+        {/* Role-Based Access Prototype Selector (Phase 11) */}
+        <div className="px-2.5 py-2 bg-zinc-900/60 border border-zinc-800/80 font-mono text-[10px] space-y-1">
+          <div className="flex items-center justify-between text-zinc-400">
+            <span>USER CONTEXT / ROLE:</span>
+            <User className="w-3 h-3 text-forge-steel" aria-hidden="true" />
+          </div>
+          <select
+            value={activeRole}
+            onChange={(e) => handleRoleSelect(e.target.value as UserRole)}
+            aria-label="Switch active user role"
+            className="w-full bg-zinc-900 border border-zinc-700 text-zinc-200 text-[10px] font-mono p-1 focus:outline-none focus:border-forge-orange"
+          >
+            <option value="PRODUCTION_MANAGER">Production Manager</option>
+            <option value="SHOP_SUPERVISOR">Shop Supervisor</option>
+            <option value="MACHINE_OPERATOR">Machine Operator (Terminal)</option>
+            <option value="QUALITY_MANAGER">Quality Manager (QA)</option>
+            <option value="INVENTORY_MANAGER">Inventory & Tooling Lead</option>
+            <option value="SYSTEM_ADMIN">System Administrator</option>
+          </select>
+          <div className="text-zinc-300 font-bold truncate pt-0.5">{user.name}</div>
+          <div className="text-forge-orange text-[9px] truncate">{user.title}</div>
         </div>
 
         {/* Settings button */}
         <button
           type="button"
-          onClick={() => alert("Settings configuration panel")}
+          onClick={() => alert("Shop Settings & Machine Connectivity: Configured for Howrah 24-Spindle Facility via MTConnect Adapter.")}
           aria-label="Open shop settings configuration"
           className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-zinc-300 hover:text-white hover:bg-white/5 font-mono text-[11px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
         >

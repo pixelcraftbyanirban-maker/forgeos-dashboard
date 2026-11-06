@@ -67,7 +67,23 @@ export const INITIAL_MACHINES: Machine[] = [
     lastStateChange: "2h 15m ago",
     telemetryTimestamp: "Just now",
     uptimeHoursToday: 6.9,
-    stateHistory: SHIFT_PROFILES.HIGH_UTILIZATION
+    stateHistory: SHIFT_PROFILES.HIGH_UTILIZATION,
+    targetCycleTimeSec: 120,
+    actualCycleTimeSec: 115,
+    partsPlanned: 500,
+    partsCompleted: 320,
+    remainingParts: 180,
+    estJobCompletion: "12-11-2026, 18:30 IST",
+    telemetryAgeSeconds: 2,
+    telemetryFreshness: "LIVE",
+    targetOee: 85,
+    diagnosis: {
+      "issue": "Active precision roughing on Op 30 Bore & Cavity",
+      "whyItMatters": "Core deliverable for Eastern Industrial Components",
+      "needsAttention": "Cycle time is 5s faster than target; no thermal drift",
+      "recommendedInvestigation": "Schedule tool offset check at piece 350 touch-off",
+      "severity": "NORMAL"
+}
   },
   {
     id: "VMC-02",
@@ -87,7 +103,25 @@ export const INITIAL_MACHINES: Machine[] = [
     lastStateChange: "18m ago",
     telemetryTimestamp: "Just now",
     uptimeHoursToday: 3.4,
-    stateHistory: SHIFT_PROFILES.ALARM_HALTED
+    stateHistory: SHIFT_PROFILES.ALARM_HALTED,
+    targetCycleTimeSec: 240,
+    actualCycleTimeSec: 0,
+    partsPlanned: 60,
+    partsCompleted: 24,
+    remainingParts: 36,
+    estJobCompletion: "Delayed (Spindle Halt)",
+    telemetryAgeSeconds: 3,
+    telemetryFreshness: "LIVE",
+    targetOee: 85,
+    activeAlarm: "ALM-402: Coolant delivery line pressure drop (<10 bar)",
+    downtimeDurationMinutes: 18,
+    diagnosis: {
+      "issue": "Spindle halted by CNC safety interlock on coolant line",
+      "whyItMatters": "Spindle stopped mid-pass; risk of thermal shock to carbide tool & bronze impeller",
+      "needsAttention": "Coolant pump intake strainer and secondary pressure regulator",
+      "recommendedInvestigation": "Maintenance supervisor Vikram Singh to bleed line and inspect solenoid SV-2",
+      "severity": "CRITICAL"
+}
   },
   {
     id: "VMC-03",
@@ -107,7 +141,23 @@ export const INITIAL_MACHINES: Machine[] = [
     lastStateChange: "3h 40m ago",
     telemetryTimestamp: "Just now",
     uptimeHoursToday: 7.2,
-    stateHistory: SHIFT_PROFILES.HIGH_UTILIZATION
+    stateHistory: SHIFT_PROFILES.HIGH_UTILIZATION,
+    targetCycleTimeSec: 90,
+    actualCycleTimeSec: 88,
+    partsPlanned: 120,
+    partsCompleted: 95,
+    remainingParts: 25,
+    estJobCompletion: "08-11-2026, 14:00 IST",
+    telemetryAgeSeconds: 1,
+    telemetryFreshness: "LIVE",
+    targetOee: 88,
+    diagnosis: {
+      "issue": "High-speed profile contouring running smoothly",
+      "whyItMatters": "High precision automotive bracket run",
+      "needsAttention": "Spindle speed steady at 11,200 RPM",
+      "recommendedInvestigation": "Routine chip sweep at next pallet swap",
+      "severity": "NORMAL"
+}
   },
   {
     id: "VMC-04",
@@ -127,7 +177,23 @@ export const INITIAL_MACHINES: Machine[] = [
     lastStateChange: "4h 10m ago",
     telemetryTimestamp: "Just now",
     uptimeHoursToday: 7.4,
-    stateHistory: SHIFT_PROFILES.HIGH_UTILIZATION
+    stateHistory: SHIFT_PROFILES.HIGH_UTILIZATION,
+    targetCycleTimeSec: 150,
+    actualCycleTimeSec: 146,
+    partsPlanned: 300,
+    partsCompleted: 180,
+    remainingParts: 120,
+    estJobCompletion: "10-11-2026, 12:00 IST",
+    telemetryAgeSeconds: 2,
+    telemetryFreshness: "LIVE",
+    targetOee: 85,
+    diagnosis: {
+      "issue": "Traveling column 5-axis dynamic finish pass",
+      "whyItMatters": "Tight tolerance aerospace manifold pocket",
+      "needsAttention": "Feed override locked at 100%",
+      "recommendedInvestigation": "Monitor CMM coordinate alignment at batch midpoint",
+      "severity": "NORMAL"
+}
   },
   {
     id: "VMC-05",
@@ -147,7 +213,25 @@ export const INITIAL_MACHINES: Machine[] = [
     lastStateChange: "35m ago",
     telemetryTimestamp: "Just now",
     uptimeHoursToday: 4.8,
-    stateHistory: SHIFT_PROFILES.SETUP_HEAVY
+    stateHistory: SHIFT_PROFILES.SETUP_HEAVY,
+    targetCycleTimeSec: 180,
+    actualCycleTimeSec: 0,
+    partsPlanned: 200,
+    partsCompleted: 70,
+    remainingParts: 130,
+    estJobCompletion: "09-11-2026, 16:30 IST",
+    telemetryAgeSeconds: 3,
+    telemetryFreshness: "LIVE",
+    targetOee: 82,
+    downtimeDurationMinutes: 35,
+    maintenanceWarning: "Setup in progress: Vise alignment & zero-point dial-in",
+    diagnosis: {
+      "issue": "Heavy duty vise realignment and probe calibration",
+      "whyItMatters": "Next operation requires runout under 0.010mm",
+      "needsAttention": "Dial indicator showing 0.012mm runout; shimming required",
+      "recommendedInvestigation": "Assist operator Rakesh Yadav with magnetic base fixture alignment",
+      "severity": "WARNING"
+}
   },
   {
     id: "VMC-06",
@@ -167,7 +251,23 @@ export const INITIAL_MACHINES: Machine[] = [
     lastStateChange: "1h 50m ago",
     telemetryTimestamp: "Just now",
     uptimeHoursToday: 6.8,
-    stateHistory: SHIFT_PROFILES.HIGH_UTILIZATION
+    stateHistory: SHIFT_PROFILES.HIGH_UTILIZATION,
+    targetCycleTimeSec: 210,
+    actualCycleTimeSec: 205,
+    partsPlanned: 80,
+    partsCompleted: 56,
+    remainingParts: 24,
+    estJobCompletion: "10-11-2026, 11:30 IST",
+    telemetryAgeSeconds: 2,
+    telemetryFreshness: "LIVE",
+    targetOee: 90,
+    diagnosis: {
+      "issue": "Dynamic 5-axis finish milling on railway bearing housing",
+      "whyItMatters": "High value PO for Eastern Rail Components due in 4 days",
+      "needsAttention": "Spindle operating at 16,500 RPM with optimal vibration damping",
+      "recommendedInvestigation": "Staged CMM inspection slot at 15:00 IST",
+      "severity": "NORMAL"
+}
   },
   {
     id: "VMC-07",
@@ -187,7 +287,23 @@ export const INITIAL_MACHINES: Machine[] = [
     lastStateChange: "3h 25m ago",
     telemetryTimestamp: "Just now",
     uptimeHoursToday: 6.5,
-    stateHistory: SHIFT_PROFILES.BALANCED_MILLING
+    stateHistory: SHIFT_PROFILES.BALANCED_MILLING,
+    targetCycleTimeSec: 130,
+    actualCycleTimeSec: 128,
+    partsPlanned: 150,
+    partsCompleted: 110,
+    remainingParts: 40,
+    estJobCompletion: "07-11-2026, 19:00 IST",
+    telemetryAgeSeconds: 4,
+    telemetryFreshness: "LIVE",
+    targetOee: 85,
+    diagnosis: {
+      "issue": "Production milling cycle running within nominal envelope",
+      "whyItMatters": "Standard production queue part",
+      "needsAttention": "Cutting parameters stable",
+      "recommendedInvestigation": "Check coolant reservoir level before shift handover",
+      "severity": "NORMAL"
+}
   },
   {
     id: "VMC-08",
@@ -207,7 +323,25 @@ export const INITIAL_MACHINES: Machine[] = [
     lastStateChange: "42m ago",
     telemetryTimestamp: "Just now",
     uptimeHoursToday: 4.2,
-    stateHistory: SHIFT_PROFILES.IDLE_STARVED
+    stateHistory: SHIFT_PROFILES.IDLE_STARVED,
+    targetCycleTimeSec: 0,
+    actualCycleTimeSec: 0,
+    partsPlanned: 0,
+    partsCompleted: 0,
+    remainingParts: 0,
+    estJobCompletion: "Awaiting Next Job Dispatch",
+    telemetryAgeSeconds: 3,
+    telemetryFreshness: "LIVE",
+    targetOee: 80,
+    downtimeDurationMinutes: 42,
+    maintenanceWarning: "Idle: Awaiting raw billet staging from stores Bay A-04",
+    diagnosis: {
+      "issue": "Machine bed clean, spindle idle, awaiting raw stock",
+      "whyItMatters": "Spindle utilization loss (+42 min idle time accumulated)",
+      "needsAttention": "Material store Bay A-04 has billet batch staged but not fork-transported",
+      "recommendedInvestigation": "Floor supervisor to expedite material handler for En-8D round bar staging",
+      "severity": "WARNING"
+}
   },
 
   // SECTION 2: CNC TURNING & LATHE CENTER (8 Machines)
@@ -229,7 +363,23 @@ export const INITIAL_MACHINES: Machine[] = [
     lastStateChange: "2h 45m ago",
     telemetryTimestamp: "Just now",
     uptimeHoursToday: 7.1,
-    stateHistory: SHIFT_PROFILES.HIGH_UTILIZATION
+    stateHistory: SHIFT_PROFILES.HIGH_UTILIZATION,
+    targetCycleTimeSec: 75,
+    actualCycleTimeSec: 72,
+    partsPlanned: 250,
+    partsCompleted: 190,
+    remainingParts: 60,
+    estJobCompletion: "06-11-2026, 17:00 IST",
+    telemetryAgeSeconds: 1,
+    telemetryFreshness: "LIVE",
+    targetOee: 88,
+    diagnosis: {
+      "issue": "Mill-turn sub-spindle turning cycle running nominally",
+      "whyItMatters": "High throughput turning line",
+      "needsAttention": "Cycle time ahead by 3s",
+      "recommendedInvestigation": "Inspect sub-spindle chuck pressure gauge",
+      "severity": "NORMAL"
+}
   },
   {
     id: "CNC-02",
@@ -249,7 +399,23 @@ export const INITIAL_MACHINES: Machine[] = [
     lastStateChange: "4h 00m ago",
     telemetryTimestamp: "Just now",
     uptimeHoursToday: 6.9,
-    stateHistory: SHIFT_PROFILES.BALANCED_MILLING
+    stateHistory: SHIFT_PROFILES.BALANCED_MILLING,
+    targetCycleTimeSec: 60,
+    actualCycleTimeSec: 58,
+    partsPlanned: 400,
+    partsCompleted: 280,
+    remainingParts: 120,
+    estJobCompletion: "07-11-2026, 13:00 IST",
+    telemetryAgeSeconds: 2,
+    telemetryFreshness: "LIVE",
+    targetOee: 85,
+    diagnosis: {
+      "issue": "Continuous turning cycle on forged pins",
+      "whyItMatters": "Standard volume production",
+      "needsAttention": "Insert tool life estimated at 72%",
+      "recommendedInvestigation": "Scheduled tool check at piece 320",
+      "severity": "NORMAL"
+}
   },
   {
     id: "CNC-03",
@@ -269,7 +435,23 @@ export const INITIAL_MACHINES: Machine[] = [
     lastStateChange: "1h 30m ago",
     telemetryTimestamp: "Just now",
     uptimeHoursToday: 6.7,
-    stateHistory: SHIFT_PROFILES.HIGH_UTILIZATION
+    stateHistory: SHIFT_PROFILES.HIGH_UTILIZATION,
+    targetCycleTimeSec: 95,
+    actualCycleTimeSec: 94,
+    partsPlanned: 180,
+    partsCompleted: 130,
+    remainingParts: 50,
+    estJobCompletion: "08-11-2026, 11:00 IST",
+    telemetryAgeSeconds: 3,
+    telemetryFreshness: "LIVE",
+    targetOee: 85,
+    diagnosis: {
+      "issue": "4-axis turning with live tooling slotting pass",
+      "whyItMatters": "Automotive transmission shaft",
+      "needsAttention": "Nominal feeds and speeds",
+      "recommendedInvestigation": "Verify groove width on vernier gauge",
+      "severity": "NORMAL"
+}
   },
   {
     id: "CNC-04",
@@ -289,7 +471,25 @@ export const INITIAL_MACHINES: Machine[] = [
     lastStateChange: "32m ago",
     telemetryTimestamp: "Just now",
     uptimeHoursToday: 4.5,
-    stateHistory: SHIFT_PROFILES.SETUP_HEAVY
+    stateHistory: SHIFT_PROFILES.SETUP_HEAVY,
+    targetCycleTimeSec: 110,
+    actualCycleTimeSec: 0,
+    partsPlanned: 120,
+    partsCompleted: 40,
+    remainingParts: 80,
+    estJobCompletion: "08-11-2026, 17:00 IST",
+    telemetryAgeSeconds: 2,
+    telemetryFreshness: "LIVE",
+    targetOee: 80,
+    downtimeDurationMinutes: 32,
+    maintenanceWarning: "Setup: 4-jaw chuck dial-in & soft jaw boring (+32m variance)",
+    diagnosis: {
+      "issue": "Soft-jaw boring in progress for precision turning diameter",
+      "whyItMatters": "Setup time exceeded target (+32 min); job schedule at risk",
+      "needsAttention": "Bore diameter dial check showing 0.015mm TIR (target: 0.008mm)",
+      "recommendedInvestigation": "Supervisor Sourav Das assisting operator Goutam Naskar with jaw skimming pass",
+      "severity": "WARNING"
+}
   },
   {
     id: "CNC-05",
@@ -309,7 +509,23 @@ export const INITIAL_MACHINES: Machine[] = [
     lastStateChange: "3h 15m ago",
     telemetryTimestamp: "Just now",
     uptimeHoursToday: 7.0,
-    stateHistory: SHIFT_PROFILES.HIGH_UTILIZATION
+    stateHistory: SHIFT_PROFILES.HIGH_UTILIZATION,
+    targetCycleTimeSec: 85,
+    actualCycleTimeSec: 84,
+    partsPlanned: 200,
+    partsCompleted: 155,
+    remainingParts: 45,
+    estJobCompletion: "07-11-2026, 15:00 IST",
+    telemetryAgeSeconds: 2,
+    telemetryFreshness: "LIVE",
+    targetOee: 88,
+    diagnosis: {
+      "issue": "Turn-mill finishing cycle running cleanly",
+      "whyItMatters": "Precision shaft with keyway milling",
+      "needsAttention": "All telemetry parameters within green zone",
+      "recommendedInvestigation": "Routine inspection of live tool turret oil level",
+      "severity": "NORMAL"
+}
   },
   {
     id: "CNC-06",
@@ -329,7 +545,23 @@ export const INITIAL_MACHINES: Machine[] = [
     lastStateChange: "2h 50m ago",
     telemetryTimestamp: "Just now",
     uptimeHoursToday: 6.6,
-    stateHistory: SHIFT_PROFILES.BALANCED_MILLING
+    stateHistory: SHIFT_PROFILES.BALANCED_MILLING,
+    targetCycleTimeSec: 90,
+    actualCycleTimeSec: 89,
+    partsPlanned: 150,
+    partsCompleted: 105,
+    remainingParts: 45,
+    estJobCompletion: "07-11-2026, 18:00 IST",
+    telemetryAgeSeconds: 2,
+    telemetryFreshness: "LIVE",
+    targetOee: 85,
+    diagnosis: {
+      "issue": "Precision lathe OD turning with diamond coated insert",
+      "whyItMatters": "Class 1 surface finish requirement (Ra 0.4)",
+      "needsAttention": "Surface finish profile verified on comparator",
+      "recommendedInvestigation": "Inspect insert nose radius wear after 20 parts",
+      "severity": "NORMAL"
+}
   },
   {
     id: "CNC-07",
@@ -349,7 +581,23 @@ export const INITIAL_MACHINES: Machine[] = [
     lastStateChange: "1h 10m ago",
     telemetryTimestamp: "2.4m ago (Delayed)",
     uptimeHoursToday: 5.9,
-    stateHistory: SHIFT_PROFILES.BALANCED_MILLING
+    stateHistory: SHIFT_PROFILES.BALANCED_MILLING,
+    targetCycleTimeSec: 100,
+    actualCycleTimeSec: 112,
+    partsPlanned: 300,
+    partsCompleted: 140,
+    remainingParts: 160,
+    estJobCompletion: "09-11-2026, 14:00 IST",
+    telemetryAgeSeconds: 12,
+    telemetryFreshness: "DELAYED",
+    targetOee: 85,
+    diagnosis: {
+      "issue": "Telemetry delay (12s latency) and 12s cycle time lag",
+      "whyItMatters": "Operator dropped feed override to 90% due to insert chatter",
+      "needsAttention": "MTConnect edge node buffering; insert pocket #12 at 85% life",
+      "recommendedInvestigation": "Replace CNMG 120408 turning insert and reboot MTConnect network adapter",
+      "severity": "WARNING"
+}
   },
   {
     id: "CNC-08",
@@ -369,7 +617,25 @@ export const INITIAL_MACHINES: Machine[] = [
     lastStateChange: "50m ago",
     telemetryTimestamp: "Just now",
     uptimeHoursToday: 4.1,
-    stateHistory: SHIFT_PROFILES.IDLE_STARVED
+    stateHistory: SHIFT_PROFILES.IDLE_STARVED,
+    targetCycleTimeSec: 0,
+    actualCycleTimeSec: 0,
+    partsPlanned: 0,
+    partsCompleted: 0,
+    remainingParts: 0,
+    estJobCompletion: "Awaiting Job Assignment",
+    telemetryAgeSeconds: 3,
+    telemetryFreshness: "LIVE",
+    targetOee: 80,
+    downtimeDurationMinutes: 50,
+    maintenanceWarning: "Idle: Completed previous batch, bed cleared",
+    diagnosis: {
+      "issue": "Machine available, spindle unallocated",
+      "whyItMatters": "Idle capacity available for quick-turn dispatch",
+      "needsAttention": "Queue has 2 pending turning orders in scheduling",
+      "recommendedInvestigation": "Production planner to assign JOB-2026-012 to CNC-08",
+      "severity": "NORMAL"
+}
   },
 
   // SECTION 3: HMC, HEAVY MACHINING & FINISHING (8 Machines)
@@ -391,7 +657,23 @@ export const INITIAL_MACHINES: Machine[] = [
     lastStateChange: "3h 05m ago",
     telemetryTimestamp: "Just now",
     uptimeHoursToday: 6.8,
-    stateHistory: SHIFT_PROFILES.HIGH_UTILIZATION
+    stateHistory: SHIFT_PROFILES.HIGH_UTILIZATION,
+    targetCycleTimeSec: 320,
+    actualCycleTimeSec: 310,
+    partsPlanned: 60,
+    partsCompleted: 42,
+    remainingParts: 18,
+    estJobCompletion: "09-11-2026, 18:00 IST",
+    telemetryAgeSeconds: 2,
+    telemetryFreshness: "LIVE",
+    targetOee: 85,
+    diagnosis: {
+      "issue": "Heavy face milling on hydraulic cylinder body",
+      "whyItMatters": "Critical heavy machine cell operation",
+      "needsAttention": "Spindle bearing thermal reading 68.5°C (warning threshold is 70°C)",
+      "recommendedInvestigation": "Verify chiller unit circulation rate during continuous milling",
+      "severity": "WARNING"
+}
   },
   {
     id: "HMC-02",
@@ -411,7 +693,23 @@ export const INITIAL_MACHINES: Machine[] = [
     lastStateChange: "4h 15m ago",
     telemetryTimestamp: "Just now",
     uptimeHoursToday: 6.9,
-    stateHistory: SHIFT_PROFILES.BALANCED_MILLING
+    stateHistory: SHIFT_PROFILES.BALANCED_MILLING,
+    targetCycleTimeSec: 280,
+    actualCycleTimeSec: 275,
+    partsPlanned: 90,
+    partsCompleted: 65,
+    remainingParts: 25,
+    estJobCompletion: "08-11-2026, 16:00 IST",
+    telemetryAgeSeconds: 3,
+    telemetryFreshness: "LIVE",
+    targetOee: 85,
+    diagnosis: {
+      "issue": "4-axis heavy box milling cycle running to schedule",
+      "whyItMatters": "Heavy casting machining batch",
+      "needsAttention": "Nominal load at 6,500 RPM",
+      "recommendedInvestigation": "Routine inspection of pallet B hydraulic clamp pressure",
+      "severity": "NORMAL"
+}
   },
   {
     id: "HMC-03",
@@ -431,7 +729,23 @@ export const INITIAL_MACHINES: Machine[] = [
     lastStateChange: "2h 20m ago",
     telemetryTimestamp: "Just now",
     uptimeHoursToday: 7.1,
-    stateHistory: SHIFT_PROFILES.HIGH_UTILIZATION
+    stateHistory: SHIFT_PROFILES.HIGH_UTILIZATION,
+    targetCycleTimeSec: 240,
+    actualCycleTimeSec: 232,
+    partsPlanned: 110,
+    partsCompleted: 78,
+    remainingParts: 32,
+    estJobCompletion: "08-11-2026, 12:00 IST",
+    telemetryAgeSeconds: 2,
+    telemetryFreshness: "LIVE",
+    targetOee: 88,
+    diagnosis: {
+      "issue": "High-speed horizontal machining on aluminum valve body",
+      "whyItMatters": "High margin defense component",
+      "needsAttention": "Cycle time performing 8s ahead of nominal target",
+      "recommendedInvestigation": "Clear chip swarf conveyor screen at end of shift",
+      "severity": "NORMAL"
+}
   },
   {
     id: "HMC-04",
@@ -451,7 +765,25 @@ export const INITIAL_MACHINES: Machine[] = [
     lastStateChange: "28m ago",
     telemetryTimestamp: "Just now",
     uptimeHoursToday: 4.6,
-    stateHistory: SHIFT_PROFILES.SETUP_HEAVY
+    stateHistory: SHIFT_PROFILES.SETUP_HEAVY,
+    targetCycleTimeSec: 300,
+    actualCycleTimeSec: 0,
+    partsPlanned: 75,
+    partsCompleted: 20,
+    remainingParts: 55,
+    estJobCompletion: "10-11-2026, 15:00 IST",
+    telemetryAgeSeconds: 2,
+    telemetryFreshness: "LIVE",
+    targetOee: 82,
+    downtimeDurationMinutes: 28,
+    maintenanceWarning: "Setup: Twin pallet tombstone fixture clamp dial-in",
+    diagnosis: {
+      "issue": "Twin pallet tombstone fixture loading and part clamping",
+      "whyItMatters": "Setup within normal window (28m elapsed of 40m planned)",
+      "needsAttention": "Torque check on clamp bolts M16",
+      "recommendedInvestigation": "Operator Partha Sarkar to run test dry-run block before cutting",
+      "severity": "NORMAL"
+}
   },
   {
     id: "LATHE-01",
@@ -471,7 +803,23 @@ export const INITIAL_MACHINES: Machine[] = [
     lastStateChange: "3h 50m ago",
     telemetryTimestamp: "Just now",
     uptimeHoursToday: 6.6,
-    stateHistory: SHIFT_PROFILES.BALANCED_MILLING
+    stateHistory: SHIFT_PROFILES.BALANCED_MILLING,
+    targetCycleTimeSec: 180,
+    actualCycleTimeSec: 176,
+    partsPlanned: 100,
+    partsCompleted: 72,
+    remainingParts: 28,
+    estJobCompletion: "07-11-2026, 16:30 IST",
+    telemetryAgeSeconds: 3,
+    telemetryFreshness: "LIVE",
+    targetOee: 80,
+    diagnosis: {
+      "issue": "Heavy duty turning on large diameter flange",
+      "whyItMatters": "Primary roughing for valve housing",
+      "needsAttention": "Feed rate stable at 850 mm/min",
+      "recommendedInvestigation": "Inspect tailstock quill pressure",
+      "severity": "NORMAL"
+}
   },
   {
     id: "LATHE-02",
@@ -491,7 +839,25 @@ export const INITIAL_MACHINES: Machine[] = [
     lastStateChange: "1h 45m ago",
     telemetryTimestamp: "Just now",
     uptimeHoursToday: 3.2,
-    stateHistory: SHIFT_PROFILES.ALARM_HALTED
+    stateHistory: SHIFT_PROFILES.ALARM_HALTED,
+    targetCycleTimeSec: 0,
+    actualCycleTimeSec: 0,
+    partsPlanned: 0,
+    partsCompleted: 0,
+    remainingParts: 0,
+    estJobCompletion: "Under Maintenance",
+    telemetryAgeSeconds: 3,
+    telemetryFreshness: "LIVE",
+    targetOee: 80,
+    activeAlarm: "Scheduled Maintenance: 3-Jaw chuck refurbishment & bed regrinding",
+    downtimeDurationMinutes: 105,
+    diagnosis: {
+      "issue": "Machine stopped for scheduled 3-jaw chuck truing and soft-jaw boring",
+      "whyItMatters": "Required to maintain runout < 0.005mm on upcoming high-precision shaft batch",
+      "needsAttention": "Soft jaw boring ring setup pending dial indicator verification",
+      "recommendedInvestigation": "Confirm zero runout with dial test indicator before releasing to production",
+      "severity": "WARNING"
+}
   },
   {
     id: "LATHE-03",
@@ -511,7 +877,23 @@ export const INITIAL_MACHINES: Machine[] = [
     lastStateChange: "2h 10m ago",
     telemetryTimestamp: "Just now",
     uptimeHoursToday: 6.8,
-    stateHistory: SHIFT_PROFILES.HIGH_UTILIZATION
+    stateHistory: SHIFT_PROFILES.HIGH_UTILIZATION,
+    targetCycleTimeSec: 140,
+    actualCycleTimeSec: 138,
+    partsPlanned: 150,
+    partsCompleted: 110,
+    remainingParts: 40,
+    estJobCompletion: "07-11-2026, 17:30 IST",
+    telemetryAgeSeconds: 2,
+    telemetryFreshness: "LIVE",
+    targetOee: 82,
+    diagnosis: {
+      "issue": "Capstan lathe threading and chamfering pass",
+      "whyItMatters": "High precision batch finishing",
+      "needsAttention": "Thread pitch pitch-gauge verified",
+      "recommendedInvestigation": "Refill cutting oil dispenser bottle",
+      "severity": "NORMAL"
+}
   },
   {
     id: "LATHE-04",
@@ -531,7 +913,25 @@ export const INITIAL_MACHINES: Machine[] = [
     lastStateChange: "38m ago",
     telemetryTimestamp: "Just now",
     uptimeHoursToday: 4.3,
-    stateHistory: SHIFT_PROFILES.IDLE_STARVED
+    stateHistory: SHIFT_PROFILES.IDLE_STARVED,
+    targetCycleTimeSec: 0,
+    actualCycleTimeSec: 0,
+    partsPlanned: 0,
+    partsCompleted: 0,
+    remainingParts: 0,
+    estJobCompletion: "Idle / Standby",
+    telemetryAgeSeconds: 4,
+    telemetryFreshness: "LIVE",
+    targetOee: 75,
+    downtimeDurationMinutes: 38,
+    maintenanceWarning: "Idle: Standby machine for secondary threading operations",
+    diagnosis: {
+      "issue": "Hollow spindle lathe on standby",
+      "whyItMatters": "Available secondary spindle for overflow turning",
+      "needsAttention": "Clean and lubricate slideways",
+      "recommendedInvestigation": "Verify spindle zero backlash",
+      "severity": "NORMAL"
+}
   }
 ];
 
@@ -801,7 +1201,7 @@ export const INITIAL_JOBS: Job[] = [
   }
 ];
 
-// Operational Deviations localized for Indian Shop Floor Context
+// Operational Deviations localized for Indian Shop Floor Context (Phase 6 6-Stage Lifecycle)
 export const INITIAL_EXCEPTIONS: ProductionException[] = [
   {
     id: "EX-01",
@@ -812,12 +1212,27 @@ export const INITIAL_EXCEPTIONS: ProductionException[] = [
     timestamp: "18 mins ago (14:12 IST)",
     machineId: "VMC-02",
     jobId: "JOB-2026-002",
+    status: "DETECTED",
+    assignee: "Vikram Singh",
+    assigneeRole: "MAINTENANCE_TECH",
+    resolutionDeadline: "15:00 IST (Immediate)",
     acknowledged: false,
+    internalNotes: [
+      "Interlock fired at 14:12:05 IST automatically via MTConnect PLC stream."
+    ],
     events: [
       { time: "14:12:05", source: "CNC PLC Interlock Channel", message: "SPINDLE_SAFETY_INTERLOCK: Coolant flow failure", channel: "S1_COOLANT", sensorValue: "8.4 bar (Min: 12.0 bar)" },
       { time: "14:11:40", source: "Coolant Filter Line Sensor", message: "Back-pressure spike detected; brass swarf filter clogged", channel: "PRESSURE_DIFF", sensorValue: "ΔP = 2.8 bar" },
       { time: "14:08:15", source: "Spindle Drive Controller", message: "High cutting load on Bronze Impeller Op 20", channel: "DRIVE_AMPS", sensorValue: "34A peak" }
-    ]
+    ],
+    correctiveAction: {
+      category: "MACHINE_ALARM",
+      problemDescription: "Coolant pressure dropped below critical safety interlock of 10.0 bar on 5-axis DMG MORI.",
+      rootCause: "Secondary swarf strainer clogged with fine bronze turnings from continuous roughing.",
+      correctiveAction: "Isolate delivery line, clean duplex filter screen, bleed line, and verify 14.5 bar line pressure.",
+      responsiblePerson: "Vikram Singh (Maintenance Tech)",
+      approvalStatus: "PENDING"
+    }
   },
   {
     id: "EX-02",
@@ -828,12 +1243,29 @@ export const INITIAL_EXCEPTIONS: ProductionException[] = [
     timestamp: "32 mins ago (13:58 IST)",
     machineId: "CNC-04",
     jobId: "JOB-2026-003",
+    status: "CORRECTIVE_ACTION",
+    assignee: "Sourav Das",
+    assigneeRole: "SUPERVISOR",
+    resolutionDeadline: "14:45 IST",
     acknowledged: true,
     acknowledgedBy: "Sourav Das (Floor Manager)",
+    internalNotes: [
+      "Chuck boring ring installed; skim cut taking runout from 0.015mm to <0.006mm."
+    ],
     events: [
       { time: "13:58:20", source: "Shop Floor Terminal Station 2", message: "Operator Goutam Naskar requested dial indicator verification", channel: "DIAL_INDICATOR", sensorValue: "0.015mm TIR (Spec: 0.008mm)" },
       { time: "13:30:00", source: "MES Job Scheduler", message: "Planned setup window elapsed (Target: 45m, Actual: 80m)", channel: "SETUP_TIMER", sensorValue: "+35 min variance" }
-    ]
+    ],
+    correctiveAction: {
+      category: "SETUP_DELAY",
+      problemDescription: "Excessive dial runout (0.015mm) on 3-jaw chuck jaws prior to precision shaft turning.",
+      rootCause: "Uneven wear on prior job clamping contact surface.",
+      correctiveAction: "Skim internal clamping diameter with boring bar using hydraulic boring ring tensioner.",
+      responsiblePerson: "Goutam Naskar (Operator) / Sourav Das (Supervisor)",
+      verificationNotes: "Post-skim dial check measured 0.005mm TIR. Within tolerance.",
+      approvalStatus: "APPROVED",
+      resolutionTimestamp: "14:25 IST"
+    }
   },
   {
     id: "EX-03",
@@ -844,12 +1276,27 @@ export const INITIAL_EXCEPTIONS: ProductionException[] = [
     timestamp: "45 mins ago (13:45 IST)",
     machineId: "HMC-01",
     jobId: "JOB-2026-006",
+    status: "INVESTIGATING",
+    assignee: "Vikram Singh",
+    assigneeRole: "MAINTENANCE_TECH",
+    resolutionDeadline: "15:30 IST",
     acknowledged: true,
     acknowledgedBy: "Vikram Singh (Maintenance Supervisor)",
+    internalNotes: [
+      "Spindle chiller unit coolant flow checked. Chiller radiator fins partially blocked with ambient dust."
+    ],
     events: [
       { time: "13:45:00", source: "Spindle Chiller Unit #3", message: "Chiller return temperature elevated", channel: "CHILLER_TEMP", sensorValue: "38.5°C" },
       { time: "13:42:10", source: "Bearing PT100 Sensor", message: "Spindle front bearing thermal warning triggered", channel: "BEARING_TEMP", sensorValue: "78.2°C (Max: 70°C)" }
-    ]
+    ],
+    correctiveAction: {
+      category: "MACHINE_ALARM",
+      problemDescription: "Front spindle bearing temperature peak at 78.2°C during continuous roughing.",
+      rootCause: "Chiller heat-exchange radiator airflow restricted by workshop dust accumulation.",
+      correctiveAction: "Clean external radiator mesh with pneumatic air jet, verify chiller glycol fluid level.",
+      responsiblePerson: "Vikram Singh (Maintenance Tech)",
+      approvalStatus: "PENDING"
+    }
   },
   {
     id: "EX-04",
@@ -860,10 +1307,23 @@ export const INITIAL_EXCEPTIONS: ProductionException[] = [
     timestamp: "1h 15m ago (13:15 IST)",
     machineId: "VMC-06",
     jobId: "JOB-2026-006",
-    acknowledged: false,
+    status: "ACKNOWLEDGED",
+    assignee: "Priya Sharma",
+    assigneeRole: "QUALITY_MANAGER",
+    resolutionDeadline: "10-11-2026",
+    acknowledged: true,
+    acknowledgedBy: "Priya Sharma (Quality Manager)",
     events: [
       { time: "13:15:00", source: "MES Production Planner", message: "4-day dispatch countdown triggered for Indian Railways schedule", channel: "SCHEDULE_DISPATCH", sensorValue: "56/80 pcs completed" }
-    ]
+    ],
+    correctiveAction: {
+      category: "CYCLE_TIME_DEVIATION",
+      problemDescription: "Tight delivery window for Indian Railways bearing housing contract.",
+      rootCause: "CMM QA queue backlog caused by large previous lot verification.",
+      correctiveAction: "Reserve dedicated CMM station slot for lot 2 at 15:00 IST upon machining completion.",
+      responsiblePerson: "Priya Sharma (Quality Lead)",
+      approvalStatus: "APPROVED"
+    }
   },
   {
     id: "EX-05",
@@ -874,12 +1334,26 @@ export const INITIAL_EXCEPTIONS: ProductionException[] = [
     timestamp: "1h 40m ago (12:50 IST)",
     machineId: "CNC-07",
     jobId: "JOB-2026-008",
+    status: "VERIFIED",
+    assignee: "Dipak Dutta",
+    assigneeRole: "OPERATOR",
+    resolutionDeadline: "Shift End",
     acknowledged: true,
     acknowledgedBy: "Dipak Dutta (Operator)",
     events: [
       { time: "12:50:00", source: "Edge Gateway 192.168.1.107", message: "Substation packet buffer sync delay", channel: "EDGE_LATENCY", sensorValue: "2.4m delayed" },
       { time: "12:45:20", source: "Tool Life Tracker", message: "CNMG 120408 roughing insert cut cycles: 340 parts", channel: "TOOL_LIFE", sensorValue: "85% utilized" }
-    ]
+    ],
+    correctiveAction: {
+      category: "TOOL_WEAR",
+      problemDescription: "Insert pocket #12 CNMG 120408 at 85% rated life with minor crater wear.",
+      rootCause: "High abrasive wear from forged En-8D outer scale.",
+      correctiveAction: "Indexed to fresh cutting edge #2 and reset tool offset touch-off.",
+      responsiblePerson: "Dipak Dutta (Operator)",
+      verificationNotes: "Visual inspection verified sharp edge, cutting load back down to 18A nominal.",
+      approvalStatus: "APPROVED",
+      resolutionTimestamp: "13:05 IST"
+    }
   }
 ];
 

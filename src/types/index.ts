@@ -3,8 +3,29 @@
  * Core Domain Types & Strict State Separation
  */
 
-// Category A: Machine States
-export type MachineState = 'RUNNING' | 'IDLE' | 'SETUP' | 'STOPPED' | 'ALARM';
+// Category A: Machine States (Mutually Exclusive Fleet State Accounting)
+export type MachineState = 'RUNNING' | 'IDLE' | 'SETUP' | 'STOPPED' | 'ALARM' | 'OFFLINE' | 'UNKNOWN';
+
+// Telemetry Freshness Standard
+export type TelemetryFreshness = 'LIVE' | 'DELAYED' | 'STALE' | 'UNKNOWN';
+
+// User Roles for Role-Based Access
+export type UserRole = 
+  | 'PRODUCTION_MANAGER'
+  | 'SHOP_SUPERVISOR'
+  | 'MACHINE_OPERATOR'
+  | 'QUALITY_MANAGER'
+  | 'INVENTORY_MANAGER'
+  | 'SYSTEM_ADMIN';
+
+// Operational Diagnosis for Machine Inspector
+export interface OperationalDiagnosis {
+  issue: string;
+  whyItMatters: string;
+  needsAttention: string;
+  recommendedInvestigation: string;
+  severity: 'CRITICAL' | 'WARNING' | 'NORMAL';
+}
 
 // Category B: Production Workflow States
 export type ProductionState = 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED' | 'ON_HOLD';
@@ -61,6 +82,8 @@ export interface Machine {
   axisCount: 3 | 4 | 5;
   state: MachineState;
   connectionState: ConnectionState;
+  telemetryFreshness?: TelemetryFreshness;
+  telemetryAgeSeconds?: number;
   currentJobId: string | null;
   operator: string;
   spindleRpm: number;
@@ -74,10 +97,21 @@ export interface Machine {
     performance: number;
     quality: number;
   };
+  targetOee?: number; // Configurable target, e.g. 85.0%
+  targetCycleTimeSec?: number;
+  actualCycleTimeSec?: number;
+  partsPlanned?: number;
+  partsCompleted?: number;
+  remainingParts?: number;
+  estJobCompletion?: string;
+  activeAlarm?: string;
+  downtimeDurationMinutes?: number;
+  maintenanceWarning?: string;
   lastStateChange: string;
   telemetryTimestamp: string;
   uptimeHoursToday: number;
   stateHistory?: MachineStateInterval[];
+  diagnosis?: OperationalDiagnosis;
 }
 
 export interface ExceptionEvent {
@@ -86,6 +120,27 @@ export interface ExceptionEvent {
   message: string;
   channel?: string;
   sensorValue?: string;
+}
+
+export type DeviationStatus = 
+  | 'DETECTED' 
+  | 'ACKNOWLEDGED' 
+  | 'INVESTIGATING' 
+  | 'CORRECTIVE_ACTION' 
+  | 'VERIFIED' 
+  | 'CLOSED';
+
+export type AssigneeRole = 'SUPERVISOR' | 'OPERATOR' | 'MAINTENANCE_TECH' | 'QUALITY_MANAGER';
+
+export interface CorrectiveActionRecord {
+  category: string;
+  problemDescription: string;
+  rootCause: string;
+  correctiveAction: string;
+  responsiblePerson: string;
+  verificationNotes?: string;
+  approvalStatus: 'PENDING' | 'APPROVED' | 'REJECTED';
+  resolutionTimestamp?: string;
 }
 
 export interface ProductionException {
@@ -97,12 +152,52 @@ export interface ProductionException {
   timestamp: string;
   machineId: string;
   jobId?: string;
+  status: DeviationStatus;
+  assignee?: string;
+  assigneeRole?: AssigneeRole;
+  resolutionDeadline?: string;
   acknowledged: boolean;
   acknowledgedBy?: string;
   events?: ExceptionEvent[];
+  correctiveAction?: CorrectiveActionRecord;
+  internalNotes?: string[];
+  escalated?: boolean;
   resolutionNotes?: string;
   resolvedAt?: string;
   resolvedBy?: string;
+}
+
+export interface MaterialStock {
+  id: string;
+  name: string;
+  grade: string;
+  availableStockKg: number;
+  minBufferKg: number;
+  reservedStockKg: number;
+  availableToPromiseKg: number; // availableStockKg - reservedStockKg
+  allocatedJob: string;
+  location: string;
+  supplier: string;
+  leadTimeDays: number;
+  expectedDeliveryDate?: string;
+  reorderQuantityKg: number;
+  status: 'HEALTHY' | 'LOW_STOCK' | 'CRITICAL_SHORTAGE' | 'OUT_OF_STOCK' | 'INCOMING';
+}
+
+export interface ToolingItem {
+  id: string;
+  name: string;
+  type: string;
+  assignedMachine: string;
+  condition: 'EXCELLENT' | 'GOOD' | 'FAIR' | 'WORN' | 'CRITICAL';
+  totalExpectedLifeMinutes: number;
+  remainingLifeMinutes: number;
+  remainingLifePct: number;
+  replacementThresholdPct: number; // e.g. 20%
+  lastReplacementDate: string;
+  estimatedRemainingParts: number;
+  replacementInStore: number;
+  status: 'OPTIMAL' | 'REPLACE_SOON' | 'EXHAUSTED';
 }
 
 export interface RealTimeCosts {

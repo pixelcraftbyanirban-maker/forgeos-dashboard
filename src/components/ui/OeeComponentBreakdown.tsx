@@ -9,6 +9,7 @@ interface OeeData {
 
 interface OeeComponentBreakdownProps {
   oee: OeeData;
+  targetOee?: number;
   title?: string;
   showFormula?: boolean;
   className?: string;
@@ -16,10 +17,14 @@ interface OeeComponentBreakdownProps {
 
 export const OeeComponentBreakdown: React.FC<OeeComponentBreakdownProps> = ({
   oee,
-  title = "GROUNDED OEE BREAKDOWN",
+  targetOee = 85.0,
+  title = "OVERALL EQUIPMENT EFFECTIVENESS (OEE)",
   showFormula = true,
   className = ''
 }) => {
+  const variance = oee.overall - targetOee;
+  const isAboveOeeTarget = variance >= 0;
+
   const components = [
     {
       name: "AVAILABILITY",
@@ -33,7 +38,7 @@ export const OeeComponentBreakdown: React.FC<OeeComponentBreakdownProps> = ({
       name: "PERFORMANCE",
       value: oee.performance,
       target: 95.0,
-      description: "Total Parts × Ideal Cycle Time / Operating Time",
+      description: "(Total Parts × Ideal Cycle Time) / Operating Time",
       color: "bg-emerald-600",
       lossCategory: "Speed Reductions & Minor Stops"
     },
@@ -42,27 +47,36 @@ export const OeeComponentBreakdown: React.FC<OeeComponentBreakdownProps> = ({
       value: oee.quality,
       target: 99.0,
       description: "Good Verified Parts / Total Parts Produced",
-      color: "bg-forge-orange",
+      color: "bg-teal-600",
       lossCategory: "Scrap & Rework Losses"
     }
   ];
 
   return (
     <div className={`border border-forge-aluminum bg-white p-3.5 sm:p-4 space-y-4 font-mono ${className}`}>
-      {/* Header with Overall Score */}
+      {/* Header with Overall Score & Configured Target */}
       <div className="flex flex-wrap items-center justify-between border-b border-forge-aluminum/50 pb-3 gap-2">
         <div>
-          <span className="text-[10px] text-forge-steel uppercase tracking-wider block">
+          <span className="text-[10px] text-forge-steel uppercase tracking-wider block font-semibold">
             {title}
           </span>
-          <span className="font-display font-bold text-2xl text-forge-black">
-            {oee.overall.toFixed(1)}%
-          </span>
+          <div className="flex items-baseline gap-2">
+            <span className="font-display font-bold text-2xl text-forge-black">
+              {oee.overall.toFixed(1)}%
+            </span>
+            <span className={`text-xs font-bold px-1.5 py-0.2 border ${
+              isAboveOeeTarget 
+                ? 'bg-emerald-50 text-emerald-900 border-emerald-300' 
+                : 'bg-amber-50 text-amber-900 border-amber-300'
+            }`}>
+              {isAboveOeeTarget ? `+${variance.toFixed(1)}% vs target` : `${variance.toFixed(1)}% vs target`}
+            </span>
+          </div>
         </div>
         <div className="text-right">
-          <span className="text-[10px] text-forge-steel uppercase block">WORLD CLASS BENCHMARK</span>
-          <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 border border-emerald-300">
-            ≥ 85.0%
+          <span className="text-[10px] text-forge-steel uppercase block">CONFIGURED TARGET</span>
+          <span className="text-xs font-bold text-forge-black bg-forge-alabaster px-2 py-0.5 border border-forge-aluminum">
+            {targetOee.toFixed(1)}%
           </span>
         </div>
       </div>
@@ -70,7 +84,8 @@ export const OeeComponentBreakdown: React.FC<OeeComponentBreakdownProps> = ({
       {/* Triple Components Breakdown */}
       <div className="space-y-3">
         {components.map((comp) => {
-          const isAboveTarget = comp.value >= comp.target;
+          const compVariance = comp.value - comp.target;
+          const isAboveTarget = compVariance >= 0;
           return (
             <div key={comp.name} className="space-y-1">
               <div className="flex items-center justify-between text-xs">
@@ -83,6 +98,9 @@ export const OeeComponentBreakdown: React.FC<OeeComponentBreakdownProps> = ({
                   </span>
                   <span className={`font-bold ${isAboveTarget ? 'text-emerald-800' : 'text-amber-900'}`}>
                     {comp.value.toFixed(1)}%
+                    <span className="text-[9px] font-normal ml-1">
+                      ({isAboveTarget ? `+${compVariance.toFixed(1)}%` : `${compVariance.toFixed(1)}%`})
+                    </span>
                   </span>
                 </div>
               </div>
@@ -98,7 +116,7 @@ export const OeeComponentBreakdown: React.FC<OeeComponentBreakdownProps> = ({
               >
                 <div
                   className={`h-full ${comp.color} transition-all duration-300`}
-                  style={{ width: `${comp.value}%` }}
+                  style={{ width: `${Math.min(100, comp.value)}%` }}
                 />
                 {/* Target Marker */}
                 <div
@@ -120,10 +138,10 @@ export const OeeComponentBreakdown: React.FC<OeeComponentBreakdownProps> = ({
       {showFormula && (
         <div className="p-2.5 bg-forge-alabaster border border-forge-aluminum text-[10px] text-forge-steel space-y-1">
           <div className="font-bold text-forge-black break-words">
-            OEE FORMULA: {oee.availability.toFixed(1)}% (A) × {oee.performance.toFixed(1)}% (P) × {oee.quality.toFixed(1)}% (Q) = <span className="text-forge-orange font-extrabold">{oee.overall.toFixed(1)}%</span>
+            CALCULATION: {oee.availability.toFixed(1)}% (A) × {oee.performance.toFixed(1)}% (P) × {oee.quality.toFixed(1)}% (Q) = <span className="text-forge-black font-extrabold">{oee.overall.toFixed(1)}%</span>
           </div>
           <div className="text-[9px]">
-            * Calculated according to SEMI E10 & ISO 22400 shop-floor execution standards.
+            * Calculated according to standard OEE methodology: Availability × Performance × Quality.
           </div>
         </div>
       )}

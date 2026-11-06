@@ -17,11 +17,11 @@ export const AuditHistoryCard: React.FC<AuditHistoryCardProps> = ({
   return (
     <ChamferCard
       title="VERIFIED PRODUCTION HISTORY"
-      tag="IMMUTABLE AUDIT TRAIL"
+      tag="TIMESTAMPED AUDIT LOG"
       action={
         <div className="flex items-center gap-1 text-[10px] font-mono text-emerald-900 bg-emerald-50 px-2 py-0.5 border border-emerald-300">
           <ShieldCheck className="w-3 h-3 text-emerald-600 flex-shrink-0" aria-hidden="true" />
-          <span>CRYPTOGRAPHIC HASH: VERIFIED</span>
+          <span>QC RECORDS: VERIFIED</span>
         </div>
       }
     >

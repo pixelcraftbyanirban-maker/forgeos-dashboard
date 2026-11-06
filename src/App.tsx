@@ -7,6 +7,7 @@ import { MachinesPage } from './pages/Machines/MachinesPage';
 import { ExceptionsPage } from './pages/Exceptions/ExceptionsPage';
 import { ReportsPage } from './pages/Reports/ReportsPage';
 import { InventoryPage } from './pages/Inventory/InventoryPage';
+import { OperatorConsolePage } from './pages/Operator/OperatorConsolePage';
 import { DetailDrawer } from './components/ui/DetailDrawer';
 import {
   INITIAL_MACHINES,
@@ -136,6 +137,8 @@ export const App: React.FC = () => {
             ? 'Exceptions & Deviations'
             : currentTab === 'inventory'
             ? 'Material & Tooling Inventory'
+            : currentTab === 'operator'
+            ? 'Operator Shop-Floor Terminal'
             : 'Analytics Reports'
         }
         subtitle={
@@ -151,6 +154,8 @@ export const App: React.FC = () => {
             ? 'Active Alarms, Tool Wear & Supervisor Sign-off'
             : currentTab === 'inventory'
             ? 'Raw Billet Stock, Carbide Inserts & Tool Wear Status'
+            : currentTab === 'operator'
+            ? 'Tablet-optimized console for job execution, scrap tracking & maintenance dispatch'
             : 'Historical Audit Trails & Shipped Part Certification'
         }
         searchQuery={searchQuery}
@@ -202,6 +207,14 @@ export const App: React.FC = () => {
 
         {currentTab === 'inventory' && (
           <InventoryPage />
+        )}
+
+        {currentTab === 'operator' && (
+          <OperatorConsolePage
+            machines={machines}
+            jobs={jobs}
+            onSelectMachine={handleSelectMachine}
+          />
         )}
 
         {currentTab === 'reports' && (

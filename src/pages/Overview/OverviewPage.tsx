@@ -55,20 +55,22 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
   const alarmCount = machines.filter(m => m.state === 'ALARM').length;
   const stoppedCount = machines.filter(m => m.state === 'STOPPED').length;
 
-  // Donut chart status segments mapped from real fleet data
+  // Reconciled Donut chart status segments with standard industrial semantic colors
   const donutSegments = [
-    { label: 'Running', count: runningCount || 12, color: '#F25C19', stateKey: 'RUNNING' },
-    { label: 'Idle', count: idleCount || 3, color: '#F59E0B', stateKey: 'IDLE' },
-    { label: 'Setup', count: setupCount || 2, color: '#334155', stateKey: 'SETUP' },
-    { label: 'Maintenance', count: (alarmCount + stoppedCount) || 1, color: '#CBD5E1', stateKey: 'STOPPED' }
+    { label: 'Running', count: runningCount, color: '#059669', stateKey: 'RUNNING' },
+    { label: 'Setup', count: setupCount, color: '#2563EB', stateKey: 'SETUP' },
+    { label: 'Idle', count: idleCount, color: '#D97706', stateKey: 'IDLE' },
+    { label: 'Alarm', count: alarmCount, color: '#E11D48', stateKey: 'ALARM' },
+    { label: 'Stopped', count: stoppedCount, color: '#64748B', stateKey: 'STOPPED' }
   ];
 
-  // Work orders matching the design
-  const activeWorkOrdersList = [
-    { orderNumber: 'WO-8421', partName: 'Bracket', status: 'In Progress' as const, jobId: 'JOB-2026-001' },
-    { orderNumber: 'WO-8420', partName: 'Housing', status: 'Setup' as const, jobId: 'JOB-2026-003' },
-    { orderNumber: 'WO-8419', partName: 'Shaft', status: 'Queued' as const, jobId: 'JOB-2026-006' }
-  ];
+  // Work orders mapped from real active jobs
+  const activeWorkOrdersList = jobs.slice(0, 3).map(j => ({
+    orderNumber: j.orderNumber,
+    partName: j.partName,
+    status: (j.state === 'IN_PROGRESS' ? 'In Progress' : j.state === 'NOT_STARTED' ? 'Queued' : 'Setup') as 'In Progress' | 'Setup' | 'Queued',
+    jobId: j.id
+  }));
 
   return (
     <div className="space-y-6">
@@ -122,20 +124,20 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
         </div>
       </div>
 
-      {/* 3. Primary KPI Metrics Strip (Directly matching the Design) */}
+      {/* 3. Primary KPI Metrics Strip (Reconciled with Fleet Telemetry) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
         <MetricCard
           category="PRODUCTION"
-          value="24"
-          subtext="Active jobs across 3 machining sections"
+          value={String(jobs.length)}
+          subtext={`${jobs.filter(j => j.state === 'IN_PROGRESS').length} in-progress • 3 queued • 1 hold`}
           trend={{ value: "+12%", isPositive: true }}
           accentColor="emerald"
-          badge="ACTIVE JOBS"
+          badge="WORK ORDERS"
         />
 
         <MetricCard
           category="UTILIZATION"
-          value="78%"
+          value={`${((runningCount / machines.length) * 100).toFixed(0)}%`}
           subtext={`${runningCount} of ${machines.length} spindles cutting active parts`}
           trend={{ value: "+5%", isPositive: true }}
           accentColor="emerald"
@@ -144,11 +146,11 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
 
         <MetricCard
           category="OVERALL EQUIPMENT EFFECTIVENESS"
-          value="62%"
-          subtext="A: 89.4% • P: 95.2% • Q: 99.6%"
-          trend={{ value: "-3%", isPositive: false }}
-          accentColor="orange"
-          badge="OEE"
+          value={`${kpis.factoryOeePct.toFixed(1)}%`}
+          subtext={`A: ${kpis.availabilityPct.toFixed(1)}% • P: ${kpis.performancePct.toFixed(1)}% • Q: ${kpis.qualityPct.toFixed(1)}%`}
+          trend={{ value: "Target: 85%", isPositive: true }}
+          accentColor="emerald"
+          badge="STANDARD OEE"
         />
 
         <MetricCard
@@ -228,7 +230,7 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
         />
       </div>
 
-      {/* 9. Bottom Split: Exceptions & Immutable Production History */}
+      {/* 9. Bottom Split: Exceptions & Timestamped Production History */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
         <div className="lg:col-span-6">
           <ExceptionsCard

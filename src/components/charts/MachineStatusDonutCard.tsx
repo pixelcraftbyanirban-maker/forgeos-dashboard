@@ -16,12 +16,13 @@ interface MachineStatusDonutCardProps {
 }
 
 export const MachineStatusDonutCard: React.FC<MachineStatusDonutCardProps> = ({
-  totalMachines = 18,
+  totalMachines = 24,
   segments = [
-    { label: 'Running', count: 12, color: '#F25C19', stateKey: 'RUNNING' },
-    { label: 'Idle', count: 3, color: '#F59E0B', stateKey: 'IDLE' },
-    { label: 'Setup', count: 2, color: '#334155', stateKey: 'SETUP' },
-    { label: 'Maintenance', count: 1, color: '#CBD5E1', stateKey: 'STOPPED' }
+    { label: 'Running', count: 16, color: '#059669', stateKey: 'RUNNING' },
+    { label: 'Setup', count: 3, color: '#2563EB', stateKey: 'SETUP' },
+    { label: 'Idle', count: 3, color: '#D97706', stateKey: 'IDLE' },
+    { label: 'Alarm', count: 1, color: '#E11D48', stateKey: 'ALARM' },
+    { label: 'Stopped', count: 1, color: '#64748B', stateKey: 'STOPPED' }
   ],
   activeFilter = 'ALL',
   onSelectSegment

@@ -6,7 +6,8 @@ import { FleetDistributionBar } from '../../components/ui/FleetDistributionBar';
 import { ShiftTimeline } from '../../components/ui/ShiftTimeline';
 import { LinearGauge } from '../../components/ui/GaugeIndicator';
 import { Machine } from '../../types';
-import { LayoutGrid, List, Search, Cpu, User, ArrowRight } from 'lucide-react';
+import { evaluateTelemetryFreshness } from '../../utils/telemetry';
+import { LayoutGrid, List, Search, Cpu, User, ArrowRight, AlertTriangle, Clock } from 'lucide-react';
 
 interface MachinesPageProps {
   machines: Machine[];
@@ -21,6 +22,8 @@ export const MachinesPage: React.FC<MachinesPageProps> = ({
   const [search, setSearch] = useState('');
   const [stateFilter, setStateFilter] = useState<string>('ALL');
   const [axisFilter, setAxisFilter] = useState<string>('ALL');
+  const [sectionFilter, setSectionFilter] = useState<string>('ALL');
+  const [lowOeeOnly, setLowOeeOnly] = useState<boolean>(false);
 
   const filteredMachines = machines.filter((m) => {
     const matchesSearch =
@@ -31,8 +34,10 @@ export const MachinesPage: React.FC<MachinesPageProps> = ({
 
     const matchesState = stateFilter === 'ALL' || m.state === stateFilter;
     const matchesAxis = axisFilter === 'ALL' || m.axisCount.toString() === axisFilter;
+    const matchesSection = sectionFilter === 'ALL' || (m.section && m.section.toLowerCase().includes(sectionFilter.toLowerCase()));
+    const matchesLowOee = !lowOeeOnly || m.oee.overall < 75;
 
-    return matchesSearch && matchesState && matchesAxis;
+    return matchesSearch && matchesState && matchesAxis && matchesSection && matchesLowOee;
   });
 
   const runningCount = machines.filter((m) => m.state === 'RUNNING').length;
@@ -59,10 +64,10 @@ export const MachinesPage: React.FC<MachinesPageProps> = ({
         <MetricCard
           category="FLEET AVERAGE OEE"
           value={`${avgOee}%`}
-          subtext="Grounded shop floor calculation"
+          subtext="Standard OEE (A × P × Q)"
           trend={{ value: "Target: 85%", isPositive: true }}
-          accentColor="orange"
-          badge="GROUNDED"
+          accentColor="emerald"
+          badge="ISO 22400"
         />
 
         <MetricCard
@@ -136,7 +141,7 @@ export const MachinesPage: React.FC<MachinesPageProps> = ({
         }
       >
         <div className="space-y-4">
-          {/* Controls: Search, State & Axis Filters */}
+          {/* Controls: Search, State, Section & Axis Filters */}
           <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 border-b border-forge-aluminum/60 pb-3">
             {/* Search */}
             <div className="relative flex-1 max-w-sm">
@@ -179,16 +184,41 @@ export const MachinesPage: React.FC<MachinesPageProps> = ({
               <span className="text-forge-aluminum mx-1 hidden sm:inline" aria-hidden="true">|</span>
 
               <select
+                aria-label="Filter machines by section"
+                value={sectionFilter}
+                onChange={(e) => setSectionFilter(e.target.value)}
+                className="px-2 py-1 text-[10px] font-mono bg-white border border-forge-aluminum text-forge-black focus:outline-none focus:border-forge-orange"
+              >
+                <option value="ALL">ALL SECTIONS</option>
+                <option value="VMC">VMC CENTER</option>
+                <option value="Turning">CNC TURNING</option>
+                <option value="HMC">HMC & HEAVY</option>
+              </select>
+
+              <select
                 aria-label="Filter machines by axis count"
                 value={axisFilter}
                 onChange={(e) => setAxisFilter(e.target.value)}
                 className="px-2 py-1 text-[10px] font-mono bg-white border border-forge-aluminum text-forge-black focus:outline-none focus:border-forge-orange"
               >
-                <option value="ALL">ALL AXIS TYPES</option>
-                <option value="5">5-AXIS ONLY</option>
-                <option value="4">4-AXIS ONLY</option>
-                <option value="3">3-AXIS ONLY</option>
+                <option value="ALL">ALL AXIS</option>
+                <option value="5">5-AXIS</option>
+                <option value="4">4-AXIS</option>
+                <option value="3">3-AXIS</option>
               </select>
+
+              <button
+                type="button"
+                onClick={() => setLowOeeOnly(!lowOeeOnly)}
+                aria-pressed={lowOeeOnly}
+                className={`px-2 py-1 text-[10px] font-mono border transition-all ${
+                  lowOeeOnly
+                    ? 'bg-amber-100 text-amber-950 border-amber-400 font-bold'
+                    : 'bg-white text-forge-steel border-forge-aluminum hover:text-forge-black'
+                }`}
+              >
+                LOW OEE
+              </button>
             </div>
           </div>
 
@@ -206,6 +236,12 @@ export const MachinesPage: React.FC<MachinesPageProps> = ({
                   ? 'border-forge-aluminum hover:border-emerald-500 bg-white'
                   : 'border-forge-aluminum bg-white';
 
+                const maxRpm = machine.maxRpm || 20000;
+                const freshness = evaluateTelemetryFreshness(machine.telemetryAgeSeconds, machine.telemetryTimestamp);
+                const partsCompleted = machine.partsCompleted || 0;
+                const partsPlanned = machine.partsPlanned || 0;
+                const progressPct = partsPlanned > 0 ? Math.round((partsCompleted / partsPlanned) * 100) : 0;
+
                 return (
                   <div
                     key={machine.id}
@@ -222,7 +258,7 @@ export const MachinesPage: React.FC<MachinesPageProps> = ({
                     className={`border p-3.5 cursor-pointer transition-all hover:shadow-flat relative flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange ${cardBorder}`}
                   >
                     <div>
-                      {/* Machine Header */}
+                      {/* Primary 1 & 2: Machine Header & Operational Status Badge */}
                       <div className="flex items-start justify-between mb-2">
                         <div>
                           <div className="flex items-center gap-1.5">
@@ -240,28 +276,68 @@ export const MachinesPage: React.FC<MachinesPageProps> = ({
                         <StatusBadge type="machine" status={machine.state} size="sm" />
                       </div>
 
-                      {/* Operator & Active Order */}
+                      {/* Primary 3 & 4: Operator & Active Work Order */}
                       <div className="text-[11px] font-mono space-y-1 mb-2.5">
-                        <div className="flex items-center justify-between">
-                          <span className="text-forge-steel flex items-center gap-1">
-                            <User className="w-3 h-3 text-forge-steel flex-shrink-0" aria-hidden="true" />
-                            <span className="truncate max-w-[110px]">{machine.operator}</span>
-                          </span>
-                          <span className="text-[10px] text-forge-steel">
-                            {machine.uptimeHoursToday}h uptime
-                          </span>
-                        </div>
-
                         <div className="p-1.5 bg-forge-alabaster border border-forge-aluminum/60 flex items-center justify-between">
-                          <span className="text-[10px] text-forge-steel">ORDER:</span>
+                          <span className="text-[10px] text-forge-steel font-semibold uppercase">ORDER:</span>
                           <span className="font-bold text-forge-black text-[10px] truncate max-w-[130px]">
                             {machine.currentJobId ? machine.currentJobId : '— IDLE / SETUP —'}
                           </span>
                         </div>
+
+                        <div className="flex items-center justify-between text-[10px]">
+                          <span className="text-forge-steel flex items-center gap-1">
+                            <User className="w-3 h-3 text-forge-steel flex-shrink-0" aria-hidden="true" />
+                            <span className="truncate max-w-[110px]">{machine.operator}</span>
+                          </span>
+                          <span className="text-forge-steel font-semibold">
+                            {machine.uptimeHoursToday}h uptime
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Primary 5: Production Progress */}
+                      {partsPlanned > 0 && (
+                        <div className="space-y-1 mb-2 font-mono text-[10px]">
+                          <div className="flex justify-between text-forge-steel">
+                            <span>BATCH PROGRESS</span>
+                            <span className="font-bold text-forge-black">
+                              {partsCompleted}/{partsPlanned} pcs ({progressPct}%)
+                            </span>
+                          </div>
+                          <div className="h-1.5 bg-forge-alabaster border border-forge-aluminum overflow-hidden">
+                            <div
+                              className="h-full bg-emerald-600 transition-all duration-300"
+                              style={{ width: `${Math.min(100, progressPct)}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Secondary 6 & 7: RPM Gauge & Cycle Time Variance */}
+                      <div className="pt-2 border-t border-forge-aluminum/40 space-y-1.5">
+                        <LinearGauge
+                          label="SPINDLE ROTATION"
+                          value={machine.spindleRpm}
+                          max={maxRpm}
+                          unit="RPM"
+                          nominalTarget={12000}
+                          color={machine.state === 'RUNNING' ? 'emerald' : 'slate'}
+                          showTicks={false}
+                        />
+
+                        {machine.targetCycleTimeSec && machine.targetCycleTimeSec > 0 ? (
+                          <div className="flex justify-between items-center text-[10px] font-mono pt-1">
+                            <span className="text-forge-steel">CYCLE TIME:</span>
+                            <span className="font-bold text-forge-black">
+                              {machine.actualCycleTimeSec ? `${machine.actualCycleTimeSec}s` : '0s'} <span className="text-forge-steel font-normal">/ {machine.targetCycleTimeSec}s tgt</span>
+                            </span>
+                          </div>
+                        ) : null}
                       </div>
 
                       {/* 8-Hour State Timeline */}
-                      <div className="space-y-1 mb-2.5">
+                      <div className="space-y-1 my-2.5">
                         <div className="flex justify-between text-[9px] font-mono text-forge-steel">
                           <span>8H SHIFT TIMELINE</span>
                           <span className="font-bold text-forge-black">06:00 - 14:00</span>
@@ -269,25 +345,31 @@ export const MachinesPage: React.FC<MachinesPageProps> = ({
                         <ShiftTimeline intervals={machine.stateHistory} compact={true} />
                       </div>
 
-                      {/* Real-time Spindle RPM Linear Gauge */}
-                      <div className="pt-2 border-t border-forge-aluminum/40">
-                        <LinearGauge
-                          label="SPINDLE ROTATION"
-                          value={machine.spindleRpm}
-                          max={machine.maxRpm || 20000}
-                          unit="RPM"
-                          nominalTarget={12000}
-                          color={machine.state === 'RUNNING' ? 'orange' : 'slate'}
-                          showTicks={false}
-                        />
-                      </div>
+                      {/* Alert / Warning Banner if active */}
+                      {machine.activeAlarm ? (
+                        <div className="p-1.5 bg-rose-50 border border-rose-300 text-rose-950 font-mono text-[9px] flex items-center gap-1 mb-2">
+                          <AlertTriangle className="w-3 h-3 text-rose-600 flex-shrink-0" aria-hidden="true" />
+                          <span className="truncate font-semibold">{machine.activeAlarm}</span>
+                        </div>
+                      ) : machine.maintenanceWarning ? (
+                        <div className="p-1.5 bg-amber-50 border border-amber-300 text-amber-950 font-mono text-[9px] flex items-center gap-1 mb-2">
+                          <Clock className="w-3 h-3 text-amber-600 flex-shrink-0" aria-hidden="true" />
+                          <span className="truncate">{machine.maintenanceWarning}</span>
+                        </div>
+                      ) : null}
                     </div>
 
-                    {/* Card Footer: Timestamp & Inspection link */}
-                    <div className="pt-2 mt-2 border-t border-forge-aluminum/30 flex items-center justify-between text-[9px] font-mono text-forge-steel">
-                      <span>{machine.telemetryTimestamp}</span>
-                      <span className="font-bold text-forge-black hover:text-forge-orange flex items-center gap-0.5">
-                        TELEMETRY <ArrowRight className="w-2.5 h-2.5" aria-hidden="true" />
+                    {/* Card Footer: OEE, Telemetry Freshness & Inspection link */}
+                    <div className="pt-2 mt-2 border-t border-forge-aluminum/30 flex items-center justify-between text-[10px] font-mono">
+                      <div>
+                        <span className="text-[9px] text-forge-steel uppercase block">OEE</span>
+                        <span className="font-bold text-forge-black text-xs">{machine.oee.overall}%</span>
+                      </div>
+                      <span className={`text-[9px] px-1.5 py-0.2 border font-semibold ${freshness.badgeBg} ${freshness.badgeText} ${freshness.badgeBorder}`}>
+                        {freshness.freshness} • {freshness.ageText}
+                      </span>
+                      <span className="font-bold text-forge-orange hover:underline flex items-center gap-0.5">
+                        INSPECT <ArrowRight className="w-3 h-3" aria-hidden="true" />
                       </span>
                     </div>
                   </div>
@@ -310,17 +392,22 @@ export const MachinesPage: React.FC<MachinesPageProps> = ({
                     <th scope="col" className="py-2.5 px-3 font-semibold text-center">State</th>
                     <th scope="col" className="py-2.5 px-3 font-semibold min-w-[120px]">8h Shift State</th>
                     <th scope="col" className="py-2.5 px-3 font-semibold">Active Order</th>
+                    <th scope="col" className="py-2.5 px-3 font-semibold">Progress</th>
                     <th scope="col" className="py-2.5 px-3 font-semibold">Operator</th>
                     <th scope="col" className="py-2.5 px-3 font-semibold text-right">RPM</th>
-                    <th scope="col" className="py-2.5 px-3 font-semibold text-right">Feed (mm/m)</th>
-                    <th scope="col" className="py-2.5 px-3 font-semibold text-right">Override</th>
+                    <th scope="col" className="py-2.5 px-3 font-semibold text-right">Cycle (Act/Tgt)</th>
                     <th scope="col" className="py-2.5 px-3 font-semibold text-center">OEE</th>
-                    <th scope="col" className="py-2.5 px-3 font-semibold text-right">Uptime</th>
+                    <th scope="col" className="py-2.5 px-3 font-semibold text-right">Freshness</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-forge-aluminum/40">
                   {filteredMachines.map((machine) => {
                     const isAlarm = machine.state === 'ALARM';
+                    const freshness = evaluateTelemetryFreshness(machine.telemetryAgeSeconds, machine.telemetryTimestamp);
+                    const partsCompleted = machine.partsCompleted || 0;
+                    const partsPlanned = machine.partsPlanned || 0;
+                    const progressPct = partsPlanned > 0 ? Math.round((partsCompleted / partsPlanned) * 100) : 0;
+
                     return (
                       <tr
                         key={machine.id}
@@ -345,7 +432,7 @@ export const MachinesPage: React.FC<MachinesPageProps> = ({
                             {machine.name}
                           </span>
                           <span className="text-[10px] text-forge-steel">
-                            {machine.axisCount}-Axis CNC Cell
+                            {machine.axisCount}-Axis • {machine.section || 'General'}
                           </span>
                         </td>
 
@@ -369,6 +456,10 @@ export const MachinesPage: React.FC<MachinesPageProps> = ({
                           )}
                         </td>
 
+                        <td className="py-3 px-3 text-forge-black text-[11px]">
+                          {partsPlanned > 0 ? `${partsCompleted}/${partsPlanned} (${progressPct}%)` : '—'}
+                        </td>
+
                         <td className="py-3 px-3 text-forge-steel text-[11px]">
                           {machine.operator}
                         </td>
@@ -377,26 +468,18 @@ export const MachinesPage: React.FC<MachinesPageProps> = ({
                           {machine.spindleRpm.toLocaleString()}
                         </td>
 
-                        <td className="py-3 px-3 text-right text-forge-steel">
-                          {machine.feedRateMmpm.toLocaleString()}
-                        </td>
-
-                        <td className="py-3 px-3 text-right">
-                          <span className={`px-1 py-0.2 border font-bold text-[10px] ${
-                            machine.feedOverridePct >= 95
-                              ? 'bg-emerald-50 text-emerald-900 border-emerald-300'
-                              : 'bg-amber-50 text-amber-950 border-amber-300'
-                          }`}>
-                            {machine.feedOverridePct}%
-                          </span>
+                        <td className="py-3 px-3 text-right text-forge-black text-[11px]">
+                          {machine.actualCycleTimeSec ? `${machine.actualCycleTimeSec}s` : '0s'} / {machine.targetCycleTimeSec ? `${machine.targetCycleTimeSec}s` : '—'}
                         </td>
 
                         <td className="py-3 px-3 text-center font-bold text-forge-black">
                           {machine.oee.overall}%
                         </td>
 
-                        <td className="py-3 px-3 text-right text-forge-steel">
-                          {machine.uptimeHoursToday}h
+                        <td className="py-3 px-3 text-right">
+                          <span className={`text-[9px] px-1.5 py-0.2 border font-semibold ${freshness.badgeBg} ${freshness.badgeText} ${freshness.badgeBorder}`}>
+                            {freshness.freshness}
+                          </span>
                         </td>
                       </tr>
                     );

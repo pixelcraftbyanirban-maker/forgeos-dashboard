@@ -55,6 +55,21 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
             ALARM
           </span>
         );
+      case 'OFFLINE':
+        return (
+          <span className={`inline-flex items-center gap-1.5 font-mono font-medium tracking-wider bg-zinc-100 text-zinc-700 border border-zinc-400 ${padding}`}>
+            {showIcon && <span className="w-1.5 h-1.5 rounded-full bg-zinc-500" aria-hidden="true" />}
+            OFFLINE
+          </span>
+        );
+      case 'UNKNOWN':
+      default:
+        return (
+          <span className={`inline-flex items-center gap-1.5 font-mono font-medium tracking-wider bg-zinc-50 text-zinc-600 border border-dashed border-zinc-400 ${padding}`}>
+            {showIcon && <span className="w-1.5 h-1.5 rounded-full bg-zinc-400" aria-hidden="true" />}
+            UNKNOWN
+          </span>
+        );
     }
   }
 

@@ -13,6 +13,8 @@ const STATE_COLORS: Record<MachineState, { bg: string; text: string }> = {
   IDLE: { bg: 'bg-amber-500', text: 'text-amber-700' },
   STOPPED: { bg: 'bg-slate-500', text: 'text-slate-700' },
   ALARM: { bg: 'bg-rose-600', text: 'text-rose-700' },
+  OFFLINE: { bg: 'bg-zinc-400', text: 'text-zinc-600' },
+  UNKNOWN: { bg: 'bg-zinc-300', text: 'text-zinc-500' }
 };
 
 export const ShiftTimeline: React.FC<ShiftTimelineProps> = ({

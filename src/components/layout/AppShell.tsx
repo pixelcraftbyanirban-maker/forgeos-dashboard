@@ -146,7 +146,7 @@ export const AppShell: React.FC<AppShellProps> = ({
               <span className="text-forge-aluminum hidden md:inline" aria-hidden="true">|</span>
               <span className="hidden md:inline">SYNC: MTCONNECT STREAM (5s)</span>
               <span className="text-forge-aluminum hidden lg:inline" aria-hidden="true">|</span>
-              <span className="hidden lg:inline">AUDIT: IMMUTABLE LEDGER</span>
+              <span className="hidden lg:inline">AUDIT: TIMESTAMPED AUDIT LOG</span>
             </div>
 
             <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-forge-steel text-[10px]">

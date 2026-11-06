@@ -18,6 +18,7 @@ export const PlaceholderPage: React.FC<PlaceholderPageProps> = ({ tab, onBackToO
     inventory: { title: 'Material & Tooling Inventory', phase: 'INVENTORY', desc: 'Raw billet stock and CNC spindle tooling lifecycle.' },
     exceptions: { title: 'Production Exceptions & Deviations', phase: 'PHASE 05', desc: 'Deviation event history, root cause investigation workflows, and manager sign-offs.' },
     reports: { title: 'Historical & Analytics Reports', phase: 'REPORTS', desc: 'Audit compliance, shift-over-shift OEE comparison, and job profitability analytics.' },
+    operator: { title: 'Shop-Floor Operator Terminal', phase: 'PHASE 09', desc: 'Dedicated touch-screen console for machine operators, work orders, tool resets, and scrap logging.' }
   };
 
   const info = titles[tab];
