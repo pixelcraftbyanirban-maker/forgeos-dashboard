@@ -1,6 +1,7 @@
 import React from 'react';
 import { ConnectionState } from '../../types';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { MotionButton } from '../../motion';
 
 interface DataStatusBannerProps {
   connectionState: ConnectionState;
@@ -58,7 +59,7 @@ export const DataStatusBanner: React.FC<DataStatusBannerProps> = ({
           </span>
 
           {onRefresh && (
-            <button
+            <MotionButton
               type="button"
               onClick={onRefresh}
               disabled={isRefreshing}
@@ -68,7 +69,7 @@ export const DataStatusBanner: React.FC<DataStatusBannerProps> = ({
             >
               <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin text-forge-orange' : 'text-forge-steel'}`} aria-hidden="true" />
               <span>SYNC</span>
-            </button>
+            </MotionButton>
           )}
         </div>
       </div>

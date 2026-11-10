@@ -8,6 +8,7 @@ import { OeeComponentBreakdown } from './OeeComponentBreakdown';
 import { OperationFlowBar } from './OperationFlowBar';
 import { formatINR } from '../../utils/formatters';
 import { evaluateTelemetryFreshness, calculateShiftDurations } from '../../utils/telemetry';
+import { DrawerMotion, MotionIconButton, MotionButton } from '../../motion';
 
 interface DetailDrawerProps {
   isOpen: boolean;
@@ -46,8 +47,6 @@ export const DetailDrawer: React.FC<DetailDrawerProps> = ({
     };
   }, [isOpen]);
 
-  if (!isOpen || (!machine && !job)) return null;
-
   // Telemetry freshness & shift durations
   const freshness = machine
     ? evaluateTelemetryFreshness(machine.telemetryAgeSeconds, machine.telemetryTimestamp)
@@ -56,17 +55,13 @@ export const DetailDrawer: React.FC<DetailDrawerProps> = ({
   const shiftDurations = machine ? calculateShiftDurations(machine.stateHistory) : null;
 
   return (
-    <div 
-      className="fixed inset-0 z-50 overflow-hidden bg-black/60 backdrop-blur-xs flex justify-end"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="detail-drawer-heading"
-      onClick={onClose}
+    <DrawerMotion
+      isOpen={isOpen && !!(machine || job)}
+      onClose={onClose}
+      position="right"
+      ariaLabelledBy="detail-drawer-heading"
     >
-      <div 
-        className="w-full max-w-full sm:max-w-xl lg:max-w-2xl bg-white border-l border-forge-aluminum h-full shadow-2xl flex flex-col justify-between animate-in slide-in-from-right duration-200"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="flex flex-col h-full justify-between">
         {/* Drawer Header */}
         <div className="p-4 border-b border-forge-aluminum flex items-center justify-between bg-forge-alabaster gap-2">
           <div className="flex items-center gap-2.5 min-w-0">
@@ -89,7 +84,7 @@ export const DetailDrawer: React.FC<DetailDrawerProps> = ({
               </h2>
             </div>
           </div>
-          <button
+          <MotionIconButton
             type="button"
             onClick={onClose}
             aria-label="Close detail inspector"
@@ -97,7 +92,7 @@ export const DetailDrawer: React.FC<DetailDrawerProps> = ({
             title="Close Inspector (Esc)"
           >
             <X className="w-4 h-4" aria-hidden="true" />
-          </button>
+          </MotionIconButton>
         </div>
 
         {/* Drawer Body */}
@@ -378,15 +373,15 @@ export const DetailDrawer: React.FC<DetailDrawerProps> = ({
           <span className="text-forge-steel">
             SHREE GANESH PRECISION • MES v1.0
           </span>
-          <button
+          <MotionButton
             type="button"
             onClick={onClose}
             className="px-4 py-2 bg-forge-black text-white text-xs font-mono font-semibold uppercase hover:bg-zinc-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
           >
             Close Inspector
-          </button>
+          </MotionButton>
         </div>
       </div>
-    </div>
+    </DrawerMotion>
   );
 };

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { TrendingUp } from 'lucide-react';
 import { ChamferCard } from '../ui/ChamferCard';
+import { AnimatedChartPath, AnimatedChartArea, ChartTooltipMotion, AnimatedCounter } from '../../motion';
 
 interface DataPoint {
   day: string;
@@ -93,15 +94,14 @@ export const WeeklyUtilizationCard: React.FC<WeeklyUtilizationCardProps> = ({
             </defs>
 
             {/* Area Fill */}
-            <path d={areaPath} fill="url(#utilizationGradient)" />
+            <AnimatedChartArea d={areaPath} fill="url(#utilizationGradient)" />
 
-            {/* Stroke Line */}
-            <path
+            {/* Stroke Line with Progressive Path Drawing */}
+            <AnimatedChartPath
               d={linePath}
-              fill="none"
               stroke="#F25C19"
               strokeWidth="2.5"
-              strokeLinecap="round"
+              duration={0.85}
             />
 
             {/* Interactive Data Dots */}
@@ -126,11 +126,12 @@ export const WeeklyUtilizationCard: React.FC<WeeklyUtilizationCardProps> = ({
           </svg>
 
           {/* Floating Tooltip if hovered */}
-          {hoveredPoint && (
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-forge-black text-white px-2 py-0.5 text-[10px] font-mono shadow-sm pointer-events-none select-none">
-              {hoveredPoint.day}: <strong className="text-forge-orange">{hoveredPoint.utilization}%</strong>
-            </div>
-          )}
+          <ChartTooltipMotion
+            isVisible={!!hoveredPoint}
+            className="absolute top-0 left-1/2 -translate-x-1/2 bg-forge-black text-white px-2 py-0.5 text-[10px] font-mono shadow-sm pointer-events-none select-none"
+          >
+            {hoveredPoint?.day}: <strong className="text-forge-orange">{hoveredPoint?.utilization}%</strong>
+          </ChartTooltipMotion>
 
           {/* Days Baseline */}
           <div className="flex justify-between px-2 pt-1 font-mono text-[9px] text-forge-steel select-none">
@@ -147,7 +148,7 @@ export const WeeklyUtilizationCard: React.FC<WeeklyUtilizationCardProps> = ({
               AVERAGE OEE
             </div>
             <div className="font-display font-bold text-3xl sm:text-4xl text-forge-black tracking-tight leading-none mt-1">
-              {currentUtilization}%
+              <AnimatedCounter value={`${currentUtilization}%`} />
             </div>
           </div>
 

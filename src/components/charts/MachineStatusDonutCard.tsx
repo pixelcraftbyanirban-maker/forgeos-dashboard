@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ChamferCard } from '../ui/ChamferCard';
+import { AnimatedCounter, EASINGS } from '../../motion';
 
 export interface MachineStatusSegment {
   label: string;
@@ -51,6 +53,15 @@ export const MachineStatusDonutCard: React.FC<MachineStatusDonutCardProps> = ({
       strokeDashoffset
     };
   });
+
+  const activeSegmentObj = hoveredSegment
+    ? segments.find((s) => s.stateKey === hoveredSegment)
+    : activeFilter !== 'ALL'
+    ? segments.find((s) => s.stateKey === activeFilter)
+    : null;
+
+  const centerCount = activeSegmentObj ? activeSegmentObj.count : totalMachines;
+  const centerLabel = activeSegmentObj ? activeSegmentObj.label : 'Machines';
 
   return (
     <ChamferCard
@@ -110,17 +121,22 @@ export const MachineStatusDonutCard: React.FC<MachineStatusDonutCardProps> = ({
             })}
           </svg>
 
-          {/* Centered Donut Metric */}
+          {/* Centered Donut Metric with Smooth Transition */}
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none select-none">
-            <span className="font-display font-bold text-3xl sm:text-4xl text-forge-black tracking-tight leading-none">
-              {hoveredSegment
-                ? segments.find((s) => s.stateKey === hoveredSegment)?.count
-                : totalMachines}
-            </span>
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={`${centerCount}-${centerLabel}`}
+                initial={{ opacity: 0, scale: 0.94 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.94 }}
+                transition={{ duration: 0.16, ease: EASINGS.easeOut }}
+                className="font-display font-bold text-3xl sm:text-4xl text-forge-black tracking-tight leading-none"
+              >
+                <AnimatedCounter value={centerCount} duration={0.4} />
+              </motion.span>
+            </AnimatePresence>
             <span className="font-sans text-xs text-forge-steel font-medium mt-1">
-              {hoveredSegment
-                ? segments.find((s) => s.stateKey === hoveredSegment)?.label
-                : 'Machines'}
+              {centerLabel}
             </span>
           </div>
         </div>
@@ -142,7 +158,7 @@ export const MachineStatusDonutCard: React.FC<MachineStatusDonutCardProps> = ({
                 aria-pressed={isFiltered}
                 className={`w-full flex items-center justify-between p-2 text-xs border transition-all text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange ${
                   isFiltered
-                    ? 'border-forge-orange bg-orange-50/50 shadow-sm'
+                    ? 'border-forge-orange bg-orange-50/70 shadow-sm'
                     : isHovered
                     ? 'border-forge-aluminum bg-forge-alabaster'
                     : 'border-transparent hover:bg-forge-alabaster/60'
@@ -150,8 +166,11 @@ export const MachineStatusDonutCard: React.FC<MachineStatusDonutCardProps> = ({
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <span
-                    className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                    style={{ backgroundColor: seg.color }}
+                    className="w-2.5 h-2.5 rounded-full flex-shrink-0 transition-transform duration-200"
+                    style={{
+                      backgroundColor: seg.color,
+                      transform: isHovered || isFiltered ? 'scale(1.25)' : 'scale(1)',
+                    }}
                     aria-hidden="true"
                   />
                   <span className="text-forge-black font-sans text-xs sm:text-sm font-medium">

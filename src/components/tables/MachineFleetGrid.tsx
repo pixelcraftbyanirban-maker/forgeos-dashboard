@@ -6,6 +6,8 @@ import { LinearGauge } from '../ui/GaugeIndicator';
 import { Machine } from '../../types';
 import { evaluateTelemetryFreshness } from '../../utils/telemetry';
 import { User, ArrowRight, AlertTriangle, Clock, Search } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { EASINGS } from '../../motion';
 
 interface MachineFleetGridProps {
   machines: Machine[];
@@ -164,7 +166,8 @@ export const MachineFleetGrid: React.FC<MachineFleetGridProps> = ({
 
         {/* Machine Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-          {filteredMachines.map((machine) => {
+          <AnimatePresence mode="popLayout">
+            {filteredMachines.map((machine) => {
             const isAlarm = machine.state === 'ALARM';
             const isStopped = machine.state === 'STOPPED';
             const cardBorder = isAlarm
@@ -184,7 +187,17 @@ export const MachineFleetGrid: React.FC<MachineFleetGridProps> = ({
             const progressPct = partsPlanned > 0 ? Math.round((partsCompleted / partsPlanned) * 100) : 0;
 
             return (
-              <div
+              <motion.div
+                layout
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{ duration: 0.2, ease: EASINGS.easeOut }}
+                whileHover={{
+                  y: -2,
+                  boxShadow: '0 6px 14px -2px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                  transition: { duration: 0.16 },
+                }}
                 key={machine.id}
                 role="button"
                 tabIndex={0}
@@ -196,7 +209,7 @@ export const MachineFleetGrid: React.FC<MachineFleetGridProps> = ({
                     onSelectMachine(machine.id);
                   }
                 }}
-                className={`border p-3.5 cursor-pointer transition-all hover:shadow-flat relative flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange ${cardBorder}`}
+                className={`border p-3.5 cursor-pointer transition-colors relative flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange ${cardBorder}`}
               >
                 <div>
                   {/* Primary 1 & 2: Machine ID, Axis & Operational Status Badge */}
@@ -326,9 +339,10 @@ export const MachineFleetGrid: React.FC<MachineFleetGridProps> = ({
                     DETAILS <ArrowRight className="w-3 h-3" aria-hidden="true" />
                   </span>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
+          </AnimatePresence>
         </div>
       </div>
     </ChamferCard>

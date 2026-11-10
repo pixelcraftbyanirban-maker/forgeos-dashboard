@@ -14,6 +14,7 @@ import {
   Clock,
   ArrowRight
 } from 'lucide-react';
+import { ModalMotion, MotionButton } from '../../motion';
 
 interface OperatorConsolePageProps {
   machines: Machine[];
@@ -559,15 +560,14 @@ export const OperatorConsolePage: React.FC<OperatorConsolePageProps> = ({
         </div>
       </div>
 
-      {/* ACTION MODAL DIALOGS */}
-      {actionModal && (
-        <div 
-          className="fixed inset-0 z-50 overflow-hidden bg-black/60 flex items-center justify-center p-4 font-mono"
-          role="dialog"
-          aria-modal="true"
-        >
-          <div className="bg-white border-2 border-forge-black w-full max-w-lg p-5 space-y-4 shadow-2xl">
-            {actionModal === 'DOWNTIME' && (
+      {/* ACTION MODAL DIALOGS WITH SMOOTH FADE & SCALE */}
+      <ModalMotion
+        isOpen={Boolean(actionModal)}
+        onClose={() => setActionModal(null)}
+        className="bg-white border-2 border-forge-black w-full max-w-lg p-5 space-y-4 shadow-2xl font-mono"
+      >
+        <div>
+          {actionModal === 'DOWNTIME' && (
               <>
                 <div className="flex items-center justify-between border-b border-forge-aluminum/60 pb-2">
                   <span className="font-bold text-sm uppercase text-forge-black flex items-center gap-2">
@@ -605,20 +605,20 @@ export const OperatorConsolePage: React.FC<OperatorConsolePageProps> = ({
                 </div>
 
                 <div className="flex justify-end gap-2 pt-2 border-t border-forge-aluminum/40">
-                  <button
+                  <MotionButton
                     type="button"
                     onClick={() => setActionModal(null)}
-                    className="px-3 py-1.5 bg-white border border-forge-aluminum text-xs uppercase"
+                    className="px-3 py-1.5 bg-white border border-forge-aluminum text-xs uppercase hover:bg-forge-alabaster"
                   >
                     Cancel
-                  </button>
-                  <button
+                  </MotionButton>
+                  <MotionButton
                     type="button"
                     onClick={handleSubmitDowntime}
                     className="px-4 py-1.5 bg-amber-600 text-white font-bold text-xs uppercase hover:bg-amber-700"
                   >
                     Confirm Stoppage
-                  </button>
+                  </MotionButton>
                 </div>
               </>
             )}
@@ -789,8 +789,7 @@ export const OperatorConsolePage: React.FC<OperatorConsolePageProps> = ({
               </>
             )}
           </div>
-        </div>
-      )}
+        </ModalMotion>
     </div>
   );
 };

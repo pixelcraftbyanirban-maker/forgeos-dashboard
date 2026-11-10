@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { Logo } from '../ui/Logo';
 import { UserRole } from '../../types';
+import { SidebarActiveIndicator } from '../../motion';
 
 export type NavTab = 
   | 'overview' 
@@ -139,29 +140,41 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 key={item.id}
                 onClick={() => handleTabClick(item.id)}
                 aria-current={isActive ? 'page' : undefined}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs font-mono tracking-wider transition-all relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange ${
+                className={`group w-full flex items-center justify-between px-3.5 py-2.5 text-xs font-mono tracking-wider transition-colors relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange ${
                   isActive
-                    ? 'bg-forge-orange text-white font-bold shadow-md rounded-none'
+                    ? 'text-white font-bold'
                     : 'text-zinc-300 hover:text-white hover:bg-white/10'
                 }`}
               >
-                <div className="flex items-center gap-3">
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-zinc-400'}`} aria-hidden="true" />
+                {isActive && (
+                  <SidebarActiveIndicator
+                    layoutId={isMobile ? 'mobileSidebarActiveTab' : 'desktopSidebarActiveTab'}
+                    className="absolute inset-0 bg-forge-orange shadow-md -z-0"
+                  />
+                )}
+
+                <div className="flex items-center gap-3 relative z-10">
+                  <Icon
+                    className={`w-4 h-4 transition-transform duration-200 group-hover:scale-110 ${
+                      isActive ? 'text-white' : 'text-zinc-400 group-hover:text-zinc-200'
+                    }`}
+                    aria-hidden="true"
+                  />
                   <span className="uppercase text-[11px]">{item.label}</span>
                 </div>
 
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 relative z-10">
                   {item.badge !== undefined && item.badge > 0 && (
                     <span 
                       aria-label={`${item.badge} active exceptions`}
-                      className={`font-mono text-[10px] font-bold px-1.5 py-0.2 ${
+                      className={`font-mono text-[10px] font-bold px-1.5 py-0.2 transition-colors ${
                         isActive ? 'bg-white text-forge-orange' : 'bg-rose-600 text-white'
                       }`}
                     >
                       {item.badge}
                     </span>
                   )}
-                  {isActive && <ChevronRight className="w-3.5 h-3.5 text-white" aria-hidden="true" />}
+                  {isActive && <ChevronRight className="w-3.5 h-3.5 text-white animate-in fade-in duration-150" aria-hidden="true" />}
                 </div>
               </button>
             );

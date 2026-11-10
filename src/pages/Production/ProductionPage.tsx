@@ -6,6 +6,7 @@ import { OperationFlowBar } from '../../components/ui/OperationFlowBar';
 import { Job, JobPriority } from '../../types';
 import { Search, ChevronDown, ChevronRight, Clock, ArrowUpDown, List, Layers, ArrowRight } from 'lucide-react';
 import { formatINR, formatNumberIN } from '../../utils/formatters';
+import { ExpandableRowMotion, AnimatedSortIcon } from '../../motion';
 
 interface ProductionPageProps {
   jobs: Job[];
@@ -342,7 +343,9 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({
                         className="flex items-center gap-1 hover:text-forge-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
                       >
                         Order / Part
-                        <ArrowUpDown className="w-2.5 h-2.5" aria-hidden="true" />
+                        <AnimatedSortIcon isActive={sortBy === 'order'} direction={sortAsc ? 'asc' : 'desc'}>
+                          <ArrowUpDown className="w-2.5 h-2.5" aria-hidden="true" />
+                        </AnimatedSortIcon>
                       </button>
                     </th>
                     <th scope="col" className="py-2.5 px-3 font-semibold">Material / Spec</th>
@@ -355,7 +358,9 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({
                         className="flex items-center gap-1 hover:text-forge-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
                       >
                         Progress & Operation
-                        <ArrowUpDown className="w-2.5 h-2.5" aria-hidden="true" />
+                        <AnimatedSortIcon isActive={sortBy === 'progress'} direction={sortAsc ? 'asc' : 'desc'}>
+                          <ArrowUpDown className="w-2.5 h-2.5" aria-hidden="true" />
+                        </AnimatedSortIcon>
                       </button>
                     </th>
                     <th scope="col" className="py-2.5 px-3 font-semibold">
@@ -365,7 +370,9 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({
                         className="flex items-center gap-1 hover:text-forge-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
                       >
                         Est. Dispatch (IST)
-                        <ArrowUpDown className="w-2.5 h-2.5" aria-hidden="true" />
+                        <AnimatedSortIcon isActive={sortBy === 'completion'} direction={sortAsc ? 'asc' : 'desc'}>
+                          <ArrowUpDown className="w-2.5 h-2.5" aria-hidden="true" />
+                        </AnimatedSortIcon>
                       </button>
                     </th>
                     <th scope="col" className="py-2.5 px-3 font-semibold text-right">Unit Cost (INR)</th>
@@ -495,32 +502,34 @@ export const ProductionPage: React.FC<ProductionPageProps> = ({
                         {/* Expanded Operations Breakdown Row */}
                         {isExpanded && (
                           <tr className="bg-forge-alabaster/40 border-b border-forge-aluminum/80">
-                            <td colSpan={9} className="py-3 px-4 sm:px-8">
-                              <div className="p-3 bg-white border border-forge-aluminum space-y-3">
-                                <div className="flex flex-wrap items-center justify-between border-b border-forge-aluminum/40 pb-2 gap-2">
-                                  <span className="font-mono text-[10px] font-bold tracking-wider uppercase text-forge-black">
-                                    ROUTING SHEET • {job.orderNumber} ({job.partName})
-                                  </span>
-                                  <button
-                                    type="button"
-                                    onClick={() => onSelectJob(job.id)}
-                                    className="text-[10px] font-mono text-forge-orange hover:underline font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
-                                  >
-                                    OPEN FULL INSPECTOR →
-                                  </button>
-                                </div>
-
-                                {job.operations && job.operations.length > 0 ? (
-                                  <OperationFlowBar
-                                    operations={job.operations}
-                                    currentOperationName={job.currentOperation}
-                                  />
-                                ) : (
-                                  <div className="text-[11px] text-forge-steel font-mono py-2">
-                                    Operations in standard dispatch queue.
+                            <td colSpan={9} className="p-0">
+                              <ExpandableRowMotion isExpanded={isExpanded} className="py-3 px-4 sm:px-8">
+                                <div className="p-3 bg-white border border-forge-aluminum space-y-3">
+                                  <div className="flex flex-wrap items-center justify-between border-b border-forge-aluminum/40 pb-2 gap-2">
+                                    <span className="font-mono text-[10px] font-bold tracking-wider uppercase text-forge-black">
+                                      ROUTING SHEET • {job.orderNumber} ({job.partName})
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={() => onSelectJob(job.id)}
+                                      className="text-[10px] font-mono text-forge-orange hover:underline font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
+                                    >
+                                      OPEN FULL INSPECTOR →
+                                    </button>
                                   </div>
-                                )}
-                              </div>
+
+                                  {job.operations && job.operations.length > 0 ? (
+                                    <OperationFlowBar
+                                      operations={job.operations}
+                                      currentOperationName={job.currentOperation}
+                                    />
+                                  ) : (
+                                    <div className="text-[11px] text-forge-steel font-mono py-2">
+                                      Operations in standard dispatch queue.
+                                    </div>
+                                  )}
+                                </div>
+                              </ExpandableRowMotion>
                             </td>
                           </tr>
                         )}

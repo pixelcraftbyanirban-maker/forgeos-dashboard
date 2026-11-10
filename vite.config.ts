@@ -6,5 +6,15 @@ export default defineConfig({
   server: {
     port: 3000,
     host: true
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          motion: ['framer-motion'],
+          icons: ['lucide-react'],
+        }
+      }
+    }
   }
 });

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Sidebar, NavTab } from './Sidebar';
 import { TopBar } from './TopBar';
 import { ConnectionState } from '../../types';
+import { MobileSidebarDrawer } from '../../motion';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -77,34 +78,19 @@ export const AppShell: React.FC<AppShellProps> = ({
           />
         </div>
 
-        {/* Mobile Off-Canvas Sidebar Drawer with Backdrop */}
-        {isMobileNavOpen && (
-          <div
-            id="mobile-navigation-drawer"
-            className="fixed inset-0 z-40 lg:hidden flex"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Navigation drawer"
-          >
-            {/* Backdrop */}
-            <div
-              className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
-              onClick={() => setIsMobileNavOpen(false)}
-              aria-hidden="true"
-            />
-
-            {/* Sliding Drawer Container */}
-            <div className="relative z-50 flex-1 max-w-xs w-full bg-forge-black shadow-2xl animate-in slide-in-from-left duration-200">
-              <Sidebar
-                currentTab={currentTab}
-                onTabChange={onTabChange}
-                exceptionsCount={activeExceptionsCount}
-                isMobile={true}
-                onCloseMobile={() => setIsMobileNavOpen(false)}
-              />
-            </div>
-          </div>
-        )}
+        {/* Mobile Off-Canvas Sidebar Drawer with Smooth Backdrop & Slide */}
+        <MobileSidebarDrawer
+          isOpen={isMobileNavOpen}
+          onClose={() => setIsMobileNavOpen(false)}
+        >
+          <Sidebar
+            currentTab={currentTab}
+            onTabChange={onTabChange}
+            exceptionsCount={activeExceptionsCount}
+            isMobile={true}
+            onCloseMobile={() => setIsMobileNavOpen(false)}
+          />
+        </MobileSidebarDrawer>
 
         {/* Main Content Column */}
         <div className="flex-1 flex flex-col min-w-0 w-full overflow-x-hidden">

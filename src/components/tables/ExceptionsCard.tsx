@@ -2,6 +2,7 @@ import React from 'react';
 import { ChamferCard } from '../ui/ChamferCard';
 import { ProductionException } from '../../types';
 import { AlertCircle, AlertTriangle, Info, Check, Clock } from 'lucide-react';
+import { MotionButton } from '../../motion';
 
 interface ExceptionsCardProps {
   exceptions: ProductionException[];
@@ -84,18 +85,18 @@ export const ExceptionsCard: React.FC<ExceptionsCardProps> = ({
 
               <div className="flex items-center gap-2 flex-shrink-0 self-end sm:self-center">
                 {!ex.acknowledged ? (
-                  <button
+                  <MotionButton
                     type="button"
                     onClick={() => onAcknowledge(ex.id)}
                     aria-label={`Acknowledge exception on ${ex.machineId}: ${ex.title}`}
                     className="px-2.5 py-1 bg-white hover:bg-forge-alabaster border border-forge-aluminum text-xs font-mono font-semibold text-forge-black flex items-center gap-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
                   >
-                    <Check className="w-3 h-3" aria-hidden="true" />
+                    <Check className="w-3 h-3 text-forge-orange" aria-hidden="true" />
                     ACKNOWLEDGE
-                  </button>
+                  </MotionButton>
                 ) : (
-                  <span className="text-emerald-800 text-[10px] font-mono font-bold flex items-center gap-1">
-                    <Check className="w-3 h-3" aria-hidden="true" /> VERIFIED
+                  <span className="text-emerald-800 text-[10px] font-mono font-bold flex items-center gap-1 animate-in fade-in duration-200">
+                    <Check className="w-3 h-3 text-emerald-600" aria-hidden="true" /> VERIFIED
                   </span>
                 )}
               </div>

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Search, RefreshCw, Clock, Menu, X, Calendar, ChevronDown, Bell } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { DropdownMotion, MotionIconButton, SPRINGS } from '../../motion';
 import { ConnectionState } from '../../types';
 
 interface TopBarProps {
@@ -121,28 +123,26 @@ export const TopBar: React.FC<TopBarProps> = ({
             >
               <Calendar className="w-3.5 h-3.5 text-forge-steel" aria-hidden="true" />
               <span className="hidden sm:inline font-medium">{selectedTimeframe}</span>
-              <ChevronDown className={`w-3 h-3 text-forge-steel transition-transform ${isTimeframeOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
+              <ChevronDown className={`w-3 h-3 text-forge-steel transition-transform duration-200 ${isTimeframeOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
             </button>
 
-            {isTimeframeOpen && (
-              <div className="absolute right-0 top-full mt-1 w-36 bg-white border border-forge-aluminum shadow-lg z-30 py-1 font-mono text-xs animate-in fade-in duration-150">
-                {timeframes.map((tf) => (
-                  <button
-                    type="button"
-                    key={tf}
-                    onClick={() => {
-                      if (onTimeframeChange) onTimeframeChange(tf);
-                      setIsTimeframeOpen(false);
-                    }}
-                    className={`w-full text-left px-3 py-1.5 hover:bg-forge-alabaster transition-colors ${
-                      selectedTimeframe === tf ? 'text-forge-orange font-bold bg-orange-50/50' : 'text-forge-black'
-                    }`}
-                  >
-                    {tf}
-                  </button>
-                ))}
-              </div>
-            )}
+            <DropdownMotion isOpen={isTimeframeOpen} className="absolute right-0 top-full mt-1 w-36 bg-white border border-forge-aluminum shadow-lg z-30 py-1 font-mono text-xs">
+              {timeframes.map((tf) => (
+                <button
+                  type="button"
+                  key={tf}
+                  onClick={() => {
+                    if (onTimeframeChange) onTimeframeChange(tf);
+                    setIsTimeframeOpen(false);
+                  }}
+                  className={`w-full text-left px-3 py-1.5 transition-colors ${
+                    selectedTimeframe === tf ? 'text-forge-orange font-bold bg-orange-50/70 border-l-2 border-l-forge-orange' : 'text-forge-black hover:bg-forge-alabaster'
+                  }`}
+                >
+                  {tf}
+                </button>
+              ))}
+            </DropdownMotion>
           </div>
 
           {/* Data Freshness Indicator */}
@@ -163,7 +163,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           </div>
 
           {/* Refresh Action */}
-          <button
+          <MotionIconButton
             type="button"
             onClick={onManualRefresh}
             disabled={isRefreshing}
@@ -172,10 +172,10 @@ export const TopBar: React.FC<TopBarProps> = ({
             className="p-2 sm:p-1.5 bg-forge-alabaster hover:bg-forge-aluminum/30 border border-forge-aluminum text-forge-black transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
           >
             <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-forge-orange' : 'text-forge-black'}`} aria-hidden="true" />
-          </button>
+          </MotionIconButton>
 
           {/* Notification Bell (Design element: [ 🔔 1 ]) */}
-          <button
+          <MotionIconButton
             type="button"
             onClick={onExceptionsClick}
             aria-label={`View ${activeExceptionsCount} production alerts and exceptions`}
@@ -184,52 +184,68 @@ export const TopBar: React.FC<TopBarProps> = ({
           >
             <Bell className="w-4 h-4 text-forge-black" aria-hidden="true" />
             {activeExceptionsCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-forge-orange text-white text-[9px] font-mono font-bold rounded-full flex items-center justify-center shadow-sm">
+              <motion.span
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={SPRINGS.snappy}
+                className="absolute -top-1 -right-1 w-4 h-4 bg-forge-orange text-white text-[9px] font-mono font-bold rounded-full flex items-center justify-center shadow-sm"
+              >
                 {activeExceptionsCount}
-              </span>
+              </motion.span>
             )}
-          </button>
+          </MotionIconButton>
 
           {/* User Profile Avatar (Design element: [ AS ]) */}
           <div className="flex items-center pl-1 sm:pl-2 border-l border-forge-aluminum/70">
-            <div
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={SPRINGS.snappy}
               className="w-8 h-8 rounded-full bg-forge-black text-white font-mono font-bold text-xs flex items-center justify-center border border-forge-steel shadow-sm select-none cursor-pointer hover:border-forge-orange transition-colors"
               title="Anirban Sarkar • Lead Production Engineer"
               aria-label="User profile: Anirban Sarkar"
             >
               AS
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>
 
-      {/* Expandable Mobile Search Drawer */}
-      {isMobileSearchOpen && (
-        <div className="p-3 bg-forge-alabaster border-t border-forge-aluminum md:hidden animate-in slide-in-from-top-2 duration-150">
-          <div className="relative">
-            <Search className="w-4 h-4 text-forge-steel absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
-            <input
-              type="text"
-              autoFocus
-              aria-label="Search work orders, spindles, materials, and parts"
-              placeholder="Search orders, spindles, parts, materials..."
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              className="w-full pl-9 pr-8 py-2 bg-white border border-forge-aluminum text-xs font-mono text-forge-black placeholder:text-forge-steel/70 focus:outline-none focus:border-forge-orange"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => onSearchChange('')}
-                aria-label="Clear search input"
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-forge-steel hover:text-forge-black p-1"
-              >
-                <X className="w-3.5 h-3.5" aria-hidden="true" />
-              </button>
-            )}
-          </div>
-        </div>
-      )}
+      {/* Expandable Mobile Search Drawer with AnimatePresence */}
+      <AnimatePresence>
+        {isMobileSearchOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden p-3 bg-forge-alabaster border-t border-forge-aluminum md:hidden"
+          >
+            <div className="relative">
+              <Search className="w-4 h-4 text-forge-steel absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
+              <input
+                type="text"
+                autoFocus
+                aria-label="Search work orders, spindles, materials, and parts"
+                placeholder="Search orders, spindles, parts, materials..."
+                value={searchQuery}
+                onChange={(e) => onSearchChange(e.target.value)}
+                className="w-full pl-9 pr-8 py-2 bg-white border border-forge-aluminum text-xs font-mono text-forge-black placeholder:text-forge-steel/70 focus:outline-none focus:border-forge-orange"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => onSearchChange('')}
+                  aria-label="Clear search input"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-forge-steel hover:text-forge-black p-1"
+                >
+                  <X className="w-3.5 h-3.5" aria-hidden="true" />
+                </button>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 };

@@ -3,6 +3,7 @@ import { ChamferCard } from '../ui/ChamferCard';
 import { RealTimeCosts } from '../../types';
 import { CheckCircle2 } from 'lucide-react';
 import { formatINR } from '../../utils/formatters';
+import { AnimatedHorizontalBar } from '../../motion';
 
 interface RealTimeCostsChartProps {
   costs: RealTimeCosts;
@@ -57,7 +58,7 @@ export const RealTimeCostsChart: React.FC<RealTimeCostsChartProps> = ({ costs })
 
         {/* Clean Bar Visualization */}
         <div className="space-y-3 pt-1">
-          {items.map((item) => {
+          {items.map((item, idx) => {
             const percentage = (item.value / maxCost) * 100;
             return (
               <div key={item.label} className="space-y-1">
@@ -78,11 +79,12 @@ export const RealTimeCostsChart: React.FC<RealTimeCostsChartProps> = ({ costs })
                   aria-label={`${item.label}: ${formatINR(item.value)}`}
                   className="h-4 bg-forge-alabaster border border-forge-aluminum relative overflow-hidden flex items-center"
                 >
-                  <div
-                    className={`h-full ${item.color} transition-all duration-500`}
-                    style={{ width: `${percentage}%` }}
+                  <AnimatedHorizontalBar
+                    widthPercent={percentage}
+                    delay={idx * 0.08}
+                    colorClass={item.color}
                   />
-                  <span className="absolute right-2 font-mono text-[9px] text-forge-steel font-semibold">
+                  <span className="absolute right-2 font-mono text-[9px] text-forge-steel font-semibold pointer-events-none z-10">
                     {((item.value / costs.totalCost) * 100).toFixed(0)}%
                   </span>
                 </div>

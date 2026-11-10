@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ChamferCard } from '../ui/ChamferCard';
+import { AnimatedVerticalBar, ChartTooltipMotion } from '../../motion';
 
 interface DayData {
   day: string;
@@ -77,32 +78,37 @@ export const ProductionTrendChart: React.FC<ProductionTrendChartProps> = ({
                   onBlur={() => setHoveredIndex(null)}
                 >
                   {/* Tooltip */}
-                  {isHovered && (
-                    <div className="absolute -top-11 z-30 bg-forge-black text-white px-2 py-1 text-[10px] font-mono shadow-md border border-forge-aluminum whitespace-nowrap select-none animate-in fade-in duration-150">
-                      <div>
-                        {item.day}: <strong className="text-forge-orange">{item.actual}</strong> / {item.target} pcs
-                      </div>
-                      <div className="text-[9px] text-zinc-300">
-                        {Math.round((item.actual / item.target) * 100)}% of target
-                      </div>
+                  <ChartTooltipMotion
+                    isVisible={isHovered}
+                    className="absolute -top-11 z-30 bg-forge-black text-white px-2 py-1 text-[10px] font-mono shadow-md border border-forge-aluminum whitespace-nowrap select-none pointer-events-none"
+                  >
+                    <div>
+                      {item.day}: <strong className="text-forge-orange">{item.actual}</strong> / {item.target} pcs
                     </div>
-                  )}
+                    <div className="text-[9px] text-zinc-300">
+                      {Math.round((item.actual / item.target) * 100)}% of target
+                    </div>
+                  </ChartTooltipMotion>
 
                   {/* Dual Bar Columns */}
                   <div className="w-full max-w-[28px] sm:max-w-[34px] flex items-end justify-center gap-1 sm:gap-1.5 h-full">
                     {/* Target Bar (Light Aluminum) */}
-                    <div
-                      style={{ height: `${targetHeightPct}%` }}
-                      className="w-1/2 bg-forge-aluminum/80 group-hover:bg-forge-aluminum transition-all duration-200"
-                      aria-hidden="true"
-                    />
+                    <div className="w-1/2 h-full flex items-end">
+                      <AnimatedVerticalBar
+                        heightPercent={targetHeightPct}
+                        delay={idx * 0.04}
+                        colorClass="bg-forge-aluminum/80 group-hover:bg-forge-aluminum"
+                      />
+                    </div>
 
                     {/* Actual Bar (Forge Orange) */}
-                    <div
-                      style={{ height: `${actualHeightPct}%` }}
-                      className="w-1/2 bg-forge-orange group-hover:brightness-110 transition-all duration-200 shadow-sm"
-                      aria-hidden="true"
-                    />
+                    <div className="w-1/2 h-full flex items-end">
+                      <AnimatedVerticalBar
+                        heightPercent={actualHeightPct}
+                        delay={idx * 0.04 + 0.02}
+                        colorClass="bg-forge-orange group-hover:brightness-110 shadow-sm"
+                      />
+                    </div>
                   </div>
 
                   {/* Day Label */}
