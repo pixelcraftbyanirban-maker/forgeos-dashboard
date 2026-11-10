@@ -6,7 +6,7 @@ import { MotionButton } from '../../motion';
 interface DataStatusBannerProps {
   connectionState: ConnectionState;
   lastRefresh: string;
-  onRefresh?: () => void;
+  onRefresh?: (fullSkeleton?: boolean) => void;
   isRefreshing?: boolean;
   delayedCount?: number;
   disconnectedCount?: number;
@@ -61,11 +61,11 @@ export const DataStatusBanner: React.FC<DataStatusBannerProps> = ({
           {onRefresh && (
             <MotionButton
               type="button"
-              onClick={onRefresh}
+              onClick={(e: React.MouseEvent) => onRefresh(e.shiftKey)}
               disabled={isRefreshing}
-              aria-label={isRefreshing ? "Synchronizing telemetry data..." : "Manually synchronize telemetry data"}
+              aria-label={isRefreshing ? "Synchronizing telemetry data..." : "Manually synchronize telemetry data (Shift+Click for skeleton preview)"}
               className="flex items-center gap-1 px-2.5 py-1 bg-white border border-forge-aluminum hover:border-forge-black text-forge-black font-semibold transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
-              title="Manual Poll Sync"
+              title={isRefreshing ? "Synchronizing..." : "Manual Poll Sync (Shift+Click to test skeleton loader)"}
             >
               <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin text-forge-orange' : 'text-forge-steel'}`} aria-hidden="true" />
               <span>SYNC</span>

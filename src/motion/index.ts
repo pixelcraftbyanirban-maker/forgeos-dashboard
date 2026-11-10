@@ -7,3 +7,4 @@ export * from './TableMotion';
 export * from './ModalMotion';
 export * from './DropdownMotion';
 export * from './ButtonMotion';
+export * from './SkeletonMotion';

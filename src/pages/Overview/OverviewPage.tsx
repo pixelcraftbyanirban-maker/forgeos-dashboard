@@ -23,7 +23,7 @@ interface OverviewPageProps {
   onSelectJob: (jobId: string) => void;
   onAcknowledgeException: (id: string) => void;
   onNavigateToTab: (tab: any) => void;
-  onRefresh?: () => void;
+  onRefresh?: (fullSkeleton?: boolean) => void;
   isRefreshing?: boolean;
 }
 

@@ -11,7 +11,7 @@ interface TopBarProps {
   onSearchChange: (q: string) => void;
   connectionState: ConnectionState;
   lastRefresh: string;
-  onManualRefresh: () => void;
+  onManualRefresh: (fullSkeleton?: boolean) => void;
   isRefreshing: boolean;
   activeExceptionsCount: number;
   onExceptionsClick: () => void;
@@ -165,10 +165,10 @@ export const TopBar: React.FC<TopBarProps> = ({
           {/* Refresh Action */}
           <MotionIconButton
             type="button"
-            onClick={onManualRefresh}
+            onClick={(e: React.MouseEvent) => onManualRefresh(e.shiftKey)}
             disabled={isRefreshing}
-            aria-label={isRefreshing ? "Refreshing spindle telemetry data..." : "Refresh telemetry data now"}
-            title="Manual Telemetry Poll"
+            aria-label={isRefreshing ? "Refreshing spindle telemetry data..." : "Refresh telemetry data now (Shift+Click to preview skeleton loader)"}
+            title={isRefreshing ? "Refreshing..." : "Manual Telemetry Poll (Shift+Click to test skeleton loader)"}
             className="p-2 sm:p-1.5 bg-forge-alabaster hover:bg-forge-aluminum/30 border border-forge-aluminum text-forge-black transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
           >
             <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-forge-orange' : 'text-forge-black'}`} aria-hidden="true" />

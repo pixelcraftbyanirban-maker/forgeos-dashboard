@@ -9,7 +9,7 @@ import { ReportsPage } from './pages/Reports/ReportsPage';
 import { InventoryPage } from './pages/Inventory/InventoryPage';
 import { OperatorConsolePage } from './pages/Operator/OperatorConsolePage';
 import { DetailDrawer } from './components/ui/DetailDrawer';
-import { PageTransition } from './motion';
+import { PageTransition, DashboardSkeleton } from './motion';
 import {
   INITIAL_MACHINES,
   INITIAL_JOBS,
@@ -29,6 +29,15 @@ export const App: React.FC = () => {
   const [connectionState] = useState<ConnectionState>('CURRENT');
   const [lastRefresh, setLastRefresh] = useState('14:30:00 IST');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Initial MTConnect stream connection simulation with skeleton loading effect
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 650);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Inspector Drawer State
   const [selectedMachine, setSelectedMachine] = useState<Machine | null>(null);
@@ -52,7 +61,14 @@ export const App: React.FC = () => {
   );
 
   // Handle manual refresh / polling simulation
-  const handleManualRefresh = () => {
+  const handleManualRefresh = (fullSkeleton = false) => {
+    if (fullSkeleton) {
+      setIsLoading(true);
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 700);
+      return;
+    }
     setIsRefreshing(true);
     setTimeout(() => {
       // Simulate slight realistic telemetry fluctuations (RPM, OEE)
@@ -167,62 +183,68 @@ export const App: React.FC = () => {
         isRefreshing={isRefreshing}
         activeExceptionsCount={activeExceptionsCount}
       >
-        <PageTransition pageKey={currentTab}>
-          {currentTab === 'overview' && (
-            <OverviewPage
-              kpis={kpis}
-              machines={filteredMachines}
-              jobs={filteredJobs}
-              exceptions={exceptions}
-              auditHistory={INITIAL_AUDIT_HISTORY}
-              onSelectMachine={handleSelectMachine}
-              onSelectJob={handleSelectJob}
-              onAcknowledgeException={handleAcknowledgeException}
-              onNavigateToTab={setCurrentTab}
-              onRefresh={handleManualRefresh}
-              isRefreshing={isRefreshing}
-            />
-          )}
+        <PageTransition pageKey={isLoading ? 'loading-skeleton' : currentTab}>
+          {isLoading ? (
+            <DashboardSkeleton />
+          ) : (
+            <>
+              {currentTab === 'overview' && (
+                <OverviewPage
+                  kpis={kpis}
+                  machines={filteredMachines}
+                  jobs={filteredJobs}
+                  exceptions={exceptions}
+                  auditHistory={INITIAL_AUDIT_HISTORY}
+                  onSelectMachine={handleSelectMachine}
+                  onSelectJob={handleSelectJob}
+                  onAcknowledgeException={handleAcknowledgeException}
+                  onNavigateToTab={setCurrentTab}
+                  onRefresh={handleManualRefresh}
+                  isRefreshing={isRefreshing}
+                />
+              )}
 
-          {(currentTab === 'production' || currentTab === 'orders') && (
-            <ProductionPage
-              jobs={filteredJobs}
-              onSelectJob={handleSelectJob}
-            />
-          )}
+              {(currentTab === 'production' || currentTab === 'orders') && (
+                <ProductionPage
+                  jobs={filteredJobs}
+                  onSelectJob={handleSelectJob}
+                />
+              )}
 
-          {currentTab === 'machines' && (
-            <MachinesPage
-              machines={filteredMachines}
-              onSelectMachine={handleSelectMachine}
-            />
-          )}
+              {currentTab === 'machines' && (
+                <MachinesPage
+                  machines={filteredMachines}
+                  onSelectMachine={handleSelectMachine}
+                />
+              )}
 
-          {(currentTab === 'exceptions' || currentTab === 'quality') && (
-            <ExceptionsPage
-              exceptions={exceptions}
-              onAcknowledge={handleAcknowledgeException}
-              onSelectMachine={handleSelectMachine}
-              onSelectJob={handleSelectJob}
-            />
-          )}
+              {(currentTab === 'exceptions' || currentTab === 'quality') && (
+                <ExceptionsPage
+                  exceptions={exceptions}
+                  onAcknowledge={handleAcknowledgeException}
+                  onSelectMachine={handleSelectMachine}
+                  onSelectJob={handleSelectJob}
+                />
+              )}
 
-          {currentTab === 'inventory' && (
-            <InventoryPage />
-          )}
+              {currentTab === 'inventory' && (
+                <InventoryPage />
+              )}
 
-          {currentTab === 'operator' && (
-            <OperatorConsolePage
-              machines={machines}
-              jobs={jobs}
-              onSelectMachine={handleSelectMachine}
-            />
-          )}
+              {currentTab === 'operator' && (
+                <OperatorConsolePage
+                  machines={machines}
+                  jobs={jobs}
+                  onSelectMachine={handleSelectMachine}
+                />
+              )}
 
-          {currentTab === 'reports' && (
-            <ReportsPage
-              auditHistory={INITIAL_AUDIT_HISTORY}
-            />
+              {currentTab === 'reports' && (
+                <ReportsPage
+                  auditHistory={INITIAL_AUDIT_HISTORY}
+                />
+              )}
+            </>
           )}
         </PageTransition>
       </AppShell>

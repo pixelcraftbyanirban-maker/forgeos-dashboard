@@ -14,7 +14,7 @@ interface AppShellProps {
   onSearchChange: (q: string) => void;
   connectionState: ConnectionState;
   lastRefresh: string;
-  onManualRefresh: () => void;
+  onManualRefresh: (fullSkeleton?: boolean) => void;
   isRefreshing: boolean;
   activeExceptionsCount: number;
 }
