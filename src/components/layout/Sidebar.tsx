@@ -12,6 +12,7 @@ import {
   ChevronRight,
   Terminal,
   User,
+  LogOut,
   X 
 } from 'lucide-react';
 import { Logo } from '../ui/Logo';
@@ -37,6 +38,7 @@ interface SidebarProps {
   onCloseMobile?: () => void;
   currentRole?: UserRole;
   onRoleChange?: (role: UserRole) => void;
+  onSignOut?: () => void;
 }
 
 export const ROLE_PERSONNEL: Record<UserRole, { name: string; title: string }> = {
@@ -55,7 +57,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isMobile = false,
   onCloseMobile,
   currentRole = 'PRODUCTION_MANAGER',
-  onRoleChange
+  onRoleChange,
+  onSignOut
 }) => {
   const [activeRole, setActiveRole] = useState<UserRole>(currentRole);
 
@@ -236,6 +239,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <Settings className="w-3.5 h-3.5" aria-hidden="true" />
           <span className="uppercase">Shop Settings</span>
         </button>
+
+        {/* Lock Terminal / Sign Out */}
+        {onSignOut && (
+          <button
+            type="button"
+            onClick={onSignOut}
+            aria-label="Lock terminal and sign out to 3D entrance"
+            className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-forge-orange hover:text-white hover:bg-forge-orange/20 border border-forge-orange/30 font-mono text-[11px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-orange"
+          >
+            <LogOut className="w-3.5 h-3.5" aria-hidden="true" />
+            <span className="uppercase">LOCK TERMINAL // GATEWAY</span>
+          </button>
+        )}
       </div>
     </aside>
   );

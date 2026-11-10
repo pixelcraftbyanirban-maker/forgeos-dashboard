@@ -18,8 +18,11 @@ import {
   INITIAL_AUDIT_HISTORY
 } from './data/mockData';
 import { Machine, Job, ProductionException, FactoryKPIs, ConnectionState } from './types';
+import { FactoryLoginExperience } from './components/auth/FactoryLoginExperience';
 
 export const App: React.FC = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [activeOperator, setActiveOperator] = useState('Arindam Chatterjee (Prod. Mgr)');
   const [currentTab, setCurrentTab] = useState<NavTab>('overview');
   const [searchQuery, setSearchQuery] = useState('');
   const [machines, setMachines] = useState<Machine[]>(INITIAL_MACHINES);
@@ -136,11 +139,23 @@ export const App: React.FC = () => {
 
   const activeExceptionsCount = exceptions.filter((e) => !e.acknowledged).length;
 
+  if (!isAuthenticated) {
+    return (
+      <FactoryLoginExperience
+        onAuthenticated={(operatorId) => {
+          setActiveOperator(operatorId || 'Arindam Chatterjee (Prod. Mgr)');
+          setIsAuthenticated(true);
+        }}
+      />
+    );
+  }
+
   return (
     <>
       <AppShell
         currentTab={currentTab}
         onTabChange={setCurrentTab}
+        onSignOut={() => setIsAuthenticated(false)}
         title={
           currentTab === 'overview'
             ? 'Shop-Floor Overview'
@@ -160,7 +175,7 @@ export const App: React.FC = () => {
         }
         subtitle={
           currentTab === 'overview'
-            ? 'Real-time performance across machines, jobs, and production.'
+            ? `Active Terminal: ${activeOperator} • Real-time performance across machines, jobs, and production.`
             : currentTab === 'orders'
             ? 'Work Order Routing, Part Allocation & Batch Progress'
             : currentTab === 'production'

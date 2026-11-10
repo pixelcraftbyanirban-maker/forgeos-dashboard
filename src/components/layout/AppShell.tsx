@@ -17,6 +17,7 @@ interface AppShellProps {
   onManualRefresh: (fullSkeleton?: boolean) => void;
   isRefreshing: boolean;
   activeExceptionsCount: number;
+  onSignOut?: () => void;
 }
 
 export const AppShell: React.FC<AppShellProps> = ({
@@ -31,7 +32,8 @@ export const AppShell: React.FC<AppShellProps> = ({
   lastRefresh,
   onManualRefresh,
   isRefreshing,
-  activeExceptionsCount
+  activeExceptionsCount,
+  onSignOut
 }) => {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
@@ -75,6 +77,7 @@ export const AppShell: React.FC<AppShellProps> = ({
             currentTab={currentTab}
             onTabChange={onTabChange}
             exceptionsCount={activeExceptionsCount}
+            onSignOut={onSignOut}
           />
         </div>
 
@@ -89,6 +92,7 @@ export const AppShell: React.FC<AppShellProps> = ({
             exceptionsCount={activeExceptionsCount}
             isMobile={true}
             onCloseMobile={() => setIsMobileNavOpen(false)}
+            onSignOut={onSignOut}
           />
         </MobileSidebarDrawer>
 
